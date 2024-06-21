@@ -9,6 +9,12 @@ const LLM_STREAMING = process.env.LLM_STREAMING !== 'no';
 
 const LLM_DEBUG = process.env.LLM_DEBUG;
 
+const NORMAL = '\x1b[0m';
+const YELLOW = '\x1b[93m';
+const GREEN = '\x1b[92m';
+const CYAN = '\x1b[36m';
+const GRAY = '\x1b[90m';
+
 /**
  * Represents a chat message.
  *
@@ -123,7 +129,7 @@ const chat = async (messages, handler) => {
 const SYSTEM_PROMPT = 'Answer the question politely and concisely.';
 
 (async () => {
-    console.log(`Using LLM at ${LLM_API_BASE_URL} (model: ${LLM_CHAT_MODEL || 'default'}).`);
+    console.log(`Using LLM at ${LLM_API_BASE_URL} (model: ${GREEN}${LLM_CHAT_MODEL || 'default'}${NORMAL}).`);
     console.log('Press Ctrl+D to exit.')
     console.log();
 
@@ -135,7 +141,7 @@ const SYSTEM_PROMPT = 'Answer the question politely and concisely.';
     io.on('close', () => { loop = false; });
 
     const qa = () => {
-        io.question('>> ', async (question) => {
+        io.question(`${YELLOW}>> ${CYAN}`, async (question) => {
             process.stdout.write(NORMAL);
             messages.push({ role: 'user', content: question });
             const start = Date.now();
@@ -143,7 +149,7 @@ const SYSTEM_PROMPT = 'Answer the question politely and concisely.';
             messages.push({ role: 'assistant', content: answer.trim() });
             console.log();
             const elapsed = Date.now() - start;
-            LLM_DEBUG && console.log(`[${elapsed} ms]`);
+            LLM_DEBUG && console.log(`${GRAY}[${elapsed} ms]${NORMAL}`);
             console.log();
             loop && qa();
         })
