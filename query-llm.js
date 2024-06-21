@@ -15,6 +15,7 @@ const MAGENTA = '\x1b[35m';
 const GREEN = '\x1b[92m';
 const CYAN = '\x1b[36m';
 const GRAY = '\x1b[90m';
+const ARROW = '⇢';
 
 /**
  * Represents a chat message.
@@ -185,6 +186,45 @@ const reply = async (context) => {
  * @property {Object.<string, function>} delegates - Impure functions to access the outside world.
  */
 
+
+/**
+ * Prints the pipeline stages, mostly for troubleshooting.
+ *
+ * @param {Array<Stage>} stages
+ */
+const review = (stages) => {
+    console.log();
+    console.log(`${MAGENTA}Pipeline review ${NORMAL}`);
+    console.log('---------------');
+    stages.map((stage, index) => {
+        const { name, duration, timestamp, ...fields } = stage;
+        console.log(`${GREEN}${ARROW} Stage #${index + 1} ${YELLOW}${name} ${GRAY}[${duration} ms]${NORMAL}`);
+        Object.keys(fields).map(key => {
+            console.log(`${GRAY}${key}: ${NORMAL}${fields[key]}`);
+        });
+    });
+    console.log();
+}
+
+/**
+ * Collapses every pair of stages (enter and leave) into one stage,
+ * and compute its duration instead of invididual timestamps.
+ *
+ * @param {Array<object} stage
+ * @returns {Array<object>}
+ */
+const simplify = (stages) => {
+    const isOdd = (x) => { return (x % 2) !== 0 };
+    return stages.map((stage, index) => {
+        if (isOdd(index)) {
+            const before = stages[index - 1];
+            const duration = stage.timestamp - before.timestamp;
+            return { ...stage, duration };
+        }
+        return stage;
+    }).filter((_, index) => isOdd(index));
+}
+
 const interact = async () => {
     const history = [];
     const stream = (text) => process.stdout.write(text);
@@ -196,18 +236,29 @@ const interact = async () => {
     const qa = () => {
         io.question(`${YELLOW}>> ${CYAN}`, async (inquiry) => {
             process.stdout.write(NORMAL);
-            const stages = [];
-            const enter = (name) => { stages.push({ name, timestamp: Date.now() }) };
-            const leave = (name, fields) => { stages.push({ name, timestamp: Date.now(), ...fields }) };
-            const delegates = { stream, enter, leave };
-            const context = { inquiry, history, delegates };
-            const start = Date.now();
-            const result = await reply(context);
-            const duration = Date.now() - start;
-            const { answer } = result;
-            history.push({ inquiry, answer, duration, stages });
-            console.log();
-            console.log();
+            if (inquiry === '!review' || inquiry === '/review') {
+                const last = history.slice(-1).pop();
+                if (!last) {
+                    console.log('Nothing to review yet!');
+                    console.log();
+                } else {
+                    const { stages } = last;
+                    review(simplify(stages));
+                }
+
+            } else {
+                const stages = [];
+                const enter = (name) => { stages.push({ name, timestamp: Date.now() }) };
+                const leave = (name, fields) => { stages.push({ name, timestamp: Date.now(), ...fields }) };
+                const delegates = { stream, enter, leave };
+                const context = { inquiry, history, delegates };
+                const start = Date.now();
+                const result = await reply(context);
+                const duration = Date.now() - start;
+                const { answer } = result;
+                history.push({ inquiry, answer, duration, stages });
+                console.log();
+            }
             loop && qa();
         })
     }
