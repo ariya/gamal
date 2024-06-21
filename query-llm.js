@@ -7,10 +7,11 @@ const LLM_API_KEY = process.env.LLM_API_KEY || process.env.OPENAI_API_KEY;
 const LLM_CHAT_MODEL = process.env.LLM_CHAT_MODEL;
 const LLM_STREAMING = process.env.LLM_STREAMING !== 'no';
 
-const LLM_DEBUG = process.env.LLM_DEBUG;
+const LLM_DEBUG_CHAT = process.env.LLM_DEBUG_CHAT;
 
 const NORMAL = '\x1b[0m';
 const YELLOW = '\x1b[93m';
+const MAGENTA = '\x1b[35m';
 const GREEN = '\x1b[92m';
 const CYAN = '\x1b[36m';
 const GRAY = '\x1b[90m';
@@ -56,6 +57,10 @@ const chat = async (messages, handler) => {
         throw new Error(`HTTP error with the status: ${response.status} ${response.statusText}`);
     }
 
+    LLM_DEBUG_CHAT && messages.forEach(({ role, content }) => {
+        console.log(`${MAGENTA}${role}:${NORMAL} ${content}`);
+    });
+
     if (!stream) {
         const data = await response.json();
         const { choices } = data;
@@ -64,6 +69,7 @@ const chat = async (messages, handler) => {
         const { content } = message;
         const answer = content.trim();
         handler && handler(answer);
+        LLM_DEBUG_CHAT && console.log(`${YELLOW}${answer}${NORMAL}`);
         return answer;
     }
 
