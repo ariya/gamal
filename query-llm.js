@@ -123,7 +123,7 @@ const chat = async (messages, handler) => {
 const SYSTEM_PROMPT = 'Answer the question politely and concisely.';
 
 (async () => {
-    console.log(`Using LLM at ${LLM_API_BASE_URL}.`);
+    console.log(`Using LLM at ${LLM_API_BASE_URL} (model: ${LLM_CHAT_MODEL || 'default'}).`);
     console.log('Press Ctrl+D to exit.')
     console.log();
 
