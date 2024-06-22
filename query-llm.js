@@ -7,15 +7,26 @@ const LLM_API_KEY = process.env.LLM_API_KEY || process.env.OPENAI_API_KEY;
 const LLM_CHAT_MODEL = process.env.LLM_CHAT_MODEL;
 const LLM_STREAMING = process.env.LLM_STREAMING !== 'no';
 
+const LLM_ZERO_SHOT = process.env.LLM_ZERO_SHOT;
 const LLM_DEBUG_CHAT = process.env.LLM_DEBUG_CHAT;
 
 const NORMAL = '\x1b[0m';
+const BOLD = '\x1b[1m';
 const YELLOW = '\x1b[93m';
 const MAGENTA = '\x1b[35m';
 const GREEN = '\x1b[92m';
 const CYAN = '\x1b[36m';
 const GRAY = '\x1b[90m';
 const ARROW = '⇢';
+
+/**
+ * Creates a new function by chaining multiple async functions from left to right.
+ *
+ * @param  {...any} fns - Functions to chain
+ * @returns {function}
+ */
+const pipe = (...fns) => arg => fns.reduce((d, fn) => d.then(fn), Promise.resolve(arg));
+
 
 /**
  * Represents a chat message.
@@ -45,7 +56,7 @@ const chat = async (messages, handler) => {
     const url = `${LLM_API_BASE_URL}/chat/completions`;
     const auth = LLM_API_KEY ? { 'Authorization': `Bearer ${LLM_API_KEY}` } : {};
     const model = LLM_CHAT_MODEL || 'gpt-3.5-turbo';
-    const stop = ['<|im_end|>', '<|end|>', '<|eot_id|>'];
+    const stop = ['<|im_end|>', '<|end|>', '<|eot_id|>', '<|end_of_turn|>', 'INQUIRY: '];;
     const max_tokens = 400;
     const temperature = 0;
     const stream = LLM_STREAMING && typeof handler === 'function';
@@ -167,6 +178,54 @@ const reply = async (context) => {
     return { answer, ...context };
 }
 
+const PREDEFINED_KEYS = ['INQUIRY', 'TOOL', 'THOUGHT', 'KEYPHRASES', 'OBSERVATION', 'TOPIC'];
+
+/**
+ * Break downs a multi-line text based on a number of predefined keys.
+ *
+ * @param {string} text
+ * @returns {Array<string>}
+ */
+
+const deconstruct = (text, markers = PREDEFINED_KEYS) => {
+    const parts = {};
+    const keys = [...markers].reverse();
+    const anchor = markers.slice().pop();
+    const start = text.lastIndexOf(anchor + ':');
+    if (start >= 0) {
+        parts[anchor.toLowerCase()] = text.substring(start).replace(anchor + ':', '').trim();
+        let str = text.substring(0, start);
+        for (let i = 0; i < keys.length; ++i) {
+            const marker = keys[i];
+            const pos = str.lastIndexOf(marker + ':');
+            if (pos >= 0) {
+                const substr = str.substr(pos + marker.length + 1).trim();
+                const value = substr.split('\n').shift();
+                str = str.slice(0, pos);
+                const key = marker.toLowerCase();
+                parts[key] = value;
+            }
+        }
+    }
+    return parts;
+}
+
+/**
+ * Constructs a multi-line text based on a number of key-value pairs.
+ *
+ * @param {Object} key-value pairs
+ * @return {text}
+ */
+const construct = (kv) => {
+    return PREDEFINED_KEYS.filter(key => kv[key.toLowerCase()]).map(key => {
+        const value = kv[key.toLowerCase()];
+        if (value && value.length > 0) {
+            return `${key.toUpperCase()}: ${value}`;
+        }
+        return null;
+    }).join('\n');
+}
+
 /**
  * Represents the record of an atomic processing.
  *
@@ -182,10 +241,122 @@ const reply = async (context) => {
  * @typedef {Object} Context
  * @property {Array<object>} history
  * @property {string} inquiry
+ * @property {string} thought
+ * @property {string} keyphrases
+ * @property {string} observation
  * @property {string} answer
  * @property {Object.<string, function>} delegates - Impure functions to access the outside world.
  */
 
+/**
+ * Performs a basic step-by-step reasoning, in the style of Chain of Thought.
+ * The updated context will contains new information such as `keyphrases` and `observation`.
+ *
+ * @param {Context} context - Current pipeline context.
+ * @returns {Context} Updated pipeline context.
+ */
+
+const REASON_PROMPT = `Use Google to search for the answer.
+Think step by step. Always output your thought in the following format:
+
+TOOL: the search engine to use (must be Google).
+THOUGHT: describe your thoughts about the inquiry.
+KEYPHRASES:  the important key phrases to search for.
+OBSERVATION: the concise result of the search tool.
+TOPIC: the specific topic covering the inquiry.`;
+
+const REASON_EXAMPLE = `
+
+# Example
+
+Given an inquiry "What is Pitch Lake in Trinidad famous for?", you will output:
+
+TOOL: Google.
+THOUGHT: This is about geography, I will use Google search.
+KEYPHRASES: Pitch Lake in Trinidad fame.
+OBSERVATION: Pitch Lake in Trinidad is the largest natural deposit of asphalt.
+TOPIC: geography.`;
+
+const reason = async (context) => {
+    const { history, delegates } = context;
+    const { enter, leave } = delegates;
+    enter && enter('Reason');
+
+    const relevant = history.slice(-3);
+    let prompt = REASON_PROMPT;
+    if (relevant.length === 0) {
+        prompt += REASON_EXAMPLE;
+    }
+
+    const messages = [];
+    messages.push({ role: 'system', content: prompt });
+    relevant.forEach(msg => {
+        const { inquiry, topic, thought, keyphrases, answer } = msg;
+        const observation = answer;
+        messages.push({ role: 'user', content: inquiry });
+        const assistant = construct({ tool: 'Google.', thought, keyphrases, observation, topic });
+        messages.push({ role: 'assistant', content: assistant });
+    });
+
+    const { inquiry } = context;
+    messages.push({ role: 'user', content: inquiry });
+    const hint = ['TOOL: Google.', 'THOUGHT: '].join('\n');
+    messages.push({ role: 'assistant', content: hint });
+    const completion = await chat(messages);
+    let result = deconstruct(hint + completion);
+    if (!result.observation) {
+        result = deconstruct(hint + completion + '\n' + 'TOPIC: general knowledge.');
+    }
+    const { topic, thought, keyphrases, observation } = result;
+    leave && leave('Reason', { topic, thought, keyphrases, observation });
+    return { topic, thought, keyphrases, observation, ...context };
+}
+
+/**
+ * Responds to the user's recent message using an LLM.
+ * The response from the LLM is available as `answer` in the updated context.
+ *
+ * @param {Context} context - Current pipeline context.
+ * @returns {Context} Updated pipeline context.
+ */
+
+const RESPOND_PROMPT = `You are an assistant for question-answering tasks.
+You are digesting the most recent user's inquiry, thought, and observation.
+Your task is to use the observation to answer the inquiry politely and concisely.
+You may need to refer to the user's conversation history to understand some context.
+There is no need to mention "based on the observation" or "based on the previous conversation" in your answer.
+Your answer is in simple English, and at max 3 sentences.
+Do not make any apology or other commentary.
+Do not use other sources of information, including your memory.
+Do not make up new names or come up with new facts.`;
+
+const respond = async (context) => {
+    const { history, delegates } = context;
+    const { enter, leave, stream } = delegates;
+    enter && enter('Respond');
+
+    let prompt = RESPOND_PROMPT;
+    const relevant = history.slice(-2);
+    if (relevant.length > 0) {
+        prompt += '\n';
+        prompt += '\n';
+        prompt += 'For your reference, you and the user have the following Q&A discussion:\n';
+        relevant.forEach(msg => {
+            const { inquiry, answer } = msg;
+            prompt += `* ${inquiry} ${answer}\n`;
+        });
+    }
+
+    const messages = [];
+    messages.push({ role: 'system', content: prompt });
+    const { inquiry, thought, observation } = context;
+    messages.push({ role: 'user', content: construct({ inquiry, thought, observation }) });
+    messages.push({ role: 'assistant', content: 'ANSWER: ' });
+    const answer = await chat(messages, stream);
+
+    leave && leave('Respond', { inquiry, thought, observation, answer });
+    return { answer, ...context };
+}
 
 /**
  * Prints the pipeline stages, mostly for troubleshooting.
@@ -248,15 +419,26 @@ const interact = async () => {
 
             } else {
                 const stages = [];
+                const update = (stage, fields) => {
+                    if (stage === 'Reason') {
+                        const { keyphrases } = fields;
+                        if (keyphrases && keyphrases.length > 0) {
+                            console.log(`${GRAY}${ARROW} Searching for ${keyphrases}...${NORMAL}`);
+                        }
+                    }
+                }
                 const enter = (name) => { stages.push({ name, timestamp: Date.now() }) };
-                const leave = (name, fields) => { stages.push({ name, timestamp: Date.now(), ...fields }) };
+                const leave = (name, fields) => { update(name, fields); stages.push({ name, timestamp: Date.now(), ...fields }) };
                 const delegates = { stream, enter, leave };
                 const context = { inquiry, history, delegates };
                 const start = Date.now();
-                const result = await reply(context);
+                const pipeline = LLM_ZERO_SHOT ? reply : pipe(reason, respond);
+                const result = await pipeline(context);
+                const { topic, thought, keyphrases } = result;
                 const duration = Date.now() - start;
+                // console.log({ result });
                 const { answer } = result;
-                history.push({ inquiry, answer, duration, stages });
+                history.push({ inquiry, thought, keyphrases, topic, answer, duration, stages });
                 console.log();
             }
             loop && qa();
