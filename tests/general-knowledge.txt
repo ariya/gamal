@@ -1,0 +1,177 @@
+Story: Science
+
+User: Name 2 scientists who developed modern calculus
+Assistant: /Newton/ and /Leibniz/ are credited with the development of modern calculus.
+Pipeline.Reason.Keyphrases: /calculus/
+
+User: Who described the mathematics of information theory?
+Assistant: Claude /Shannon/ described the mathematics of information theory in 1948.
+Pipeline.Reason.Keyphrases: /information|communication/ /theory/
+
+User: Who came up with the special theory of relativity?
+Assistant: The special theory of relativity was developed by Albert /Einstein/.
+Pipeline.Reason.Keyphrases: /relativity/
+
+User: Which Persian scientist authored the Canon of Medicine?
+Assistant: The Canon of Medicine was written by the Persian scientist /Avicenna|Sina/.
+Pipeline.Reason.Keyphrases: /Canon of Medicine|Persia(n)?/
+
+User: What is the atomic number of Magnesium?
+Assistant: /twelve|12/
+Pipeline.Reason.Keyphrases: /Magnesium/
+
+User: Which branch of math deals with shapes and structures?
+Assistant: The branch of mathematics that focuses on shapes and structures is known as /geometry|topology/.
+Pipeline.Reason.Keyphrases: /math(ematics)?|geometry|topology/
+
+User: Which materials compose the gas giants in our solar system?
+Assistant: The gas giants in our solar system are primarily composed of /hydrogen/ and /helium/.
+Pipeline.Reason.Keyphrases: /composition|material| /gas giants/
+
+Story: Geography
+
+User: Which Nordic country is known for IKEA
+Assistant: IKEA is a /Sweden|Swedish/ company.
+Pipeline.Reason.Keyphrases: /IKEA/
+
+User: Which continent consists mostly of ice??
+Assistant: /Antarctic(a)?|Arctic/ is the continent that consists mostly of ice.
+Pipeline.Reason.Keyphrases: /continent|ice|icy|cold|temperature|freez/
+
+User: What is the longest river in the whole of Latin America?
+Assistant: The /Amazon/ river is the longest river in Latin America.
+Pipeline.Reason.Keyphrases: /river/ /America/
+
+User: In which country do we find kangoroo?
+Assistant: Kangoroos are predominantly found in /Australia/.
+Pipeline.Reason.Keyphrases: /kangaroo(s)?/
+
+User: Which US state is most populated?
+Assistant: /California/ is currently the most populated state in the United States.
+Pipeline.Reason.Keyphrases: /population|populous|populated/ /state/
+
+User: What is the capital of Indonesia?
+Assistant: The capital of Indonesia is /Jakarta/.
+Pipeline.Reason.Keyphrases: /capital/ /Indonesia(n)?/
+
+User: Where is the capital of East Java?
+Assistant: The capital of East Java is /Surabaya/.
+Pipeline.Reason.Keyphrases: /capital/ /East Java/
+
+Story: Trivia
+
+User: Name Indonesia's top tourist destination, known as the island of Gods!
+Assistant: /Bali/ is recognized as Indonesia's premier destination for tourists.
+Pipeline.Reason.Keyphrases: /island|destination|tourist|tourism|top/ /Indonesia/
+
+User: What is the favorite sport in India?
+Assistant: /Cricket/ is India's most beloved sport.
+Pipeline.Reason.Keyphrases: /sport/ /India/
+
+User: Which continent is the coldest?
+Assistant: /Antarctica/ is considered as the coldest continent.
+Pipeline.Reason.Keyphrases: /continent/ /cold(est)?/
+
+User: In which country Mandarin is spoken?
+Assistant: Mandarin is the official language of /China/.
+Pipeline.Reason.Keyphrases: /country|countries|language|spoken|speaking/ /Mandarin/
+
+User: Name the big desert close to Mongolia
+Assistant: The /Gobi/ desert is a large desert located near Mongolia.
+Pipeline.Reason.Keyphrases: /desert/ /Mongolia/
+
+User: Name the no 1 tallest building in the Middle East
+Assistant: The /Burj Khalifa/ in Dubai, UAE, is the tallest building in the Middle East.
+Pipeline.Reason.Keyphrases: /building/ /Middle East/
+
+User: Which country is famous for its pyramids?
+Assistant: /Egypt/ is well-known for its pyramids, particulary the Giza Pyramid.
+Pipeline.Reason.Keyphrases: /pyramid/
+
+Story:  Famous people
+User: Who wrote the poems in Masnavi?
+Assistant: The poems in Masnavi were written by the Persian poet, /Rumi|Jalal/.
+Pipeline.Reason.Keyphrases: /author|poet|poem/ /Masnavi/
+
+User: Who was the first President of USA?
+Assistant: George /Washington/ was the first US president, serving from 1789 to 1797.
+Pipeline.Reason.Keyphrases: /first/ /president/ /US(A)?|America|United States/
+
+User: Who sailed with the flagship Santa Maria on the New World voyage?
+Assistant: Christopher /Columbus/ captained the flagship Santa Maria.
+Pipeline.Reason.Keyphrases: /Santa Maria|Columbus/
+
+User: Who is the author of LISP?
+Assistant: John /Mc\s?Carthy/ invented LISP in 1958 at the MIT.
+Pipeline.Reason.Keyphrases: /LISP/
+
+User: Who painted Mona Lisa?
+Assistant: The Mona Lisa was painted by the renowned Italian polymath, Leonardo /da Vinci/.
+Pipeline.Reason.Keyphrases: /Mona Lisa/
+
+User: Who led the revolution in South Africa
+Assistant: The revolution in South Africa was led by the iconic activitist, Nelson /Mandela/.
+Pipeline.Reason.Keyphrases: /South Africa|apartheid|leader/
+
+User: Who was Britain PM who rallied the British folks during WW 2?
+Assistant: During World War II, Winston /Churchill/ served as the Prime Minister of Britain.
+Pipeline.Reason.Keyphrases: /PM|Prime Minister/
+
+Story: Cuisine
+User: Where is the origin of Biryani: India or Ireland?
+Assistant: Biryani originated from /India/.
+Pipeline.Reason.Keyphrases: /biryani/
+
+User: What is the green paste used with sushi?
+Assistant: The green paste served with sushi is known as /wasabi/.
+Pipeline.Reason.Keyphrases: /green|wasabi/ /paste/
+
+User: Where is Nasi Lemak originated?
+Assistant: Nasi Lemak is a traditional dish from /Malaysia|Malay/.
+Pipeline.Reason.Keyphrases: /Nasi Lemak/
+
+User: Name some common patties for burger!
+Assistant: Common patty fillings for burgers include /beef|chicken|turkey|veggie|fish|salmon/.
+Pipeline.Reason.Keyphrases: /patties|patty/ /burger/
+
+User: Who created KFC?
+Assistant: Colonel Harland /Sanders/ created KFC in 1952.
+Pipeline.Reason.Keyphrases: /KFC/chicken/
+
+User: Is ramen typically eaten in Egypt or Japan?
+Assistant: Ramen is typically eaten in /Japan/.
+Pipeline.Reason.Keyphrases: /ramen/
+
+User: What is the main ingredient of Nasi Goreng?
+Assistant: Preparing Nasi Goreng involves some /rice|egg(s)?|soy sauce|kecap/.
+Pipeline.Reason.Keyphrases: /Nasi Goreng/
+
+Story: Movies
+
+User: In Star Trek, what is Captain Kirk’s first name?
+Assistant: Captain Kirk's first name is /James|Jim/.
+Pipeline.Reason.Keyphrases: /Kirk|Star Trek/
+
+User: What is the name of that well-known spacecraft from Hans Solo?
+Assistant: That would be the Millennium /Falcon/.
+Pipeline.Reason.Keyphrases: /Solo|spacecraft|spaceship|Falcon/
+
+User: What is name of the fictional spy 007?
+Assistant: The name of the fictional spy known as 007 is /Bond|James/.
+Pipeline.Reason.Keyphrases: /007|Bond/
+
+User: Who directed the Dark Knight movie?
+Assistant: The Dark Knight movie was directed by Christopher /Nolan/.
+Pipeline.Reason.Keyphrases: /Dark Knight|Batman/
+
+User: Who is Spiderman real name?
+Assistant: The real name of Spiderman is Peter /Parker/.
+Pipeline.Reason.Keyphrases: /Spider-?man/
+
+User: Which fictional metal is infused into Wolverine body?
+Assistant: The metal infused into Wolverine's body is /adamantium/.
+Pipeline.Reason.Keyphrases: /Wolverine/
+
+User: In Aladdin movie, name the princess!
+Assistant: Princess /Jasmine/.
+Pipeline.Reason.Keyphrases: /Aladdin/
