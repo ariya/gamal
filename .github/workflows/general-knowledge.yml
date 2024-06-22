@@ -8,6 +8,7 @@ jobs:
     runs-on: ubuntu-22.04
     timeout-minutes: 10
     strategy:
+      max-parallel: 3
       fail-fast: false
       matrix:
         model:
