@@ -1,0 +1,29 @@
+Story: High-school STEM questions
+
+User: What is the force that pulls objects towards the center of the Earth?
+Assistant: The force that pulls object towards the center of the Earth is known as /gravit[y|tation]/.
+Pipeline.Reason.Keyphrases: /force|gravity|Earth/
+
+User: What is the atomic number of carbon?
+Assistant: The atomatic number of carbon is /6|six/.
+Pipeline.Reason.Keyphrases: /carbon/
+
+User: What is the process by which plants make their own food?
+Assistant: Plants make their own food using /photosynthesis/.
+Pipeline.Reason.Keyphrases: /plant|photosynthesis/
+
+User: What is the sum (in degrees) of the interior angles of a triangle?
+Assistant: /180/ degrees.
+Pipeline.Reason.Keyphrases: /angles/ /triangle/
+
+User: What is the unit for measuring force?
+Assistant: The standard unit for measuring force is called a /Newton/ (N).
+Pipeline.Reason.Keyphrases: /force/
+
+User: What is the chemical symbol for magnesium?
+Assistant: The chemical symbol for magnesium is /Mg/.
+Pipeline.Reason.Keyphrases: /magnesium/
+
+User: What is the smallest unit of matter?
+Assistant: The smallest unit of matter is the /atom|quark|lepton/.
+Pipeline.Reason.Keyphrases: /unit|nucleus|atom/
