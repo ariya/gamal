@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 
+const fs = require('fs');
 const readline = require('readline');
 
 const LLM_API_BASE_URL = process.env.LLM_API_BASE_URL || 'https://api.openai.com/v1';
@@ -9,15 +10,20 @@ const LLM_STREAMING = process.env.LLM_STREAMING !== 'no';
 
 const LLM_ZERO_SHOT = process.env.LLM_ZERO_SHOT;
 const LLM_DEBUG_CHAT = process.env.LLM_DEBUG_CHAT;
+const LLM_DEBUG_PIPELINE = process.env.LLM_DEBUG_PIPELINE;
+const LLM_DEBUG_FAIL_EXIT = process.env.LLM_DEBUG_FAIL_EXIT;
 
 const NORMAL = '\x1b[0m';
 const BOLD = '\x1b[1m';
 const YELLOW = '\x1b[93m';
 const MAGENTA = '\x1b[35m';
+const RED = '\x1b[91m';
 const GREEN = '\x1b[92m';
 const CYAN = '\x1b[36m';
 const GRAY = '\x1b[90m';
 const ARROW = '⇢';
+const CHECK = '✓';
+const CROSS = '✘';
 
 /**
  * Creates a new function by chaining multiple async functions from left to right.
@@ -396,6 +402,217 @@ const simplify = (stages) => {
     }).filter((_, index) => isOdd(index));
 }
 
+/**
+ * Converts an expected answer into a suitable regular expression array.
+ *
+ * @param {string} match
+ * @returns {Array<RegExp>}
+ */
+const regexify = (match) => {
+    const filler = (text, index) => {
+        let i = index;
+        while (i < text.length) {
+            if (text[i] === '/') {
+                break;
+            }
+            ++i;
+        }
+        return i;
+    };
+
+    const pattern = (text, index) => {
+        let i = index;
+        if (text[i] === '/') {
+            ++i;
+            while (i < text.length) {
+                if (text[i] === '/' && text[i - 1] !== '\\') {
+                    break;
+                }
+                ++i;
+            }
+        }
+        return i;
+    };
+
+    const regexes = [];
+    let pos = 0;
+    while (pos < match.length) {
+        pos = filler(match, pos);
+        const next = pattern(match, pos);
+        if (next > pos && next < match.length) {
+            const sub = match.substring(pos + 1, next);
+            const regex = RegExp(sub, 'gi');
+            regexes.push(regex);
+            pos = next + 1;
+        } else {
+            break;
+        }
+    }
+
+    if (regexes.length === 0) {
+        regexes.push(RegExp(match, 'gi'));
+    }
+
+    return regexes;
+}
+
+/**
+ * Returns all possible matches given a list of regular expressions.
+ *
+ * @param {string} text
+ * @param {Array<RegExp>} regexes
+ * @returns {Array<Span>}
+ */
+const match = (text, regexes) => {
+    return regexes.map(regex => {
+        const match = regex.exec(text);
+        if (!match) {
+            return null;
+        }
+        const [first] = match;
+        const { index } = match;
+        const { length } = first;
+        return { index, length };
+    }).filter(span => span !== null);
+}
+
+/**
+ * Formats the input (using ANSI colors) to highlight the spans.
+ *
+ * @param {string} text
+ * @param {Array<Span>} spans
+ * @param {string} color
+ * @returns {string}
+ */
+
+const highlight = (text, spans, color = BOLD + GREEN) => {
+    let result = text;
+    spans.sort((p, q) => q.index - p.index).forEach((span) => {
+        const { index, length } = span;
+        const prefix = result.substring(0, index);
+        const content = result.substring(index, index + length);
+        const suffix = result.substring(index + length);
+        result = `${prefix}${color}${content}${NORMAL}${suffix}`;
+    });
+    return result;
+}
+
+/**
+ * Evaluates a test file and executes the test cases.
+ *
+ * @param {string} filename - The path to the test file.
+ */
+const evaluate = async (filename) => {
+    const identity = (x) => x;
+
+    try {
+        let history = [];
+        let total = 0;
+        let failures = 0;
+
+        const handle = async (line) => {
+            const parts = (line && line.length > 0) ? line.split(':') : [];
+            if (parts.length >= 2) {
+                const role = parts[0];
+                const content = line.slice(role.length + 1).trim();
+                if (role === 'Story') {
+                    console.log();
+                    console.log('-----------------------------------');
+                    console.log(`Story: ${MAGENTA}${BOLD}${content}${NORMAL}`);
+                    console.log('-----------------------------------');
+                    history = [];
+                } else if (role === 'User') {
+                    const inquiry = content;
+                    const stages = [];
+                    const enter = (name) => { stages.push({ name, timestamp: Date.now() }) };
+                    const leave = (name, fields) => { stages.push({ name, timestamp: Date.now(), ...fields }) };
+                    const delegates = { enter, leave };
+                    const context = { inquiry, history, delegates };
+                    process.stdout.write(`  ${inquiry}\r`);
+                    const start = Date.now();
+                    const pipeline = LLM_ZERO_SHOT ? reply : pipe(reason, respond);
+                    const result = await pipeline(context);
+                    const duration = Date.now() - start;
+                    const { topic, thought, keyphrases, answer } = result;
+                    history.push({ inquiry, thought, keyphrases, topic, answer, duration, stages });
+                    ++total;
+                } else if (role === 'Assistant') {
+                    const expected = content;
+                    const last = history.slice(-1).pop();
+                    if (!last) {
+                        console.error('There is no answer yet!');
+                        process.exit(-1);
+                    } else {
+                        const { inquiry, answer, duration, stages } = last;
+                        const target = answer;
+                        const regexes = regexify(expected);
+                        const matches = match(target, regexes);
+                        if (matches.length === regexes.length) {
+                            console.log(`${GREEN}${CHECK} ${CYAN}${inquiry} ${GRAY}[${duration} ms]${NORMAL}`);
+                            console.log(' ', highlight(target, matches));
+                            LLM_DEBUG_PIPELINE && review(simplify(stages));
+                        } else {
+                            ++failures;
+                            console.error(`${RED}${CROSS} ${YELLOW}${inquiry} ${GRAY}[${duration} ms]${NORMAL}`);
+                            console.error(`Expected ${role} to contain: ${CYAN}${regexes.join(',')}${NORMAL}`);
+                            console.error(`Actual ${role}: ${MAGENTA}${target}${NORMAL}`);
+                            review(simplify(stages));
+                            LLM_DEBUG_FAIL_EXIT && process.exit(-1);
+                        }
+                    }
+                } else if (role === 'Pipeline.Reason.Keyphrases' || role === 'Pipeline.Reason.Topic') {
+                    const expected = content;
+                    const last = history.slice(-1).pop();
+                    if (!last) {
+                        console.error('There is no answer yet!');
+                        process.exit(-1);
+                    } else {
+                        const { keyphrases, topic, stages } = last;
+                        const target = (role === 'Pipeline.Reason.Keyphrases') ? keyphrases : topic;
+                        const regexes = regexify(expected);
+                        const matches = match(target, regexes);
+                        if (matches.length === regexes.length) {
+                            console.log(`${GRAY}    ${ARROW} ${role}:`, highlight(target, matches, GREEN));
+                        } else {
+                            ++failures;
+                            console.error(`${RED}Expected ${role} to contain: ${CYAN}${regexes.join(',')}${NORMAL}`);
+                            console.error(`${RED}Actual ${role}: ${MAGENTA}${target}${NORMAL}`);
+                            review(simplify(stages));
+                            LLM_DEBUG_FAIL_EXIT && process.exit(-1);
+                        }
+                    }
+                } else {
+                    console.error(`Unknown role: ${role}!`);
+                    handle.exit(-1);
+                }
+            }
+        };
+
+        const trim = (input) => {
+            const text = input.trim();
+            const marker = text.indexOf('#');
+            if (marker >= 0) {
+                return text.substr(0, marker).trim();
+            }
+            return text;
+        }
+
+        const lines = fs.readFileSync(filename, 'utf-8').split('\n').map(trim);
+        for (const i in lines) {
+            await handle(lines[i]);
+        }
+        if (failures <= 0) {
+            console.log(`${GREEN}${CHECK}${NORMAL} SUCCESS: ${GREEN}${total} test(s)${NORMAL}.`);
+        } else {
+            console.log(`${RED}${CROSS}${NORMAL} FAIL: ${GRAY}${total} test(s), ${RED}${failures} failure(s)${NORMAL}.`);
+            process.exit(-1);
+        }
+    } catch (e) {
+        console.error('ERROR:', e.toString());
+        process.exit(-1);
+    }
+}
+
 const interact = async () => {
     const history = [];
     const stream = (text) => process.stdout.write(text);
@@ -451,5 +668,10 @@ const interact = async () => {
 
 (async () => {
     console.log(`Using LLM at ${LLM_API_BASE_URL} (model: ${GREEN}${LLM_CHAT_MODEL || 'default'}${NORMAL}).`);
-    await interact();
+
+    const args = process.argv.slice(2);
+    args.forEach(evaluate);
+    if (args.length == 0) {
+        await interact();
+    }
 })();

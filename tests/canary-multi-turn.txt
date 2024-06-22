@@ -1,0 +1,8 @@
+User: Which Southeast Asia country has the largest population?
+Assistant: /Indonesia/ is the most populous country in Southeast Asia.
+
+User: Where is its capital?
+Assistant: The capital of Indonesia is /Jakarta/.
+
+User: What's the currency used there and what's the symbol?
+Assistant: The official currency is the Rupiah and its symbol is /Rp|IDR/.
