@@ -653,7 +653,6 @@ const interact = async () => {
                 const result = await pipeline(context);
                 const { topic, thought, keyphrases } = result;
                 const duration = Date.now() - start;
-                // console.log({ result });
                 const { answer } = result;
                 history.push({ inquiry, thought, keyphrases, topic, answer, duration, stages });
                 console.log();
