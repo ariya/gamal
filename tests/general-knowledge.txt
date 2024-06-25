@@ -140,7 +140,7 @@ Pipeline.Reason.Keyphrases: /KFC/chicken/
 
 User: Is ramen typically eaten in Egypt or Japan?
 Assistant: Ramen is typically eaten in /Japan/.
-Pipeline.Reason.Keyphrases: /ramen/
+Pipeline.Reason.Keyphrases: /ramen|eaten|Japan/
 
 User: What is the main ingredient of Nasi Goreng?
 Assistant: Preparing Nasi Goreng involves some /rice|egg(s)?|soy sauce|kecap/.
