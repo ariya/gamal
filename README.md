@@ -1,6 +1,6 @@
 # Query LLM
 
-Query LLM is a simple, zero-dependency CLI tool for querying an LLM with questions. It works seamlessly with both cloud-based managed LLM services (e.g. [OpenAI GPT](https://platform.openai.com/docs), [Groq](https://groq.com), [OpenRouter](https://openrouter.ai)) and locally hosted LLM servers (e.g. [llama.cpp](https://github.com/ggerganov/llama.cpp), [LocalAI](https://localai.io), [Ollama](https://ollama.com), etc).
+Query LLM is a simple, zero-dependency CLI tool for querying an LLM with questions. It works seamlessly with both cloud-based managed LLM services (e.g. [OpenAI GPT](https://platform.openai.com/docs), [Groq](https://groq.com), [OpenRouter](https://openrouter.ai)) and locally hosted LLM servers (e.g. [llama.cpp](https://github.com/ggerganov/llama.cpp), [LocalAI](https://localai.io), [Ollama](https://ollama.com), etc). Internally, it guides the LLM to perform step-by-step reasoning following the [Chain of Thought approach](https://www.promptingguide.ai/techniques/cot).
 
 You’ll need either [Node.js](https://nodejs.org) (>= v18) or [Bun](https://bun.sh) to run Query LLM.
 
