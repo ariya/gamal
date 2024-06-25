@@ -12,20 +12,20 @@ jobs:
       fail-fast: false
       matrix:
         model:
-          - mistralai/mistral-7b-instruct-v0.3           # $0.07
-          - meta-llama/llama-3-8b-instruct               # $0.07
-          - openchat/openchat-7b                         # $0.07
-          - openchat/openchat-8b                         # $0.08
-          - qwen/qwen-4b-chat                            # $0.09
-          - microsoft/phi-3-medium-4k-instruct           # $0.14
-          - nousresearch/hermes-2-pro-llama-3-8b         # $0.15
-          - teknium/openhermes-2.5-mistral-7b            # $0.17
-          - nousresearch/nous-hermes-2-mistral-7b-dpo    # $0.18
-          - open-orca/mistral-7b-openorca                # $0.18
-          - mistralai/mixtral-8x7b-instruct              # $0.24
-          - qwen/qwen-14b-chat                           # $0.27
-          - meta-llama/llama-3-70b-instruct              # $0.59
-          - mistralai/mixtral-8x22b-instruct             # $0.65
+          - mistralai/mistral-7b-instruct-v0.3           # $0.07 [32K]
+          - meta-llama/llama-3-8b-instruct               # $0.07 [ 8K]
+          - openchat/openchat-7b                         # $0.07 [ 8K]
+          - openchat/openchat-8b                         # $0.08 [ 8K]
+          - qwen/qwen-4b-chat                            # $0.09 [32K]
+          - microsoft/phi-3-medium-4k-instruct           # $0.14 [ 4K]
+          - nousresearch/hermes-2-pro-llama-3-8b         # $0.15 [ 8K]
+          - teknium/openhermes-2.5-mistral-7b            # $0.17 [ 4K]
+          - nousresearch/nous-hermes-2-mistral-7b-dpo    # $0.18 [32K]
+          - open-orca/mistral-7b-openorca                # $0.18 [ 8K]
+          - mistralai/mixtral-8x7b-instruct              # $0.24 [32K]
+          - qwen/qwen-14b-chat                           # $0.27 [32K]
+          - meta-llama/llama-3-70b-instruct              # $0.59 [ 8K]
+          - mistralai/mixtral-8x22b-instruct             # $0.65 [64K]
     steps:
       - uses: actions/checkout@v4
 
