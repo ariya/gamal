@@ -283,6 +283,16 @@ KEYPHRASES: Pitch Lake in Trinidad fame.
 OBSERVATION: Pitch Lake in Trinidad is the largest natural deposit of asphalt.
 TOPIC: geography.`;
 
+const breakdown = (hint, completion) => {
+    const text = hint + completion;
+    let result = deconstruct(text);
+    const { topic } = result;
+    if (!topic || topic.length === 0) {
+        result = deconstruct(text + '\n' + 'TOPIC: general knowledge.');
+    }
+    return result;
+}
+
 const reason = async (context) => {
     const { history, delegates } = context;
     const { enter, leave } = delegates;
@@ -309,17 +319,14 @@ const reason = async (context) => {
     const hint = ['TOOL: Google.', 'THOUGHT: '].join('\n');
     messages.push({ role: 'assistant', content: hint });
     const completion = await chat(messages);
-    let result = deconstruct(hint + completion);
+    let result = breakdown(hint, completion);
     if (!result.keyphrases || result.keyphrases.length === 0) {
-        // invalid, let's try again once more with a nudge
+        LLM_DEBUG_CHAT && console.log(`-->${RED}Invalid keyphrases. Trying again...`);
         const hint = ['TOOL: Google.', 'THOUGHT: ' + result.thought, 'KEYPHRASES: '].join('\n');
         messages.pop();
         messages.push({ role: 'assistant', content: hint });
         const completion = await chat(messages);
-        result = deconstruct(hint + completion);
-    }
-    if (!result.observation) {
-        result = deconstruct(hint + completion + '\n' + 'TOPIC: general knowledge.');
+        result = breakdown(hint, completion);
     }
     const { topic, thought, keyphrases, observation } = result;
     leave && leave('Reason', { topic, thought, keyphrases, observation });
