@@ -54,69 +54,14 @@ To use [OpenAI GPT model](https://platform.openai.com/docs), configure the envir
 export OPENAI_API_KEY="sk-yourownapikey"
 ```
 
-To utilize other LLM services, populate the relevant environment variables as demonstrated in the following examples:
-
-* [Anyscale](https://www.anyscale.com/)
-```bash
-export LLM_API_BASE_URL=https://api.endpoints.anyscale.com/v1
-export LLM_API_KEY="yourownapikey"
-export LLM_CHAT_MODEL="meta-llama/Llama-3-8b-chat-hf"
-```
-
-* [Deep Infra](https://deepinfra.com)
-```bash
-export LLM_API_BASE_URL=https://api.deepinfra.com/v1/openai
-export LLM_API_KEY="yourownapikey"
-export LLM_CHAT_MODEL="mistralai/Mistral-7B-Instruct-v0.1"
-```
-
-* [Fireworks](https://fireworks.ai/)
-```bash
-export LLM_API_BASE_URL=https://api.fireworks.ai/inference/v1
-export LLM_API_KEY="yourownapikey"
-export LLM_CHAT_MODEL="accounts/fireworks/models/llama-v3-8b-instruct"
-```
-
-* [Groq](https://groq.com/)
-```bash
-export LLM_API_BASE_URL=https://api.groq.com/openai/v1
-export LLM_API_KEY="yourownapikey"
-export LLM_CHAT_MODEL="gemma-7b-it"
-```
-
-* [Lepton](https://lepton.ai)
-```bash
-export LLM_API_BASE_URL=https://mixtral-8x7b.lepton.run/api/v1/
-export LLM_API_KEY="yourownapikey"
-```
-
-* [Novita](https://novita.ai)
-```bash
-export LLM_API_BASE_URL=https://api.novita.ai/v3/openai
-export LLM_API_KEY="yourownapikey"
-export LLM_CHAT_MODEL="meta-llama/llama-3-8b-instruct"
-```
-
-* [Octo](https://octo.ai)
-```bash
-export LLM_API_BASE_URL=https://text.octoai.run/v1/
-export LLM_API_KEY="yourownapikey"
-export LLM_CHAT_MODEL="hermes-2-pro-mistral-7b"
-```
-
-* [OpenRouter](https://openrouter.ai/)
+To use [OpenRouter](https://openrouter.ai/), select a model (e.g. [Mistral 7B](https://openrouter.ai/models/mistralai/mistral-7b-instruct), [LLama-3 8B](https://openrouter.ai/models/meta-llama/llama-3-8b-instruct), [OpenChat 3.6](https://openrouter.ai/models/openchat/openchat-8b), etc) and set the environment variables accordingly.
 ```bash
 export LLM_API_BASE_URL=https://openrouter.ai/api/v1
 export LLM_API_KEY="yourownapikey"
 export LLM_CHAT_MODEL="meta-llama/llama-3-8b-instruct"
 ```
 
-* [Together](https://www.together.ai/)
-```bash
-export LLM_API_BASE_URL=https://api.together.xyz/v1
-export LLM_API_KEY="yourownapikey"
-export LLM_CHAT_MODEL="meta-llama/Llama-3-8b-chat-hf"
-```
+Quick LLM is also compatible with [Anyscale](https://www.anyscale.com), [Deep Infra](https://deepinfra.com), [Fireworks](https://fireworks.ai), [Groq](https://groq.com), [Lepton](https://lepton.ai), [Novita](https://novita.ai), [Octo](https://octo.ai), and [Together](https://www.together.ai). For details on how to configure the environment variables for each of these services, refer to the documentation of the sister project, [Ask LLM](https://github.com/ariya/ask-llm).
 
 ## Evaluating Questions
 
