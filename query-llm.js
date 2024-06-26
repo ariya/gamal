@@ -310,6 +310,14 @@ const reason = async (context) => {
     messages.push({ role: 'assistant', content: hint });
     const completion = await chat(messages);
     let result = deconstruct(hint + completion);
+    if (!result.keyphrases || result.keyphrases.length === 0) {
+        // invalid, let's try again once more with a nudge
+        const hint = ['TOOL: Google.', 'THOUGHT: ' + result.thought, 'KEYPHRASES: '].join('\n');
+        messages.pop();
+        messages.push({ role: 'assistant', content: hint });
+        const completion = await chat(messages);
+        result = deconstruct(hint + completion);
+    }
     if (!result.observation) {
         result = deconstruct(hint + completion + '\n' + 'TOPIC: general knowledge.');
     }
