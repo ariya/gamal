@@ -61,7 +61,7 @@ export LLM_API_KEY="yourownapikey"
 export LLM_CHAT_MODEL="meta-llama/llama-3-8b-instruct"
 ```
 
-Quick LLM is also compatible with [Anyscale](https://www.anyscale.com), [Deep Infra](https://deepinfra.com), [Fireworks](https://fireworks.ai), [Groq](https://groq.com), [Lepton](https://lepton.ai), [Novita](https://novita.ai), [Octo](https://octo.ai), and [Together](https://www.together.ai). For details on how to configure the environment variables for each of these services, refer to the documentation of the sister project, [Ask LLM](https://github.com/ariya/ask-llm).
+Query LLM is also compatible with [Anyscale](https://www.anyscale.com), [Deep Infra](https://deepinfra.com), [Fireworks](https://fireworks.ai), [Groq](https://groq.com), [Lepton](https://lepton.ai), [Novita](https://novita.ai), [Octo](https://octo.ai), and [Together](https://www.together.ai). For details on how to configure the environment variables for each of these services, refer to the documentation of the sister project, [Ask LLM](https://github.com/ariya/ask-llm).
 
 ## Evaluating Questions
 
