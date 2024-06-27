@@ -70,7 +70,7 @@ Pipeline.Reason.Keyphrases: /sport/ /India/
 
 User: Which continent is the coldest?
 Assistant: /Antarctica/ is considered as the coldest continent.
-Pipeline.Reason.Keyphrases: /cold(est)?/
+Pipeline.Reason.Keyphrases: /cold(est)?|temperature|ice|icy/
 
 User: In which country Mandarin is spoken?
 Assistant: Mandarin is the official language of /China/.
