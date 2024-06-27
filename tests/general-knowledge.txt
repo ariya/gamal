@@ -51,7 +51,7 @@ Assistant: /California/ is currently the most populated state in the United Stat
 Pipeline.Reason.Keyphrases: /population|populous|populated/ /state/
 
 User: What is the capital of Indonesia?
-Assistant: The capital of Indonesia is /Jakarta/.
+Assistant: The capital of Indonesia is /Jakarta|Nusantara|IKN/.
 Pipeline.Reason.Keyphrases: /capital/ /Indonesia(n)?/
 
 User: Where is the capital of East Java?
