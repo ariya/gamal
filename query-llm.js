@@ -575,30 +575,32 @@ const evaluate = async (filename) => {
                             LLM_DEBUG_FAIL_EXIT && process.exit(-1);
                         }
                     }
-                } else if (role === 'Pipeline.Reason.Keyphrases' || role === 'Pipeline.Reason.Topic') {
-                    const expected = content;
-                    const last = history.slice(-1).pop();
-                    if (!last) {
-                        console.error('There is no answer yet!');
-                        process.exit(-1);
-                    } else {
-                        const { keyphrases, topic, stages } = last;
-                        const target = (role === 'Pipeline.Reason.Keyphrases') ? keyphrases : topic;
-                        const regexes = regexify(expected);
-                        const matches = match(target, regexes);
-                        if (matches.length === regexes.length) {
-                            console.log(`${GRAY}    ${ARROW} ${role}:`, highlight(target, matches, GREEN));
+                } else if (!LLM_ZERO_SHOT) {
+                    if (role === 'Pipeline.Reason.Keyphrases' || role === 'Pipeline.Reason.Topic') {
+                        const expected = content;
+                        const last = history.slice(-1).pop();
+                        if (!last) {
+                            console.error('There is no answer yet!');
+                            process.exit(-1);
                         } else {
-                            ++failures;
-                            console.error(`${RED}Expected ${role} to contain: ${CYAN}${regexes.join(',')}${NORMAL}`);
-                            console.error(`${RED}Actual ${role}: ${MAGENTA}${target}${NORMAL}`);
-                            review(simplify(stages));
-                            LLM_DEBUG_FAIL_EXIT && process.exit(-1);
+                            const { keyphrases, topic, stages } = last;
+                            const target = (role === 'Pipeline.Reason.Keyphrases') ? keyphrases : topic;
+                            const regexes = regexify(expected);
+                            const matches = match(target, regexes);
+                            if (matches.length === regexes.length) {
+                                console.log(`${GRAY}    ${ARROW} ${role}:`, highlight(target, matches, GREEN));
+                            } else {
+                                ++failures;
+                                console.error(`${RED}Expected ${role} to contain: ${CYAN}${regexes.join(',')}${NORMAL}`);
+                                console.error(`${RED}Actual ${role}: ${MAGENTA}${target}${NORMAL}`);
+                                review(simplify(stages));
+                                LLM_DEBUG_FAIL_EXIT && process.exit(-1);
+                            }
                         }
+                    } else {
+                        console.error(`Unknown role: ${role}!`);
+                        handle.exit(-1);
                     }
-                } else {
-                    console.error(`Unknown role: ${role}!`);
-                    handle.exit(-1);
                 }
             }
         };
