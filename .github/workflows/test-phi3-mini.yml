@@ -1,11 +1,11 @@
-name: Canary tests
+name: Test with Phi-3 Mini
 
 on: [push, pull_request]
 
 jobs:
   zero-shot:
     runs-on: ubuntu-22.04
-    timeout-minutes: 10
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
 
@@ -18,10 +18,8 @@ jobs:
         timeout-minutes: 3
 
       - run: echo 'Which planet in our solar system is the largest?' | ./query-llm.js | tee output.txt
-        timeout-minutes: 7
         env:
           LLM_API_BASE_URL: 'http://127.0.0.1:8080/v1'
-          LLM_DEBUG: 1
           LLM_ZERO_SHOT: 1
 
       - run: cat output.txt
@@ -29,7 +27,7 @@ jobs:
 
   chain-of-thought:
     runs-on: ubuntu-22.04
-    timeout-minutes: 10
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
 
@@ -42,10 +40,27 @@ jobs:
         timeout-minutes: 3
 
       - run: echo 'Which planet in our solar system is the largest?' | ./query-llm.js | tee output.txt
-        timeout-minutes: 7
         env:
           LLM_API_BASE_URL: 'http://127.0.0.1:8080/v1'
-          LLM_DEBUG: 1
 
       - run: cat output.txt
       - run: grep -i jupiter output.txt
+
+  multi-turn:
+    needs: chain-of-thought
+    runs-on: ubuntu-22.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Prepare LLM (Phi-3 Mini)
+        uses: ./.github/actions/prepare-llm
+        timeout-minutes: 3
+
+      - run: ./query-llm.js tests/canary-multi-turn.txt
+        env:
+          LLM_API_BASE_URL: 'http://127.0.0.1:8080/v1'
