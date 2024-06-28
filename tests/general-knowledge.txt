@@ -97,7 +97,7 @@ User: Who was the first President of USA?
 Assistant: George /Washington/ was the first US president, serving from 1789 to 1797.
 Pipeline.Reason.Keyphrases: /first/ /president/ /US(A)?|America|United States/
 
-User: Who sailed with the flagship Santa Maria on the New World voyage?
+User: Who sailed with and became the commander of the flagship Santa Maria on the New World voyage?
 Assistant: Christopher /Columbus/ captained the flagship Santa Maria.
 Pipeline.Reason.Keyphrases: /Santa Maria|Columbus/
 
