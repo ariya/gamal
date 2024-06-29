@@ -18,6 +18,7 @@ jobs:
           - qwen/qwen-4b-chat                            # $0.09 [32K]
           - microsoft/phi-3-medium-4k-instruct           # $0.14 [ 4K]
           - nousresearch/hermes-2-pro-llama-3-8b         # $0.15 [ 8K]
+          - google/gemma-2-9b-it                         # $0.20 [ 8K]
           - mistralai/mixtral-8x7b-instruct              # $0.24 [32K]
           - meta-llama/llama-3-70b-instruct              # $0.59 [ 8K]
     steps:
