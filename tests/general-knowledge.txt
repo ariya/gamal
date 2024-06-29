@@ -2,19 +2,19 @@ Story: Science
 
 User: Name 2 scientists who developed modern calculus
 Assistant: /Newton/ and /Leibniz/ are credited with the development of modern calculus.
-Pipeline.Reason.Keyphrases: /calculus/
+Pipeline.Reason.Keyphrases: /calculus|Newton|Leibniz/
 
 User: Who described the mathematics of information theory?
 Assistant: Claude /Shannon/ described the mathematics of information theory in 1948.
-Pipeline.Reason.Keyphrases: /information|communication/ /theory/
+Pipeline.Reason.Keyphrases: /information|communication|Shannon/
 
 User: Who came up with the special theory of relativity?
 Assistant: The special theory of relativity was developed by Albert /Einstein/.
-Pipeline.Reason.Keyphrases: /relativity/
+Pipeline.Reason.Keyphrases: /relativity|Einstein/
 
 User: Which Persian scientist authored the Canon of Medicine?
 Assistant: The Canon of Medicine was written by the Persian scientist /Avicenna|Sina/.
-Pipeline.Reason.Keyphrases: /Canon of Medicine|Persia(n)?/
+Pipeline.Reason.Keyphrases: /Canon of Medicine|Persia(n)?|Avicenna/
 
 User: What is the atomic number of Magnesium?
 Assistant: /twelve|12/
@@ -90,7 +90,7 @@ Pipeline.Reason.Keyphrases: /pyramid/
 
 Story:  Famous people
 User: Who wrote the poems in Masnavi?
-Assistant: The poems in Masnavi were written by the Persian poet, /Rumi|Jalal/.
+Assistant: The poems in Masnavi were written by the Persian poet, /Rūmī|Rumi|Jalal/.
 Pipeline.Reason.Keyphrases: /author|poet|poem/ /Masnavi/
 
 User: Who was the first President of USA?
@@ -120,7 +120,7 @@ Pipeline.Reason.Keyphrases: /PM|Prime Minister/
 Story: Cuisine
 User: Where is the origin of Biryani: India or Ireland?
 Assistant: Biryani originated from /India/.
-Pipeline.Reason.Keyphrases: /biryani/
+Pipeline.Reason.Keyphrases: /biryani|origin/
 
 User: What is the green paste used with sushi?
 Assistant: The green paste served with sushi is known as /wasabi/.
@@ -131,7 +131,7 @@ Assistant: Nasi Lemak is a traditional dish from /Malaysia|Malay/.
 Pipeline.Reason.Keyphrases: /Nasi Lemak/
 
 User: Name some common patties for burger!
-Assistant: Common patty fillings for burgers include /beef|chicken|turkey|veggie|fish|salmon/.
+Assistant: Common patty fillings for burgers include /beef|chicken|turkey|veggie|fish|salmon|brisket/.
 Pipeline.Reason.Keyphrases: /patties|patty/ /burger/
 
 User: Who created KFC?
@@ -162,7 +162,7 @@ Pipeline.Reason.Keyphrases: /007|Bond/
 
 User: Who directed the Dark Knight movie?
 Assistant: The Dark Knight movie was directed by Christopher /Nolan/.
-Pipeline.Reason.Keyphrases: /Dark Knight|Batman/
+Pipeline.Reason.Keyphrases: /Dark Knight|Batman|Nolan/
 
 User: Who is Spiderman real name?
 Assistant: The real name of Spiderman is Peter /Parker/.
@@ -170,7 +170,7 @@ Pipeline.Reason.Keyphrases: /Spider-?man/
 
 User: Which fictional metal is infused into Wolverine body?
 Assistant: The metal infused into Wolverine's body is /adamantium/.
-Pipeline.Reason.Keyphrases: /Wolverine/
+Pipeline.Reason.Keyphrases: /Wolverine|adamantium/
 
 User: In Aladdin movie, name the princess!
 Assistant: Princess /Jasmine/.
