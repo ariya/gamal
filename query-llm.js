@@ -371,11 +371,11 @@ const respond = async (context) => {
     const messages = [];
     messages.push({ role: 'system', content: prompt });
     const { inquiry, thought, observation } = context;
-    messages.push({ role: 'user', content: construct({ inquiry, thought, observation }) });
+    messages.push({ role: 'user', content: construct({ inquiry, observation }) });
     messages.push({ role: 'assistant', content: 'ANSWER: ' });
     const answer = await chat(messages, stream);
 
-    leave && leave('Respond', { inquiry, thought, observation, answer });
+    leave && leave('Respond', { inquiry, observation, answer });
     return { answer, ...context };
 }
 
