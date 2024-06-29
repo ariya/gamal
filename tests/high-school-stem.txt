@@ -25,5 +25,5 @@ Assistant: The chemical symbol for magnesium is /Mg/.
 Pipeline.Reason.Keyphrases: /magnesium/
 
 User: What is the smallest unit of matter?
-Assistant: The smallest unit of matter is the /atom|quark|lepton|elementary|particle/.
+Assistant: The smallest unit of matter is the /atom|proton|quark|lepton|elementary|particle/.
 Pipeline.Reason.Keyphrases: /unit|nucleus|atom|elementary|particle/
