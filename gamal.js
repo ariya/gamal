@@ -8,7 +8,6 @@ const LLM_API_KEY = process.env.LLM_API_KEY || process.env.OPENAI_API_KEY;
 const LLM_CHAT_MODEL = process.env.LLM_CHAT_MODEL;
 const LLM_STREAMING = process.env.LLM_STREAMING !== 'no';
 
-const LLM_ZERO_SHOT = process.env.LLM_ZERO_SHOT;
 const LLM_DEBUG_CHAT = process.env.LLM_DEBUG_CHAT;
 const LLM_DEBUG_PIPELINE = process.env.LLM_DEBUG_PIPELINE;
 const LLM_DEBUG_FAIL_EXIT = process.env.LLM_DEBUG_FAIL_EXIT;
@@ -149,39 +148,6 @@ const chat = async (messages, handler) => {
         }
     }
     return answer;
-}
-
-
-/**
- * Replies to the user. This is zero-shot style.
- *
- * @param {Context} context - Current pipeline context.
- * @returns {Context} Updated pipeline context.
- */
-
-const REPLY_PROMPT = `You are a helpful answering assistant.
-Your task is to reply and respond to the user politely and concisely.
-Answer in plain text and not in Markdown format.`;
-
-const reply = async (context) => {
-    const { inquiry, history, delegates } = context;
-    const { enter, leave, stream } = delegates;
-    enter && enter('Reply');
-
-    const messages = [];
-    messages.push({ role: 'system', content: REPLY_PROMPT });
-    const relevant = history.slice(-5);
-    relevant.forEach(msg => {
-        const { inquiry, answer } = msg;
-        messages.push({ role: 'user', content: inquiry });
-        messages.push({ role: 'assistant', content: answer });
-    });
-
-    messages.push({ role: 'user', content: inquiry });
-    const answer = await chat(messages, stream);
-
-    leave && leave('Reply', { inquiry, answer });
-    return { answer, ...context };
 }
 
 const PREDEFINED_KEYS = ['INQUIRY', 'TOOL', 'THOUGHT', 'KEYPHRASES', 'OBSERVATION', 'TOPIC'];
@@ -545,7 +511,7 @@ const evaluate = async (filename) => {
                     const context = { inquiry, history, delegates };
                     process.stdout.write(`  ${inquiry}\r`);
                     const start = Date.now();
-                    const pipeline = LLM_ZERO_SHOT ? reply : pipe(reason, respond);
+                    const pipeline = pipe(reason, respond);
                     const result = await pipeline(context);
                     const duration = Date.now() - start;
                     const { topic, thought, keyphrases, answer } = result;
@@ -575,32 +541,30 @@ const evaluate = async (filename) => {
                             LLM_DEBUG_FAIL_EXIT && process.exit(-1);
                         }
                     }
-                } else if (!LLM_ZERO_SHOT) {
-                    if (role === 'Pipeline.Reason.Keyphrases' || role === 'Pipeline.Reason.Topic') {
-                        const expected = content;
-                        const last = history.slice(-1).pop();
-                        if (!last) {
-                            console.error('There is no answer yet!');
-                            process.exit(-1);
-                        } else {
-                            const { keyphrases, topic, stages } = last;
-                            const target = (role === 'Pipeline.Reason.Keyphrases') ? keyphrases : topic;
-                            const regexes = regexify(expected);
-                            const matches = match(target, regexes);
-                            if (matches.length === regexes.length) {
-                                console.log(`${GRAY}    ${ARROW} ${role}:`, highlight(target, matches, GREEN));
-                            } else {
-                                ++failures;
-                                console.error(`${RED}Expected ${role} to contain: ${CYAN}${regexes.join(',')}${NORMAL}`);
-                                console.error(`${RED}Actual ${role}: ${MAGENTA}${target}${NORMAL}`);
-                                review(simplify(stages));
-                                LLM_DEBUG_FAIL_EXIT && process.exit(-1);
-                            }
-                        }
+                } else if (role === 'Pipeline.Reason.Keyphrases' || role === 'Pipeline.Reason.Topic') {
+                    const expected = content;
+                    const last = history.slice(-1).pop();
+                    if (!last) {
+                        console.error('There is no answer yet!');
+                        process.exit(-1);
                     } else {
-                        console.error(`Unknown role: ${role}!`);
-                        handle.exit(-1);
+                        const { keyphrases, topic, stages } = last;
+                        const target = (role === 'Pipeline.Reason.Keyphrases') ? keyphrases : topic;
+                        const regexes = regexify(expected);
+                        const matches = match(target, regexes);
+                        if (matches.length === regexes.length) {
+                            console.log(`${GRAY}    ${ARROW} ${role}:`, highlight(target, matches, GREEN));
+                        } else {
+                            ++failures;
+                            console.error(`${RED}Expected ${role} to contain: ${CYAN}${regexes.join(',')}${NORMAL}`);
+                            console.error(`${RED}Actual ${role}: ${MAGENTA}${target}${NORMAL}`);
+                            review(simplify(stages));
+                            LLM_DEBUG_FAIL_EXIT && process.exit(-1);
+                        }
                     }
+                } else {
+                    console.error(`Unknown role: ${role}!`);
+                    handle.exit(-1);
                 }
             }
         };
@@ -666,7 +630,7 @@ const interact = async () => {
                 const delegates = { stream, enter, leave };
                 const context = { inquiry, history, delegates };
                 const start = Date.now();
-                const pipeline = LLM_ZERO_SHOT ? reply : pipe(reason, respond);
+                const pipeline = pipe(reason, respond);
                 const result = await pipeline(context);
                 const { topic, thought, keyphrases } = result;
                 const duration = Date.now() - start;
