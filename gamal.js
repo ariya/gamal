@@ -5,7 +5,7 @@ const readline = require('readline');
 
 const LLM_API_KEY = process.env.LLM_API_KEY;
 const LLM_API_BASE_URL = process.env.LLM_API_BASE_URL || 'https://openrouter.ai/api/v1';
-const LLM_CHAT_MODEL = process.env.LLM_CHAT_MODEL || 'mistralai/mixtral-8x7b-instruct';
+const LLM_CHAT_MODEL = process.env.LLM_CHAT_MODEL || 'mistralai/mistral-7b-instruct-v0.3';
 const LLM_STREAMING = process.env.LLM_STREAMING !== 'no';
 
 const LLM_DEBUG_CHAT = process.env.LLM_DEBUG_CHAT;
