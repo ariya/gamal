@@ -8,8 +8,12 @@ const LLM_API_BASE_URL = process.env.LLM_API_BASE_URL || 'https://openrouter.ai/
 const LLM_CHAT_MODEL = process.env.LLM_CHAT_MODEL || 'mistralai/mistral-7b-instruct-v0.3';
 const LLM_STREAMING = process.env.LLM_STREAMING !== 'no';
 
+const TAVILY_API_KEY = process.env.TAVILY_API_KEY;
+const TOP_K = 3;
+
 const LLM_DEBUG_CHAT = process.env.LLM_DEBUG_CHAT;
 const LLM_DEBUG_PIPELINE = process.env.LLM_DEBUG_PIPELINE;
+const LLM_DEBUG_SEARCH = process.env.LLM_DEBUG_SEARCH;
 const LLM_DEBUG_FAIL_EXIT = process.env.LLM_DEBUG_FAIL_EXIT;
 
 const NORMAL = '\x1b[0m';
@@ -233,7 +237,7 @@ Think step by step. Always output your thought in the following format:
 
 TOOL: the search engine to use (must be Google).
 THOUGHT: describe your thoughts about the inquiry.
-KEYPHRASES:  the important key phrases to search for.
+KEYPHRASES:  the important query to give to Google.
 OBSERVATION: the concise result of the search tool.
 TOPIC: the specific topic covering the inquiry.`;
 
@@ -300,6 +304,49 @@ const reason = async (context) => {
 }
 
 /**
+ * Uses the online search engine to collect relevant information based on the keyphrases.
+ * The TOP_K most relevant results will be stored in `references`.
+ *
+ * @param {Context} context - Current pipeline context.
+ * @returns {Context} Updated pipeline context.
+ */
+const search = async (context) => {
+    const { delegates, keyphrases, observation } = context;
+    const { enter, leave } = delegates;
+    enter && enter('Search');
+
+    const response = await fetch('https://api.tavily.com/search', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            api_key: TAVILY_API_KEY,
+            query: keyphrases,
+            max_results: TOP_K,
+            include_answer: true
+        })
+    });
+    const data = await response.json();
+    if (!response.ok) {
+        throw new Error(`Tavily call failed with status: ${response.status}`);
+    }
+    LLM_DEBUG_SEARCH && console.log('Search result: ', { keyphrases, data });
+    const { answer, results = [] } = data;
+    let references = [];
+    if (Array.isArray(results) && results.length > 0) {
+        references = results.slice(0, TOP_K).map((result, i) => {
+            const { title, url, content } = result;
+            const snippet = content;
+            return { position: i + 1, title, url, snippet };
+        });
+    }
+
+    leave && leave('Search', { answer, references });
+    return { ...context, observation: answer || observation, references };
+}
+
+/**
  * Responds to the user's recent message using an LLM.
  * The response from the LLM is available as `answer` in the updated context.
  *
@@ -307,41 +354,54 @@ const reason = async (context) => {
  * @returns {Context} Updated pipeline context.
  */
 
-const RESPOND_PROMPT = `You are an assistant for question-answering tasks.
-You are digesting the most recent user's inquiry, thought, and observation.
-Your task is to use the observation to answer the inquiry politely and concisely.
-You may need to refer to the user's conversation history to understand some context.
-There is no need to mention "based on the observation" or "based on the previous conversation" in your answer.
-Your answer is in simple English, and at max 3 sentences.
-Do not make any apology or other commentary.
-Do not use other sources of information, including your memory.
-Do not make up new names or come up with new facts.`;
+const RESPOND_PROMPT = `You are a world-renowned research assistant.
+You are given a user question, and please write clean, concise and accurate answer to the question.
+You will be given a set of related references to the question, each starting with a reference number like [citation:x], where x is a number.
+Please use only 3 most relevant references, not all of them.
+Cite each reference at the end of each sentence.
+
+You are expected to provide an answer that is accurate, correct, and reflect expert knowledge.
+Your answer must maintain an unbiased and professional tone.
+Ensure that your answer is written in simple English and does not exceed three sentences in length.
+
+Do not give any information that is not related to the question, and do not repeat.
+No need to mention "according to the references..." and other internal references.
+
+After every sentence, always cite the reference with the citation numbers, in the format [citation:x].
+If a sentence comes from multiple references, please list all applicable citations, like [citation:3][citation:5].
+
+Here are the set of references:
+
+{REFERENCES}
+
+Remember, don't blindly repeat the references verbatim.
+Only supply the answer and do not add any additional commentaries, notes, remarks, and list of references.
+
+And here is the user question:`;
 
 const respond = async (context) => {
-    const { history, delegates } = context;
+    const { delegates } = context;
     const { enter, leave, stream } = delegates;
     enter && enter('Respond');
 
-    let prompt = RESPOND_PROMPT;
-    const relevant = history.slice(-2);
-    if (relevant.length > 0) {
-        prompt += '\n';
-        prompt += '\n';
-        prompt += 'For your reference, you and the user have the following Q&A discussion:\n';
-        relevant.forEach(msg => {
-            const { inquiry, answer } = msg;
-            prompt += `* ${inquiry} ${answer}\n`;
-        });
-    }
+    const { inquiry, references } = context;
 
     const messages = [];
-    messages.push({ role: 'system', content: prompt });
-    const { inquiry, thought, observation } = context;
-    messages.push({ role: 'user', content: construct({ inquiry, observation }) });
-    messages.push({ role: 'assistant', content: 'ANSWER: ' });
-    const answer = await chat(messages, stream);
+    if (references && Array.isArray(references) && references.length > 0) {
+        const refs = references.map(ref => {
+            const { position, title, snippet } = ref;
+            return `[citation:${position}] ${title} - ${snippet}`;
+        });
 
-    leave && leave('Respond', { inquiry, observation, answer });
+        const prompt = RESPOND_PROMPT.replace('{REFERENCES}', refs.join('\n'));
+        messages.push({ role: 'system', content: prompt });
+        messages.push({ role: 'user', content: inquiry });
+        messages.push({ role: 'assistant', content: 'ANSWER: ' });
+    } else {
+        console.error('No references to cite');
+    }
+    const answer = await chat(messages, stream);
+    leave && leave('Respond', { inquiry });
     return { answer, ...context };
 }
 
@@ -358,7 +418,9 @@ const review = (stages) => {
         const { name, duration, timestamp, ...fields } = stage;
         console.log(`${GREEN}${ARROW} Stage #${index + 1} ${YELLOW}${name} ${GRAY}[${duration} ms]${NORMAL}`);
         Object.keys(fields).map(key => {
-            console.log(`${GRAY}${key}: ${NORMAL}${fields[key]}`);
+            const value = fields[key];
+            const str = Array.isArray(value) ? JSON.stringify(value, null, 2) : value.toString();
+            console.log(`${GRAY}${key}: ${NORMAL}${str}`);
         });
     });
     console.log();
@@ -509,13 +571,14 @@ const evaluate = async (filename) => {
                     const leave = (name, fields) => { stages.push({ name, timestamp: Date.now(), ...fields }) };
                     const delegates = { enter, leave };
                     const context = { inquiry, history, delegates };
+                    console.log();
                     process.stdout.write(`  ${inquiry}\r`);
                     const start = Date.now();
-                    const pipeline = pipe(reason, respond);
+                    const pipeline = pipe(reason, search, respond);
                     const result = await pipeline(context);
                     const duration = Date.now() - start;
-                    const { topic, thought, keyphrases, answer } = result;
-                    history.push({ inquiry, thought, keyphrases, topic, answer, duration, stages });
+                    const { topic, thought, keyphrases, references, answer } = result;
+                    history.push({ inquiry, thought, keyphrases, topic, references, answer, duration, stages });
                     ++total;
                 } else if (role === 'Assistant') {
                     const expected = content;
@@ -524,13 +587,19 @@ const evaluate = async (filename) => {
                         console.error('There is no answer yet!');
                         process.exit(-1);
                     } else {
-                        const { inquiry, answer, duration, stages } = last;
+                        const { inquiry, answer, duration, references, stages } = last;
                         const target = answer;
                         const regexes = regexify(expected);
                         const matches = match(target, regexes);
                         if (matches.length === regexes.length) {
                             console.log(`${GREEN}${CHECK} ${CYAN}${inquiry} ${GRAY}[${duration} ms]${NORMAL}`);
                             console.log(' ', highlight(target, matches));
+                            if (references && Array.isArray(references) && references.length > 0) {
+                                references.forEach((reference) => {
+                                    const { position, url } = reference;
+                                    console.log(`  ${GRAY}[${position}] ${url}${NORMAL}`);
+                                })
+                            }
                             LLM_DEBUG_PIPELINE && review(simplify(stages));
                         } else {
                             ++failures;
@@ -553,7 +622,7 @@ const evaluate = async (filename) => {
                         const regexes = regexify(expected);
                         const matches = match(target, regexes);
                         if (matches.length === regexes.length) {
-                            console.log(`${GRAY}    ${ARROW} ${role}:`, highlight(target, matches, GREEN));
+                            console.log(`    ${ARROW} ${GRAY}${role}:`, highlight(target, matches, GREEN));
                         } else {
                             ++failures;
                             console.error(`${RED}Expected ${role} to contain: ${CYAN}${regexes.join(',')}${NORMAL}`);
@@ -601,6 +670,7 @@ const interact = async () => {
     let loop = true;
     const io = readline.createInterface({ input: process.stdin, output: process.stdout });
     io.on('close', () => { loop = false; });
+    console.log();
 
     const qa = () => {
         io.question(`${YELLOW}>> ${CYAN}`, async (inquiry) => {
@@ -630,12 +700,21 @@ const interact = async () => {
                 const delegates = { stream, enter, leave };
                 const context = { inquiry, history, delegates };
                 const start = Date.now();
-                const pipeline = pipe(reason, respond);
+                const pipeline = pipe(reason, search, respond);
                 const result = await pipeline(context);
                 const { topic, thought, keyphrases } = result;
                 const duration = Date.now() - start;
-                const { answer } = result;
+                const { answer, references } = result;
+                if (references && Array.isArray(references) && references.length > 0) {
+                    console.log();
+                    console.log();
+                    references.forEach((reference) => {
+                        const { position, url } = reference;
+                        console.log(`[${position}] ${GRAY}${url}${NORMAL}`);
+                    })
+                }
                 history.push({ inquiry, thought, keyphrases, topic, answer, duration, stages });
+                console.log();
                 console.log();
             }
             loop && qa();
@@ -645,8 +724,11 @@ const interact = async () => {
     qa();
 }
 
-
 (async () => {
+    if (!TAVILY_API_KEY || TAVILY_API_KEY.length < 32) {
+        console.error('Fatal error: TAVILY_API_KEY not set!');
+        process.exit(-1);
+    }
     console.log(`Using LLM at ${LLM_API_BASE_URL} (model: ${GREEN}${LLM_CHAT_MODEL || 'default'}${NORMAL}).`);
 
     const args = process.argv.slice(2);
