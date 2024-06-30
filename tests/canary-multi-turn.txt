@@ -1,8 +1,11 @@
-User: Which Southeast Asia country has the largest population?
-Assistant: /Indonesia/ is the most populous country in Southeast Asia.
+User: Which planet is the biggest?
+Assistant: /Jupiter/ is the largest planet in our solar system.
 
-User: Where is its capital?
-Assistant: The capital of Indonesia is /Jakarta/.
+User: and the smallest?
+Assistant: The smallest planet in our solar system is /Mercury/.
 
-User: What's the currency used there and what's the symbol?
-Assistant: The official currency is the Rupiah and its symbol is /Rp|IDR/.
+User: and the hottest?
+Assistant: /Venus/ is the hottest planet in our solar system.
+
+User: and the one known to have the most complex ring system?
+Assistant: It must be /Saturn/!

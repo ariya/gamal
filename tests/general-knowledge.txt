@@ -30,7 +30,7 @@ Pipeline.Reason.Keyphrases: /composition|material| /gas giants/
 
 Story: Geography
 
-User: Which Nordic country is known for IKEA
+User: Which Nordic country is known as the origin of IKEA
 Assistant: IKEA is a /Sweden|Swedish/ company.
 Pipeline.Reason.Keyphrases: /IKEA/
 

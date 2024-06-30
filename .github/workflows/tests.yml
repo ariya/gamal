@@ -1,10 +1,11 @@
-name: Sandbox
+name: Tests
 
 on:
   workflow_dispatch:
   push:
     branches:
       - main
+  pull_request:
 
 jobs:
 
@@ -18,7 +19,7 @@ jobs:
           - mistralai/mistral-7b-instruct-v0.3           # $0.07
     steps:
       - uses: actions/checkout@v4
-      - run: ./query-llm.js tests/canary-multi-turn.txt
+      - run: ./gamal.js tests/canary-multi-turn.txt
         env:
           LLM_API_BASE_URL: ${{ secrets.LLM_API_BASE_URL }}
           LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
@@ -34,7 +35,7 @@ jobs:
           - mistralai/mistral-7b-instruct-v0.3           # $0.07
     steps:
       - uses: actions/checkout@v4
-      - run: ./query-llm.js tests/high-school-stem.txt
+      - run: ./gamal.js tests/high-school-stem.txt
         env:
           LLM_API_BASE_URL: ${{ secrets.LLM_API_BASE_URL }}
           LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
@@ -50,7 +51,7 @@ jobs:
           - mistralai/mistral-7b-instruct-v0.3           # $0.07
     steps:
       - uses: actions/checkout@v4
-      - run: ./query-llm.js tests/general-knowledge.txt
+      - run: ./gamal.js tests/general-knowledge.txt
         env:
           LLM_API_BASE_URL: ${{ secrets.LLM_API_BASE_URL }}
           LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
