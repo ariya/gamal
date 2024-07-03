@@ -233,7 +233,9 @@ const construct = (kv) => {
  */
 
 const REASON_PROMPT = `Use Google to search for the answer.
-Think step by step. Always output your thought in the following format:
+Think step by step. If necessary, refer to the relevant part of the previous conversation history.
+
+Always output your thought in the following format:
 
 TOOL: the search engine to use (must be Google).
 THOUGHT: describe your thoughts about the inquiry.
