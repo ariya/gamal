@@ -1,0 +1,20 @@
+name: Latest News
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+
+  latest-news:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - run: ./gamal.js tests/latest-news.txt
+        env:
+          LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
+          TAVILY_API_KEY: ${{ secrets.TAVILY_API_KEY }}
