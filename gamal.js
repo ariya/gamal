@@ -154,7 +154,7 @@ const chat = async (messages, handler) => {
     return answer;
 }
 
-const PREDEFINED_KEYS = ['INQUIRY', 'TOOL', 'THOUGHT', 'KEYPHRASES', 'OBSERVATION', 'TOPIC'];
+const PREDEFINED_KEYS = ['INQUIRY', 'TOOL', 'LANGUAGE', 'THOUGHT', 'KEYPHRASES', 'OBSERVATION', 'TOPIC'];
 
 /**
  * Break downs a multi-line text based on a number of predefined keys.
@@ -232,14 +232,19 @@ const construct = (kv) => {
  * @returns {Context} Updated pipeline context.
  */
 
-const REASON_PROMPT = `Use Google to search for the answer.
-Think step by step. If necessary, refer to the relevant part of the previous conversation history.
+const REASON_PROMPT = `You are Gamal, a world-class answering assistant.
+You are interacting with a human who gives you an inquiry.
+Your task is as follows.
+Use Google to search for the answer. Think step by step. Fix any misspelings.
+If necessary, refer to the relevant part of the previous conversation history.
+Use the same language as the inquiry.
 
 Always output your thought in the following format:
 
 TOOL: the search engine to use (must be Google).
+LANGUAGE: the language of the inquiry.
 THOUGHT: describe your thoughts about the inquiry.
-KEYPHRASES:  the important query to give to Google.
+KEYPHRASES: the important query to give to Google.
 OBSERVATION: the concise result of the search tool.
 TOPIC: the specific topic covering the inquiry.`;
 
@@ -247,13 +252,14 @@ const REASON_EXAMPLE = `
 
 # Example
 
-Given an inquiry "What is Pitch Lake in Trinidad famous for?", you will output:
+Given an inquiry "Pour quoi le lac de Pitch à Trinidad est-il célèbre?", you will output:
 
 TOOL: Google.
-THOUGHT: This is about geography, I will use Google search.
-KEYPHRASES: Pitch Lake in Trinidad fame.
-OBSERVATION: Pitch Lake in Trinidad is the largest natural deposit of asphalt.
-TOPIC: geography.`;
+LANGUAGE: French.
+THOUGHT: Cela concerne la géographie, je vais utiliser la recherche Google.
+KEYPHRASES: Pitch Lake in Trinidad famerenommée du lac de Pitch à Trinidad.
+OBSERVATION: Le lac de Pitch à Trinidad est le plus grand dépôt naturel d'asphalte.
+TOPIC: géographie.`;
 
 const breakdown = (hint, completion) => {
     const text = hint + completion;
@@ -288,7 +294,7 @@ const reason = async (context) => {
 
     const { inquiry } = context;
     messages.push({ role: 'user', content: inquiry });
-    const hint = ['TOOL: Google.', 'THOUGHT: '].join('\n');
+    const hint = ['TOOL: Google.', 'LANGUAGE: '].join('\n');
     messages.push({ role: 'assistant', content: hint });
     const completion = await chat(messages);
     let result = breakdown(hint, completion);
@@ -300,9 +306,9 @@ const reason = async (context) => {
         const completion = await chat(messages);
         result = breakdown(hint, completion);
     }
-    const { topic, thought, keyphrases, observation } = result;
-    leave && leave('Reason', { topic, thought, keyphrases, observation });
-    return { topic, thought, keyphrases, observation, ...context };
+    const { language, topic, thought, keyphrases, observation } = result;
+    leave && leave('Reason', { language, topic, thought, keyphrases, observation });
+    return { language, topic, thought, keyphrases, observation, ...context };
 }
 
 /**
@@ -364,7 +370,7 @@ Cite each reference at the end of each sentence.
 
 You are expected to provide an answer that is accurate, correct, and reflect expert knowledge.
 Your answer must maintain an unbiased and professional tone.
-Ensure that your answer is written in simple English and does not exceed three sentences in length.
+Your answer should not exceed 3 sentences in length, unless the instruction is to do so.
 
 Do not give any information that is not related to the question, and do not repeat.
 No need to mention "according to the references..." and other internal references.
@@ -377,7 +383,9 @@ Here are the set of references:
 {REFERENCES}
 
 Remember, don't blindly repeat the references verbatim.
-Only supply the answer and do not add any additional commentaries, notes, remarks, and list of references.
+Only supply the answer and do not add any additional commentaries, notes, remarks, list of references, extra translations, postanalysis.
+
+Your answer must be in the same language as the inquiry, i.e. {LANGUAGE}.
 
 And here is the user question:`;
 
@@ -386,7 +394,7 @@ const respond = async (context) => {
     const { enter, leave, stream } = delegates;
     enter && enter('Respond');
 
-    const { inquiry, references } = context;
+    const { inquiry, language, references } = context;
 
     const messages = [];
     if (references && Array.isArray(references) && references.length > 0) {
@@ -395,10 +403,10 @@ const respond = async (context) => {
             return `[citation:${position}] ${title} - ${snippet}`;
         });
 
-        const prompt = RESPOND_PROMPT.replace('{REFERENCES}', refs.join('\n'));
+        const prompt = RESPOND_PROMPT.replace('{LANGUAGE}', language).
+            replace('{REFERENCES}', refs.join('\n'));
         messages.push({ role: 'system', content: prompt });
         messages.push({ role: 'user', content: inquiry });
-        messages.push({ role: 'assistant', content: 'ANSWER: ' });
     } else {
         console.error('No references to cite');
     }
