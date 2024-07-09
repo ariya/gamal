@@ -8,7 +8,7 @@ const LLM_API_BASE_URL = process.env.LLM_API_BASE_URL || 'https://openrouter.ai/
 const LLM_CHAT_MODEL = process.env.LLM_CHAT_MODEL || 'mistralai/mistral-7b-instruct-v0.3';
 const LLM_STREAMING = process.env.LLM_STREAMING !== 'no';
 
-const TAVILY_API_KEY = process.env.TAVILY_API_KEY;
+const YOU_API_KEY = process.env.YOU_API_KEY;
 const TOP_K = 3;
 
 const LLM_DEBUG_CHAT = process.env.LLM_DEBUG_CHAT;
@@ -323,35 +323,37 @@ const search = async (context) => {
     const { enter, leave } = delegates;
     enter && enter('Search');
 
-    const response = await fetch('https://api.tavily.com/search', {
-        method: 'POST',
+    const query = keyphrases.replace(/\.$/, "").replace(/^"|"$/g, "");
+
+    let url = new URL('https://api.ydc-index.io/search');
+    url.searchParams.append('query', query);
+    url.searchParams.append('num_web_results', TOP_K);
+
+    const response = await fetch(url, {
+        method: 'GET',
         headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            api_key: TAVILY_API_KEY,
-            query: keyphrases,
-            max_results: TOP_K,
-            include_answer: true
-        })
+            'Content-Type': 'application/json',
+            'X-API-Key': YOU_API_KEY
+        }
     });
     const data = await response.json();
     if (!response.ok) {
-        throw new Error(`Tavily call failed with status: ${response.status}`);
+        throw new Error(`You.com call failed with status: ${response.status}`);
     }
-    LLM_DEBUG_SEARCH && console.log('Search result: ', { keyphrases, data });
-    const { answer, results = [] } = data;
+    const { hits = [] } = data;
+    LLM_DEBUG_SEARCH && console.log('Search result: ', { query, data, hits });
     let references = [];
-    if (Array.isArray(results) && results.length > 0) {
-        references = results.slice(0, TOP_K).map((result, i) => {
-            const { title, url, content } = result;
-            const snippet = content;
+    if (Array.isArray(hits) && hits.length > 0) {
+        const MAX_CHARS = 1000;
+        references = hits.slice(0, TOP_K).map((hit, i) => {
+            const { title, url, description = '', snippets = [] } = hit;
+            const snippet = description + snippets.join('\n').substring(0, MAX_CHARS);
             return { position: i + 1, title, url, snippet };
         });
     }
 
-    leave && leave('Search', { answer, references });
-    return { ...context, observation: answer || observation, references };
+    leave && leave('Search', { references });
+    return { ...context, references };
 }
 
 /**
@@ -735,8 +737,8 @@ const interact = async () => {
 }
 
 (async () => {
-    if (!TAVILY_API_KEY || TAVILY_API_KEY.length < 32) {
-        console.error('Fatal error: TAVILY_API_KEY not set!');
+    if (!YOU_API_KEY || YOU_API_KEY.length < 64) {
+        console.error('Fatal error: YOU_API_KEY not set!');
         process.exit(-1);
     }
     console.log(`Using LLM at ${LLM_API_BASE_URL} (model: ${GREEN}${LLM_CHAT_MODEL || 'default'}${NORMAL}).`);
