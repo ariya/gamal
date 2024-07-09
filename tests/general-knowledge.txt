@@ -69,7 +69,7 @@ Assistant: /Cricket/ is India's most beloved sport.
 Pipeline.Reason.Keyphrases: /sport/ /India/
 
 User: Which continent is the coldest?
-Assistant: /Antarctica/ is considered as the coldest continent.
+Assistant: /Antarctic(a)?/ is considered as the coldest continent.
 Pipeline.Reason.Keyphrases: /cold(est)?|temperature|ice|icy/
 
 User: In which country Mandarin is spoken?
@@ -84,9 +84,9 @@ User: Name the no 1 tallest building in the Middle East
 Assistant: The /Burj Khalifa/ in Dubai, UAE, is the tallest building in the Middle East.
 Pipeline.Reason.Keyphrases: /building/ /Middle East/
 
-User: Which country is famous for its pyramids?
-Assistant: /Egypt/ is well-known for its pyramids, particulary the Giza Pyramid.
-Pipeline.Reason.Keyphrases: /pyramid/
+User: Which country is famous for its Great Pyramid of Giza?
+Assistant: /Egypt/ is famous for its Great Pyramid of Giza, on the Giza plateau near Cairo.
+Pipeline.Reason.Keyphrases: /pyramid|Giza/
 
 Story:  Famous people
 User: Who wrote the poems in Masnavi?
@@ -101,7 +101,7 @@ User: Who sailed with and became the commander of the flagship Santa Maria on th
 Assistant: Christopher /Columbus/ captained the flagship Santa Maria.
 Pipeline.Reason.Keyphrases: /Santa Maria|Columbus/
 
-User: Who is the author of LISP?
+User: Who is generally considered the inventor of LISP?
 Assistant: John /Mc\s?Carthy/ invented LISP in 1958 at the MIT.
 Pipeline.Reason.Keyphrases: /LISP/
 
