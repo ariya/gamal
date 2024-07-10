@@ -14,7 +14,7 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
-      - run: ./gamal.js tests/general-knowledge.txt
+      - run: ./gamal.js tests/en/general-knowledge.txt
         env:
           LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
           YOU_API_KEY: ${{ secrets.YOU_API_KEY }}

@@ -1,0 +1,29 @@
+Story: Fragen zu STEM-Themen in der Oberstufe
+
+User: Welche Kraft zieht Objekte zum Erdmittelpunkt?
+Assistant: Die /Schwerkraft|Erdanziehungskraft|Gewichtskraft|Gravitation(skraft)?/ zieht Objekte zum Erdmittelpunkt.
+Pipeline.Reason.Keyphrases: /force|gravity|Earth|(Schwer)?kraft|Gravitation/
+
+User: Was ist die Ordnungszahl von Kohlenstoff?
+Assistant: Die Ordnungszahl von Kohlenstoff beträgt /6|sechs/.
+Pipeline.Reason.Keyphrases: /carbon|Kohlenstoff/
+
+User: Durch welchen Prozess erzeugen Pflanzen ihre eigene Nahrung?
+Assistant: Pflanzen erzeugen ihre eigene Nahrung durch den Prozess der /Fotosynthese|Photosynthese/.
+Pipeline.Reason.Keyphrases: /plant|photosynthesis|Pflanze(n)?|fotodigestion|Fotosynthese|Photosynthese/
+
+User: Wie groß ist die Summe (in Grad) der Innenwinkel eines Dreiecks?
+Assistant: Die Summe der Innenwinkel eines Dreiecks beträgt /180/ Grad.
+Pipeline.Reason.Keyphrases: /angles|(Innen)?winkel/ /triangle|Dreieck(s)?/
+
+User: Was ist die Einheit der Kraft?
+Assistant: Die Maßeinheit für die Kraft ist das /Newton/ (N).
+Pipeline.Reason.Keyphrases: /force|kraft/
+
+User: Was ist das Elementsymbol für Magnesium?
+Assistant: Das Elementsymbol für Magnesium ist /Mg/.
+Pipeline.Reason.Keyphrases: /magnesium/
+
+User: Was ist die kleinsten bekannten Bausteine der Materie?
+Assistant: Die kleinsten bekannten Bausteine der Materie sind /Elementarteilchen|Quarks|Quanten|Leptonen/.
+Pipeline.Reason.Keyphrases: /unit|bausteine|elementary|particle/ 
