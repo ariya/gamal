@@ -385,7 +385,7 @@ Here are the set of references:
 {REFERENCES}
 
 Remember, don't blindly repeat the references verbatim.
-Only supply the answer and do not add any additional commentaries, notes, remarks, list of references, extra translations, postanalysis.
+Only supply the answer and do not add any additional commentaries, notes, remarks, list of citations, literature references, extra translations, postanalysis.
 
 Your answer must be in the same language as the inquiry, i.e. {LANGUAGE}.
 
