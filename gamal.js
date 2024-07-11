@@ -675,9 +675,39 @@ const evaluate = async (filename) => {
     }
 }
 
+const MAX_LOOKAHEAD = 3 * '[citation:x]'.length;
+
+const push = (buffer, text) => {
+    buffer += text;
+    let match;
+    const PATTERN = /\[citation:(\d+)\]/g;
+    while ((match = PATTERN.exec(buffer)) !== null) {
+        const number = match[1];
+        const { index } = match;
+        if (number >= '0' && number <= '9') {
+            const ref = `${GRAY}[${number}]${NORMAL}`;
+            buffer = buffer.substr(0, index) + ref + buffer.substr(index + 12);
+        }
+    }
+    if (buffer.length > MAX_LOOKAHEAD) {
+        const output = buffer.substr(0, buffer.length - MAX_LOOKAHEAD);
+        process.stdout.write(output);
+        buffer = buffer.substr(buffer.length - MAX_LOOKAHEAD);
+    }
+    return buffer;
+}
+
+const flush = buffer => {
+    process.stdout.write(buffer);
+    buffer = '';
+    return buffer;
+}
+
 const interact = async () => {
+    let buffer = '';
+    const stream = (text) => buffer = push(buffer, text);
+
     const history = [];
-    const stream = (text) => process.stdout.write(text);
 
     let loop = true;
     const io = readline.createInterface({ input: process.stdin, output: process.stdout });
@@ -714,6 +744,7 @@ const interact = async () => {
                 const start = Date.now();
                 const pipeline = pipe(reason, search, respond);
                 const result = await pipeline(context);
+                buffer = flush(buffer);
                 const { topic, thought, keyphrases } = result;
                 const duration = Date.now() - start;
                 const { answer, references } = result;
