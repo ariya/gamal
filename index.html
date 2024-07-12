@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en" class="full-h">
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Gamal - Your Assistant</title>
+</head>
+
+<body class="full-h">
+    <main id="chat">
+    </main>
+    <footer>
+        <div class="input-container">
+            <input type="text" id="prompt" autocomplete="off" autofocus placeholder="Ask something"></textarea>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+
+            const $ = (id) => document.getElementById(id);
+
+            const $div = (cls) => {
+                const el = document.createElement('div');
+                el.setAttribute('class', cls);
+                return el;
+            }
+
+            function message(type, text) {
+                const el = $div(`speech-bubble-${type} color-${type}`);
+                el.innerText = text || '';
+                const wrapper = $div(`speech speech-${type}`);
+                wrapper.appendChild(el);
+                $('chat').appendChild(wrapper);
+                setTimeout(() => {
+                    el.scrollIntoView();
+                }, 0);
+                return el;
+            }
+
+            function stream(type, text) {
+                const selectors = document.querySelectorAll(`.speech-bubble-${type}`);
+                const el = selectors[selectors.length - 1] || message(type, text);
+                el.innerText = text || '';
+                setTimeout(() => {
+                    el.scrollIntoView();
+                }, 0);
+                return el;
+            }
+
+            function unmessage(type) {
+                const el = document.querySelector(`.speech-${type}`);
+                el && el.remove();
+            }
+
+            const isTouchDevice = () => 'ontouchstart' in window;
+
+            // On a device with touch support (read: mobile), do not autofocus
+            // since it'll annoyingly trigger the on-screen keyboard
+            function focusInput() {
+                if (!isTouchDevice()) {
+                    $('prompt').focus();
+                }
+            }
+
+            async function ask(question, handler) {
+                message('human', question);
+                $('prompt').blur();
+                const url = '/chat?' + encodeURIComponent(question);
+                const el = message('loader');
+                el.innerHTML = '<div class=loader></div>';
+                setTimeout(get, 100);
+
+                async function get() {
+                    const response = await fetch(url);
+                    message('assistant');
+                    let answer = '';
+                    try {
+                        const reader = response.body.getReader();
+                        while (true) {
+                            const { done, value } = await reader.read();
+                            unmessage('loader');
+                            if (done) {
+                                break;
+                            }
+                            const text = new TextDecoder().decode(value, { stream: true });
+                            answer += text;
+                            stream('assistant', answer);
+                        }
+                    } catch (e) {
+                        message('panic', `Something is wrong: ${e.toString()}`);
+                    } finally {
+                        unmessage('loader');
+                        handler && handler(answer);
+                        setTimeout(focusInput, 0);
+                    }
+                }
+
+
+            }
+
+            $('prompt').addEventListener('keydown', function handleKeyInput(event) {
+                if (event.key === 'Enter') {
+                    const el = $('prompt');
+                    const question = el.value.trim();
+                    if (question.length > 0) {
+                        ask(question);
+                        el.value = '';
+                    }
+                }
+            });
+
+            setTimeout(() => {
+                message('assistant', 'Hi, this is Gamal! How can I help you?');
+            }, 100);
+
+            const tests = [
+                'Who is the CEO of Google?',
+                'What is a dwarf planet?',
+                'Give an example!',
+                'List all terrestrial planets',
+                'Which is the closest to the Sun?',
+                'Which planet known as the red one?',
+                'When was solar system formed?',
+                'What materials compose the gas giants?',
+                'What about the ice giants',
+                'Explain the heliopause',
+                'When did Voyager 2 enter the interstellar space?',
+                'How about Voyager 1?'
+            ];
+
+            async function verify() {
+                const question = tests.shift();
+                if (question && question.length > 0) {
+                    await ask(question, () => setTimeout(verify, 300));
+                }
+            }
+
+            // Run automated tests on a series of questions
+            // setTimeout(verify, 1000);
+        });
+    </script>
+
+    <style>
+        html {
+            line-height: 1.5;
+            background-color: white;
+            font-family: ui-sans-serif, system-ui, -apple-system,
+                BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue",
+                Arial, "Noto Sans", sans-serif, "Apple Color Emoji",
+                "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+        }
+
+        .full-h {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            color: white;
+            color-scheme: light;
+        }
+
+        *,
+        ::after,
+        ::before {
+            box-sizing: border-box;
+            border-width: 0;
+            border-style: solid;
+            border-color: currentColor;
+        }
+
+        footer {
+            flex: none;
+            padding: 0;
+        }
+
+        main#chat {
+            padding: 1rem;
+            overflow-y: scroll;
+            -webkit-overflow-scrolling: touch;
+            flex: auto;
+        }
+
+        .input-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: row;
+        }
+
+        input,
+        textarea {
+            font-family: inherit;
+            margin: 0;
+            color: white;
+            width: 100%;
+            height: 3rem;
+            padding-left: 1rem;
+            padding-right: 1rem;
+            font-size: 1rem;
+            line-height: 1.5rem;
+            border: 2px solid white;
+            background-color: black;
+            border-radius: .5rem;
+        }
+
+        input:focus,
+        textarea:focus {
+            outline: none;
+        }
+
+        input:disabled,
+        input[disabled] {
+            cursor: not-allowed;
+        }
+
+        .speech {
+            display: grid;
+            column-gap: .75rem;
+            padding-top: .25rem;
+            padding-bottom: .25rem;
+        }
+
+        .speech-loader,
+        .speech-assistant {
+            place-items: start;
+        }
+
+        .speech-human,
+        .speech-panic {
+            place-items: end;
+        }
+
+        .speech-bubble-loader,
+        .speech-bubble-assistant,
+        .speech-bubble-human,
+        .speech-bubble-panic {
+            display: block;
+            white-space: pre-line;
+            position: relative;
+            width: fit-content;
+            padding: .5rem 1rem;
+            min-height: 2.5rem;
+            min-width: 2.5rem;
+            max-width: 90%;
+            border-radius: 0.5rem;
+            border: none;
+        }
+
+        .speech-bubble-assistant {
+            border-color: #FBFFFE;
+            box-shadow: .1rem .1rem .2rem #C8D0CB;
+        }
+
+        .speech-bubble-human {
+            border-color: #127475;
+        }
+
+        .speech-bubble-panic {
+            border-color: #9B239D;
+        }
+
+        .color-assistant {
+            background-color: #FBFFFE;
+            color: #131614;
+            border: 1px solid #D3D9D5;
+        }
+
+        .color-human {
+            background-color: #127475;
+            color: #FBFFFE;
+        }
+
+        .color-panic {
+            background-color: #9B239D;
+            color: #ddd;
+        }
+
+        div#input {
+            position: fixed;
+            width: 100%;
+            left: 0;
+            bottom: 2px;
+            padding: 0px;
+        }
+
+        .loader {
+            width: 2em;
+            aspect-ratio: 2;
+            background:
+                no-repeat linear-gradient(#000 0 0),
+                no-repeat linear-gradient(#000 0 0),
+                no-repeat linear-gradient(#000 0 0);
+            background-size: 20% 50%;
+            animation: load 1s infinite linear;
+        }
+
+        @keyframes load {
+            0% {
+                background-position: 0% 100%, 50% 100%, 100% 100%
+            }
+
+            20% {
+                background-position: 0% 50%, 50% 100%, 100% 100%
+            }
+
+            40% {
+                background-position: 0% 0%, 50% 50%, 100% 100%
+            }
+
+            60% {
+                background-position: 0% 100%, 50% 0%, 100% 50%
+            }
+
+            80% {
+                background-position: 0% 100%, 50% 100%, 100% 0%
+            }
+
+            100% {
+                background-position: 0% 100%, 50% 100%, 100% 100%
+            }
+        }
+    </style>
+
+</body>
+
+</html>

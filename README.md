@@ -14,3 +14,9 @@ echo "List 5 Indonesia's best travel destinations" | ./gamal.js
 ```
 
 Gamal is also compatible with local LLM inference tools such as [llama.cpp](https://github.com/ggerganov/llama.cpp), [Jan](https://jan.ai), [Ollama](https://ollama.com), and [LocalAI](https://localai.io). For instructions on how to set up the environment variables for these services, please refer to the documentation of the project, [Ask LLM](https://github.com/ariya/ask-llm?tab=readme-ov-file#using-local-llm-servers). For the best results, it is recommended to use an LLM with 7B parameters or more.
+
+If the `GAMAL_HTTP_PORT` environment variable is specified, Gamal can be accessed through its minimalist front-end web interface. For example:
+```bash
+GAMAL_HTTP_PORT=5000 ./gamal.js
+```
+Then, open a web browser and navigate to `localhost:5000`.

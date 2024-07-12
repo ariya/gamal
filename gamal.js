@@ -1,7 +1,10 @@
 #!/usr/bin/env node
 
 const fs = require('fs');
+const http = require('http');
 const readline = require('readline');
+
+const GAMAL_HTTP_PORT = process.env.GAMAL_HTTP_PORT;
 
 const LLM_API_KEY = process.env.LLM_API_KEY;
 const LLM_API_BASE_URL = process.env.LLM_API_BASE_URL || 'https://openrouter.ai/api/v1';
@@ -783,6 +786,52 @@ const interact = async () => {
     qa();
 }
 
+const serve = async (port) => {
+    const history = [];
+
+    const decode = url => {
+        const parsedUrl = new URL(`http://localhost/${url}`);
+        const { search } = parsedUrl;
+        return decodeURIComponent(search.substring(1)).trim();
+    }
+
+    const server = http.createServer(async (request, response) => {
+        const { url } = request;
+        if (url === '/health') {
+            response.writeHead(200).end('OK');
+        } else if (url === '/' || url === '/index.html') {
+            response.writeHead(200, { 'Content-Type': 'text/html' });
+            response.end(fs.readFileSync('./index.html'));
+        } else if (url.startsWith('/chat')) {
+            const inquiry = decode(url);
+            if (inquiry.length > 0) {
+                console.log(`${YELLOW}>> ${CYAN}${inquiry}${NORMAL}`);
+                response.writeHead(200, { 'Content-Type': 'text/plain' });
+                const stream = (text) => response.write(text);
+                const delegates = { stream };
+                const context = { inquiry, history, delegates };
+                const start = Date.now();
+                const pipeline = pipe(reason, search, respond);
+                const result = await pipeline(context);
+                response.end();
+                const duration = Date.now() - start;
+                const { topic, thought, keyphrases, answer } = result;
+                history.push({ inquiry, thought, keyphrases, topic, answer, duration });
+                console.log(answer);
+                console.log();
+            } else {
+                response.writeHead(400).end();
+            }
+        } else {
+            console.error(`${url} is 404!`)
+            response.writeHead(404);
+            response.end();
+        }
+    });
+    server.listen(port);
+    console.log('Listening on port', port);
+}
+
 (async () => {
     if (!YOU_API_KEY || YOU_API_KEY.length < 64) {
         console.error('Fatal error: YOU_API_KEY not set!');
@@ -793,6 +842,11 @@ const interact = async () => {
     const args = process.argv.slice(2);
     args.forEach(evaluate);
     if (args.length == 0) {
-        await interact();
+        const port = parseInt(GAMAL_HTTP_PORT, 10);
+        if (Number.isNaN(port)) {
+            await interact();
+        } else {
+            await serve(port);
+        }
     }
 })();
