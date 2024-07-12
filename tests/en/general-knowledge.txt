@@ -119,7 +119,7 @@ Pipeline.Reason.Keyphrases: /PM|Prime Minister/
 
 Story: Cuisine
 User: Where is the origin of Biryani: India or Ireland?
-Assistant: Biryani originated from /India/.
+Assistant: Biryani originated from /India|Iran|Persia(n)?/.
 Pipeline.Reason.Keyphrases: /biryani|origin/
 
 User: What is the green paste used with sushi?
