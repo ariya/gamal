@@ -318,7 +318,7 @@ const reason = async (context) => {
  * @param {Context} context - Current pipeline context.
  * @returns {Context} Updated pipeline context.
  */
-const search = async (context) => {
+const search = async (context, attempt = 3) => {
     const { delegates, keyphrases, observation } = context;
     const { enter, leave } = delegates;
     enter && enter('Search');
@@ -338,7 +338,12 @@ const search = async (context) => {
     });
     const data = await response.json();
     if (!response.ok) {
-        throw new Error(`You.com call failed with status: ${response.status}`);
+        if (attempt > 1) {
+            LLM_DEBUG_SEARCH && console.log('You.com failed. Retrying...');
+            return await search(context, attempt - 1);
+        } else {
+            throw new Error(`You.com call failed with status: ${response.status}`);
+        }
     }
     const { hits = [] } = data;
     LLM_DEBUG_SEARCH && console.log('Search result: ', { query, data, hits });
@@ -350,6 +355,11 @@ const search = async (context) => {
             const snippet = description + snippets.join('\n').substring(0, MAX_CHARS);
             return { position: i + 1, title, url, snippet };
         });
+    } else {
+        if (attempt > 1) {
+            LLM_DEBUG_SEARCH && console.log('Something is wrong, search gives no result. Retrying...');
+            return await search(context, attempt - 1);
+        }
     }
 
     leave && leave('Search', { references });
