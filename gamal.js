@@ -558,8 +558,6 @@ const highlight = (text, spans, color = BOLD + GREEN) => {
  * @param {string} filename - The path to the test file.
  */
 const evaluate = async (filename) => {
-    const identity = (x) => x;
-
     try {
         let history = [];
         let total = 0;
