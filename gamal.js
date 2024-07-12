@@ -673,37 +673,38 @@ const evaluate = async (filename) => {
     }
 }
 
-const MAX_LOOKAHEAD = 3 * '[citation:x]'.length;
-
-const push = (buffer, text) => {
-    buffer += text;
-    let match;
-    const PATTERN = /\[citation:(\d+)\]/g;
-    while ((match = PATTERN.exec(buffer)) !== null) {
-        const number = match[1];
-        const { index } = match;
-        if (number >= '0' && number <= '9') {
-            const ref = `${GRAY}[${number}]${NORMAL}`;
-            buffer = buffer.substr(0, index) + ref + buffer.substr(index + 12);
-        }
-    }
-    if (buffer.length > MAX_LOOKAHEAD) {
-        const output = buffer.substr(0, buffer.length - MAX_LOOKAHEAD);
-        process.stdout.write(output);
-        buffer = buffer.substr(buffer.length - MAX_LOOKAHEAD);
-    }
-    return buffer;
-}
-
-const flush = buffer => {
-    process.stdout.write(buffer);
-    buffer = '';
-    return buffer;
-}
-
 const interact = async () => {
-    let buffer = '';
-    const stream = (text) => buffer = push(buffer, text);
+    let display = { buffer: '' };
+
+    const MAX_LOOKAHEAD = 3 * '[citation:x]'.length;
+
+    const push = (display, text) => {
+        let { buffer } = display;
+        buffer += text;
+        let match;
+        const PATTERN = /\[citation:(\d+)\]/g;
+        while ((match = PATTERN.exec(buffer)) !== null) {
+            const number = match[1];
+            const { index } = match;
+            if (number >= '0' && number <= '9') {
+                const ref = `${GRAY}[${number}]${NORMAL}`;
+                buffer = buffer.substr(0, index) + ref + buffer.substr(index + 12);
+            }
+        }
+        if (buffer.length > MAX_LOOKAHEAD) {
+            const output = buffer.substr(0, buffer.length - MAX_LOOKAHEAD);
+            process.stdout.write(output);
+            buffer = buffer.substr(buffer.length - MAX_LOOKAHEAD);
+        }
+        return { buffer };
+    }
+
+    const flush = display => {
+        const { buffer } = display;
+        process.stdout.write(buffer);
+        return { buffer: '' };
+    }
+
 
     const history = [];
 
@@ -735,6 +736,7 @@ const interact = async () => {
                         }
                     }
                 }
+                const stream = (text) => display = push(display, text);
                 const enter = (name) => { stages.push({ name, timestamp: Date.now() }) };
                 const leave = (name, fields) => { update(name, fields); stages.push({ name, timestamp: Date.now(), ...fields }) };
                 const delegates = { stream, enter, leave };
@@ -742,7 +744,7 @@ const interact = async () => {
                 const start = Date.now();
                 const pipeline = pipe(reason, search, respond);
                 const result = await pipeline(context);
-                buffer = flush(buffer);
+                display = flush(display);
                 const { topic, thought, keyphrases } = result;
                 const duration = Date.now() - start;
                 const { answer, references } = result;
