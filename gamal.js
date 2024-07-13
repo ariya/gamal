@@ -719,7 +719,7 @@ const interact = async () => {
 
     const flush = display => {
         const { buffer } = display;
-        process.stdout.write(buffer);
+        process.stdout.write(buffer.trimRight());
         return { buffer: '', refs: [] };
     }
 
