@@ -437,19 +437,23 @@ const respond = async (context) => {
  * @param {Array<Stage>} stages
  */
 const review = (stages) => {
+    let buffer = 'Pipeline review:\n';
     console.log();
     console.log(`${MAGENTA}Pipeline review ${NORMAL}`);
     console.log('---------------');
     stages.map((stage, index) => {
         const { name, duration, timestamp, ...fields } = stage;
         console.log(`${GREEN}${ARROW} Stage #${index + 1} ${YELLOW}${name} ${GRAY}[${duration} ms]${NORMAL}`);
+        buffer += `\nStage #${index + 1} ${name} [${duration} ms]\n`;
         Object.keys(fields).map(key => {
             const value = fields[key];
             const str = Array.isArray(value) ? JSON.stringify(value, null, 2) : value.toString();
             console.log(`${GRAY}${key}: ${NORMAL}${str}`);
+            buffer += `${key}: ${str}\n`;
         });
     });
     console.log();
+    return buffer;
 }
 
 /**
@@ -805,11 +809,23 @@ const serve = async (port) => {
             response.end(fs.readFileSync('./index.html'));
         } else if (url.startsWith('/chat')) {
             const inquiry = decode(url);
-            if (inquiry.length > 0) {
+            if (inquiry === '/review') {
+                const last = history.slice(-1).pop();
+                if (!last) {
+                    response.write('Nothing to review yet!');
+                } else {
+                    const { stages } = last;
+                    response.write(review(simplify(stages)));
+                }
+                response.end();
+            } else if (inquiry.length > 0) {
                 console.log(`${YELLOW}>> ${CYAN}${inquiry}${NORMAL}`);
                 response.writeHead(200, { 'Content-Type': 'text/plain' });
+                const stages = [];
+                const enter = (name) => { stages.push({ name, timestamp: Date.now() }) };
+                const leave = (name, fields) => { stages.push({ name, timestamp: Date.now(), ...fields }) };
                 const stream = (text) => response.write(text);
-                const delegates = { stream };
+                const delegates = { enter, leave, stream };
                 const context = { inquiry, history, delegates };
                 const start = Date.now();
                 const pipeline = pipe(reason, search, respond);
@@ -817,7 +833,7 @@ const serve = async (port) => {
                 response.end();
                 const duration = Date.now() - start;
                 const { topic, thought, keyphrases, answer } = result;
-                history.push({ inquiry, thought, keyphrases, topic, answer, duration });
+                history.push({ inquiry, thought, keyphrases, topic, answer, duration, stages });
                 console.log(answer);
                 console.log();
             } else {
@@ -898,25 +914,35 @@ const poll = async () => {
             result.forEach(async (update) => {
                 const { message, update_id } = update;
                 const { text, chat } = message;
-                offset = update_id + 1;
-                const stages = [];
-                const enter = (name) => { stages.push({ name, timestamp: Date.now() }) };
-                const leave = (name, fields) => { stages.push({ name, timestamp: Date.now(), ...fields }) };
-                const delegates = { enter, leave };
-                const inquiry = text;
-                console.log(`${YELLOW}>> ${CYAN}${inquiry}${NORMAL}`);
                 const history = state[chat.id] || [];
-                const context = { inquiry, history, delegates };
-                const start = Date.now();
-                const pipeline = pipe(reason, search, respond);
-                const result = await pipeline(context);
-                const duration = Date.now() - start;
-                const { topic, thought, keyphrases, references, answer } = result;
-                console.log(answer);
-                console.log();
-                history.push({ inquiry, thought, keyphrases, topic, references, answer, duration, stages });
-                state[chat.id] = history;
-                send(chat.id, format(answer, references));
+                offset = update_id + 1;
+                if (text === '/review') {
+                    const last = history.slice(-1).pop();
+                    if (!last) {
+                        send(chat.id, 'Nothing to review yet!');
+                    } else {
+                        const { stages } = last;
+                        send(chat.id, review(simplify(stages)));
+                    }
+                } else {
+                    const stages = [];
+                    const enter = (name) => { stages.push({ name, timestamp: Date.now() }) };
+                    const leave = (name, fields) => { stages.push({ name, timestamp: Date.now(), ...fields }) };
+                    const delegates = { enter, leave };
+                    const inquiry = text;
+                    console.log(`${YELLOW}>> ${CYAN}${inquiry}${NORMAL}`);
+                    const context = { inquiry, history, delegates };
+                    const start = Date.now();
+                    const pipeline = pipe(reason, search, respond);
+                    const result = await pipeline(context);
+                    const duration = Date.now() - start;
+                    const { topic, thought, keyphrases, references, answer } = result;
+                    console.log(answer);
+                    console.log();
+                    history.push({ inquiry, thought, keyphrases, topic, references, answer, duration, stages });
+                    state[chat.id] = history;
+                    send(chat.id, format(answer, references));
+                }
             })
         }
 
