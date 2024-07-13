@@ -5,6 +5,7 @@ const http = require('http');
 const readline = require('readline');
 
 const GAMAL_HTTP_PORT = process.env.GAMAL_HTTP_PORT;
+const GAMAL_TELEGRAM_TOKEN = process.env.GAMAL_TELEGRAM_TOKEN;
 
 const LLM_API_KEY = process.env.LLM_API_KEY;
 const LLM_API_BASE_URL = process.env.LLM_API_BASE_URL || 'https://openrouter.ai/api/v1';
@@ -832,6 +833,100 @@ const serve = async (port) => {
     console.log('Listening on port', port);
 }
 
+const poll = async () => {
+
+    let state = {};
+
+    const format = (answer, references) => {
+        let buffer = answer;
+        let refs = [];
+
+        while (true) {
+            const index = buffer.indexOf('[citation:');
+            if (index < 0) {
+                break;
+            }
+            const number = buffer[index + 10];
+            if (number >= '0' && number <= '9') {
+                const num = parseInt(number, 10);
+                if (refs.indexOf(num) < 0) {
+                    refs.push(num);
+                }
+                const citation = 1 + refs.indexOf(num);
+                buffer = buffer.substr(0, index) + `[${citation}]` + buffer.substr(index + 12);
+            }
+        }
+
+        if (references && Array.isArray(references) && references.length >= refs.length) {
+            buffer += '\n\nReferences:\n';
+            refs.forEach((ref, i) => {
+                const { url } = references[ref - 1];
+                buffer += `[${i + 1}] ${url}\n`;
+            });
+        }
+        return buffer;
+    }
+
+    const check = async (offset) => {
+
+        const POLL_URL = `https://api.telegram.org/bot${GAMAL_TELEGRAM_TOKEN}/getUpdates?offset=${offset}`;
+        const SEND_URL = `https://api.telegram.org/bot${GAMAL_TELEGRAM_TOKEN}/sendMessage`;
+
+        const send = async (id, message) => {
+            try {
+                await fetch(SEND_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        chat_id: id,
+                        text: message
+                    })
+                });
+            } catch (error) {
+                console.error(`Unable to send message to ${id}: ${error}`);
+            }
+        }
+
+        const response = await fetch(POLL_URL);
+        if (!response.ok) {
+            console.error(`Error: ${response.status} ${response.statusText}`);
+        } else {
+            const data = await response.json();
+            const { result } = data;
+            result.forEach(async (update) => {
+                const { message, update_id } = update;
+                const { text, chat } = message;
+                offset = update_id + 1;
+                const stages = [];
+                const enter = (name) => { stages.push({ name, timestamp: Date.now() }) };
+                const leave = (name, fields) => { stages.push({ name, timestamp: Date.now(), ...fields }) };
+                const delegates = { enter, leave };
+                const inquiry = text;
+                console.log(`${YELLOW}>> ${CYAN}${inquiry}${NORMAL}`);
+                const history = state[chat.id] || [];
+                const context = { inquiry, history, delegates };
+                const start = Date.now();
+                const pipeline = pipe(reason, search, respond);
+                const result = await pipeline(context);
+                const duration = Date.now() - start;
+                const { topic, thought, keyphrases, references, answer } = result;
+                console.log(answer);
+                console.log();
+                history.push({ inquiry, thought, keyphrases, topic, references, answer, duration, stages });
+                state[chat.id] = history;
+                send(chat.id, format(answer, references));
+            })
+        }
+
+        setTimeout(() => { check(offset) }, 200);
+    }
+
+    check(0);
+}
+
+
 (async () => {
     if (!YOU_API_KEY || YOU_API_KEY.length < 64) {
         console.error('Fatal error: YOU_API_KEY not set!');
@@ -843,10 +938,13 @@ const serve = async (port) => {
     args.forEach(evaluate);
     if (args.length == 0) {
         const port = parseInt(GAMAL_HTTP_PORT, 10);
-        if (Number.isNaN(port)) {
-            await interact();
-        } else {
+        if (!Number.isNaN(port) && port > 0 && port < 65536) {
             await serve(port);
+        } else if (GAMAL_TELEGRAM_TOKEN && GAMAL_TELEGRAM_TOKEN.length >= 40) {
+            console.log('Running as a Telegram bot...');
+            await poll();
+        } else {
+            await interact();
         }
     }
 })();
