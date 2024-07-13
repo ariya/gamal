@@ -729,7 +729,7 @@ const interact = async () => {
     }
 
 
-    const history = [];
+    let history = [];
 
     let loop = true;
     const io = readline.createInterface({ input: process.stdin, output: process.stdout });
@@ -739,7 +739,11 @@ const interact = async () => {
     const qa = () => {
         io.question(`${YELLOW}>> ${CYAN}`, async (inquiry) => {
             process.stdout.write(NORMAL);
-            if (inquiry === '!review' || inquiry === '/review') {
+            if (inquiry === '!reset' || inquiry === '/reset') {
+                history = [];
+                console.log('History cleared.');
+                console.log();
+            } else if (inquiry === '!review' || inquiry === '/review') {
                 const last = history.slice(-1).pop();
                 if (!last) {
                     console.log('Nothing to review yet!');
@@ -792,7 +796,7 @@ const interact = async () => {
 }
 
 const serve = async (port) => {
-    const history = [];
+    let history = [];
 
     const decode = url => {
         const parsedUrl = new URL(`http://localhost/${url}`);
@@ -809,7 +813,11 @@ const serve = async (port) => {
             response.end(fs.readFileSync('./index.html'));
         } else if (url.startsWith('/chat')) {
             const inquiry = decode(url);
-            if (inquiry === '/review') {
+            if (inquiry === '/reset') {
+                history = [];
+                response.write('History cleared.');
+                response.end();
+            } else if (inquiry === '/review') {
                 const last = history.slice(-1).pop();
                 if (!last) {
                     response.write('Nothing to review yet!');
@@ -916,7 +924,10 @@ const poll = async () => {
                 const { text, chat } = message;
                 const history = state[chat.id] || [];
                 offset = update_id + 1;
-                if (text === '/review') {
+                if (text === '/reset') {
+                    state[chat.id] = [];
+                    send(chat.id, 'History cleared.');
+                } else if (text === '/review') {
                     const last = history.slice(-1).pop();
                     if (!last) {
                         send(chat.id, 'Nothing to review yet!');
