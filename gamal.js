@@ -318,7 +318,7 @@ const reason = async (context) => {
 
 const MAX_RETRY_ATTEMPT = 3;
 
-const sleep = async(ms) => new Promise(resolve => setTimeout(resolve, ms));
+const sleep = async (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
 /**
  * Searches for relevant information using You.com search engine.
