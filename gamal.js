@@ -316,6 +316,10 @@ const reason = async (context) => {
     return { language, topic, thought, keyphrases, observation, ...context };
 }
 
+const MAX_RETRY_ATTEMPT = 3;
+
+const sleep = async(ms) => new Promise(resolve => setTimeout(resolve, ms));
+
 /**
  * Searches for relevant information using You.com search engine.
  *
@@ -323,7 +327,7 @@ const reason = async (context) => {
  * @return {Array} Array of references containing search results.
  * @throws {Error} - If the search fails with a non-200 status.
  */
-const you = async (query, attempt = 3) => {
+const you = async (query, attempt = MAX_RETRY_ATTEMPT) => {
     let url = new URL('https://api.ydc-index.io/search');
     url.searchParams.append('query', query);
     url.searchParams.append('num_web_results', TOP_K);
@@ -338,6 +342,7 @@ const you = async (query, attempt = 3) => {
     if (!response.ok) {
         if (attempt > 1) {
             LLM_DEBUG_SEARCH && console.log('You.com failed. Retrying...');
+            await sleep((MAX_RETRY_ATTEMPT - attempt + 1) * 1500);
             return await you(query, attempt - 1);
         } else {
             throw new Error(`You.com call failed with status: ${response.status}`);
@@ -357,6 +362,7 @@ const you = async (query, attempt = 3) => {
     } else {
         if (attempt > 1) {
             LLM_DEBUG_SEARCH && console.log('Something is wrong, search gives no result. Retrying...');
+            await sleep((MAX_RETRY_ATTEMPT - attempt + 1) * 1500);
             return await you(query, attempt - 1);
         }
     }
@@ -370,7 +376,7 @@ const you = async (query, attempt = 3) => {
  * @return {Array} Array of references containing search results.
  * @throws {Error} - If the search fails with a non-200 status.
  */
-const brave = async (query, attempt = 3) => {
+const brave = async (query, attempt = MAX_RETRY_ATTEMPT) => {
     let url = new URL('https://api.search.brave.com/res/v1/web/search');
     url.searchParams.append('q', query);
 
@@ -384,6 +390,7 @@ const brave = async (query, attempt = 3) => {
     if (!response.ok) {
         if (attempt > 1) {
             LLM_DEBUG_SEARCH && console.log('Brave search failed. Retrying...');
+            await sleep((MAX_RETRY_ATTEMPT - attempt + 1) * 1500);
             return await brave(query, attempt - 1);
         } else {
             throw new Error(`Brave search failed with status: ${response.status}`);
@@ -403,6 +410,7 @@ const brave = async (query, attempt = 3) => {
     } else {
         if (attempt > 1) {
             LLM_DEBUG_SEARCH && console.log('Something is wrong, Brave search gives no result. Retrying...');
+            await sleep((MAX_RETRY_ATTEMPT - attempt + 1) * 1500);
             return await brave(query, attempt - 1);
         }
     }
@@ -416,7 +424,7 @@ const brave = async (query, attempt = 3) => {
  * @param {Context} context - Current pipeline context.
  * @returns {Context} Updated pipeline context.
  */
-const search = async (context, attempt = 3) => {
+const search = async (context) => {
     const { delegates, keyphrases, observation } = context;
     const { enter, leave } = delegates;
     enter && enter('Search');
@@ -424,11 +432,11 @@ const search = async (context, attempt = 3) => {
     const query = keyphrases.replace(/\.$/, "").replace(/^"|"$/g, "");
 
     if (BRAVE_SEARCH_API_KEY && BRAVE_SEARCH_API_KEY.length >= 31) {
-        const references = await brave(query, attempt);
+        const references = await brave(query);
         leave && leave('Search', { references });
         return { ...context, references };
     } else if (YOU_API_KEY && YOU_API_KEY.length >= 64) {
-        const references = await you(query, attempt);
+        const references = await you(query);
         leave && leave('Search', { references });
         return { ...context, references };
     }
