@@ -316,6 +316,53 @@ const reason = async (context) => {
 }
 
 /**
+ * Searches for relevant information using You.com search engine.
+ *
+ * @param {string} query - The search query.
+ * @return {Array} Array of references containing search results.
+ * @throws {Error} - If the search fails with a non-200 status.
+ */
+const you = async (query, attempt = 3) => {
+    let url = new URL('https://api.ydc-index.io/search');
+    url.searchParams.append('query', query);
+    url.searchParams.append('num_web_results', TOP_K);
+
+    const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+            'Accept': 'application/json',
+            'X-API-Key': YOU_API_KEY
+        }
+    });
+    if (!response.ok) {
+        if (attempt > 1) {
+            LLM_DEBUG_SEARCH && console.log('You.com failed. Retrying...');
+            return await you(query, attempt - 1);
+        } else {
+            throw new Error(`You.com call failed with status: ${response.status}`);
+        }
+    }
+    const data = await response.json();
+    const { hits = [] } = data;
+    LLM_DEBUG_SEARCH && console.log('Search result: ', { query, hits });
+    let references = [];
+    if (Array.isArray(hits) && hits.length > 0) {
+        const MAX_CHARS = 1000;
+        references = hits.slice(0, TOP_K).map((hit, i) => {
+            const { title, url, description = '', snippets = [] } = hit;
+            const snippet = description + snippets.join('\n').substring(0, MAX_CHARS);
+            return { position: i + 1, title, url, snippet };
+        });
+    } else {
+        if (attempt > 1) {
+            LLM_DEBUG_SEARCH && console.log('Something is wrong, search gives no result. Retrying...');
+            return await you(query, attempt - 1);
+        }
+    }
+    return references;
+}
+
+/**
  * Uses the online search engine to collect relevant information based on the keyphrases.
  * The TOP_K most relevant results will be stored in `references`.
  *
@@ -329,45 +376,13 @@ const search = async (context, attempt = 3) => {
 
     const query = keyphrases.replace(/\.$/, "").replace(/^"|"$/g, "");
 
-    let url = new URL('https://api.ydc-index.io/search');
-    url.searchParams.append('query', query);
-    url.searchParams.append('num_web_results', TOP_K);
-
-    const response = await fetch(url, {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-API-Key': YOU_API_KEY
-        }
-    });
-    const data = await response.json();
-    if (!response.ok) {
-        if (attempt > 1) {
-            LLM_DEBUG_SEARCH && console.log('You.com failed. Retrying...');
-            return await search(context, attempt - 1);
-        } else {
-            throw new Error(`You.com call failed with status: ${response.status}`);
-        }
-    }
-    const { hits = [] } = data;
-    LLM_DEBUG_SEARCH && console.log('Search result: ', { query, data, hits });
-    let references = [];
-    if (Array.isArray(hits) && hits.length > 0) {
-        const MAX_CHARS = 1000;
-        references = hits.slice(0, TOP_K).map((hit, i) => {
-            const { title, url, description = '', snippets = [] } = hit;
-            const snippet = description + snippets.join('\n').substring(0, MAX_CHARS);
-            return { position: i + 1, title, url, snippet };
-        });
-    } else {
-        if (attempt > 1) {
-            LLM_DEBUG_SEARCH && console.log('Something is wrong, search gives no result. Retrying...');
-            return await search(context, attempt - 1);
-        }
+    if (YOU_API_KEY && YOU_API_KEY.length >= 64) {
+        const references = await you(query, attempt);
+        leave && leave('Search', { references });
+        return { ...context, references };
     }
 
-    leave && leave('Search', { references });
-    return { ...context, references };
+    throw new Error('No search engine is configured!');
 }
 
 /**
