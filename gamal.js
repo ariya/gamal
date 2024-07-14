@@ -13,6 +13,7 @@ const LLM_CHAT_MODEL = process.env.LLM_CHAT_MODEL || 'meta-llama/llama-3-8b-inst
 const LLM_STREAMING = process.env.LLM_STREAMING !== 'no';
 
 const YOU_API_KEY = process.env.YOU_API_KEY;
+const BRAVE_SEARCH_API_KEY = process.env.BRAVE_SEARCH_API_KEY;
 const TOP_K = 3;
 
 const LLM_DEBUG_CHAT = process.env.LLM_DEBUG_CHAT;
@@ -363,6 +364,52 @@ const you = async (query, attempt = 3) => {
 }
 
 /**
+ * Searches for relevant information using Brave search engine.
+ *
+ * @param {string} query - The search query.
+ * @return {Array} Array of references containing search results.
+ * @throws {Error} - If the search fails with a non-200 status.
+ */
+const brave = async (query, attempt = 3) => {
+    let url = new URL('https://api.search.brave.com/res/v1/web/search');
+    url.searchParams.append('q', query);
+
+    const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+            'Accept': 'application/json',
+            'X-Subscription-Token': BRAVE_SEARCH_API_KEY
+        }
+    });
+    if (!response.ok) {
+        if (attempt > 1) {
+            LLM_DEBUG_SEARCH && console.log('Brave search failed. Retrying...');
+            return await brave(query, attempt - 1);
+        } else {
+            throw new Error(`Brave search failed with status: ${response.status}`);
+        }
+    }
+    const { web } = await response.json();
+    const { results = [] } = web;
+    LLM_DEBUG_SEARCH && console.log('Brave search result: ', { query, results });
+    let references = [];
+    if (Array.isArray(results) && results.length > 0) {
+        const MAX_CHARS = 1000;
+        references = results.slice(0, TOP_K).map((result, i) => {
+            const { title, url, description = '', extra_snippets = [] } = result;
+            const snippet = description + extra_snippets.join('\n').substring(0, MAX_CHARS);
+            return { position: i + 1, title, url, snippet };
+        });
+    } else {
+        if (attempt > 1) {
+            LLM_DEBUG_SEARCH && console.log('Something is wrong, Brave search gives no result. Retrying...');
+            return await brave(query, attempt - 1);
+        }
+    }
+    return references;
+}
+
+/**
  * Uses the online search engine to collect relevant information based on the keyphrases.
  * The TOP_K most relevant results will be stored in `references`.
  *
@@ -376,7 +423,11 @@ const search = async (context, attempt = 3) => {
 
     const query = keyphrases.replace(/\.$/, "").replace(/^"|"$/g, "");
 
-    if (YOU_API_KEY && YOU_API_KEY.length >= 64) {
+    if (BRAVE_SEARCH_API_KEY && BRAVE_SEARCH_API_KEY.length >= 31) {
+        const references = await brave(query, attempt);
+        leave && leave('Search', { references });
+        return { ...context, references };
+    } else if (YOU_API_KEY && YOU_API_KEY.length >= 64) {
         const references = await you(query, attempt);
         leave && leave('Search', { references });
         return { ...context, references };
@@ -980,8 +1031,8 @@ const poll = async () => {
 
 
 (async () => {
-    if (!YOU_API_KEY || YOU_API_KEY.length < 64) {
-        console.error('Fatal error: YOU_API_KEY not set!');
+    if (!BRAVE_SEARCH_API_KEY || BRAVE_SEARCH_API_KEY.length < 31) {
+        console.error('Fatal error: BRAVE_SEARCH_API_KEY not set!');
         process.exit(-1);
     }
     console.log(`Using LLM at ${LLM_API_BASE_URL} (model: ${GREEN}${LLM_CHAT_MODEL || 'default'}${NORMAL}).`);

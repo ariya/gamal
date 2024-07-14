@@ -2,7 +2,7 @@
 
 Gamal is a simple, zero-dependency tool designed to quickly provide answers to questions. It finds relevant web pages and uses an LLM to summarize the content, delivering concise answers.  Gamal is accessible via the terminal (as a CLI tool), through its minimalist web interface, or as a Telegram bot.
 
-To run Gamal, API keys for both [You.com](https://you.com) and [OpenRouter](https://openrouter.ai) are required (both offer generous free credits). Store these keys as `YOU_API_KEY` and `LLM_API_KEY`, respectively. Then use either [Node.js](https://nodejs.org) (>= v18) or [Bun](https://bun.sh) to run Gamal:
+To run Gamal, API keys for both [Brave Search API](https://brave.com/search/api/) and [OpenRouter](https://openrouter.ai) are required (both offer generous free credits). Store these keys as `BRAVE_SEARCH_API_KEY` and `LLM_API_KEY`, respectively. Then use either [Node.js](https://nodejs.org) (>= v18) or [Bun](https://bun.sh) to run Gamal:
 
 ```bash
 ./gamal.js

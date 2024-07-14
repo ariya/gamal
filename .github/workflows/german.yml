@@ -17,7 +17,7 @@ jobs:
       - run: ./gamal.js tests/de/canary-multi-turn.txt
         env:
           LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
-          YOU_API_KEY: ${{ secrets.YOU_API_KEY }}
+          BRAVE_SEARCH_API_KEY: ${{ secrets.BRAVE_SEARCH_API_KEY }}
 
   high-school-stem:
     runs-on: ubuntu-22.04
@@ -28,4 +28,4 @@ jobs:
       - run: ./gamal.js tests/de/high-school-stem.txt
         env:
           LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
-          YOU_API_KEY: ${{ secrets.YOU_API_KEY }}
+          BRAVE_SEARCH_API_KEY: ${{ secrets.BRAVE_SEARCH_API_KEY }}
