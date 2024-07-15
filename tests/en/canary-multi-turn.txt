@@ -1,11 +1,11 @@
 User: Which planet is the biggest?
 Assistant: /Jupiter/ is the largest planet in our solar system.
 
-User: and the smallest?
-Assistant: The smallest planet in our solar system is /Mercury/.
-
 User: and the hottest?
 Assistant: /Venus/ is the hottest planet in our solar system.
+
+User: and the one nicknamed as the Red Planet?
+Assistant: /Mars/, due to its reddish appearance caused by iron oxide on its surface.
 
 User: and the one known to have the most complex ring system?
 Assistant: It must be /Saturn/!

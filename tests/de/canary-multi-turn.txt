@@ -1,11 +1,11 @@
 User: Welcher Planet in unserem Sonnensystem ist der größte?
 Assistant: /Jupiter/ ist der größte Planet in unserem Sonnensystem.
 
-User: und der kleinste?
-Assistant: Der kleinste Planet im Sonnensystem ist /Merkur/.
-
 User: und der heißeste?
 Assistant: Die /Venus/ ist der heißeste Planet in unserem Sonnensystem.
+
+User: und derjenige, der den Spitznamen "Der Rote Planet" hat?
+Assistant: /Mars/, aufgrund seines rötlichen Aussehens, das durch Eisenoxid auf seiner Oberfläche verursacht wird.
 
 User: und welcher ist bekannt für das komplexeste Ringsystem?
 Assistant: Das muss /Saturn/ sein!
