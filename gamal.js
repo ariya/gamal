@@ -995,7 +995,7 @@ const poll = async () => {
 
     const check = async (offset) => {
 
-        const TIMEOUT = 3 * 1000; // 3 seconds
+        const TIMEOUT = 5 * 1000; // 5 seconds
         const POLL_URL = `https://api.telegram.org/bot${GAMAL_TELEGRAM_TOKEN}/getUpdates?offset=${offset}`;
         const SEND_URL = `https://api.telegram.org/bot${GAMAL_TELEGRAM_TOKEN}/sendMessage`;
 
@@ -1016,51 +1016,56 @@ const poll = async () => {
             }
         }
 
-        const response = await xfetch(POLL_URL, TIMEOUT);
-        if (!response.ok) {
-            console.error(`Error: ${response.status} ${response.statusText}`);
-        } else {
-            const data = await response.json();
-            const { result } = data;
-            result.forEach(async (update) => {
-                const { message, update_id } = update;
-                const { text, chat } = message;
-                const history = state[chat.id] || [];
-                offset = update_id + 1;
-                if (text === '/reset') {
-                    state[chat.id] = [];
-                    send(chat.id, 'History cleared.');
-                } else if (text === '/review') {
-                    const last = history.slice(-1).pop();
-                    if (!last) {
-                        send(chat.id, 'Nothing to review yet!');
+        try {
+            const response = await xfetch(POLL_URL, TIMEOUT);
+            if (!response.ok) {
+                console.error(`Error: ${response.status} ${response.statusText}`);
+            } else {
+                const data = await response.json();
+                const { result } = data;
+                result.forEach(async (update) => {
+                    const { message, update_id } = update;
+                    const { text, chat } = message;
+                    const history = state[chat.id] || [];
+                    offset = update_id + 1;
+                    if (text === '/reset') {
+                        state[chat.id] = [];
+                        send(chat.id, 'History cleared.');
+                    } else if (text === '/review') {
+                        const last = history.slice(-1).pop();
+                        if (!last) {
+                            send(chat.id, 'Nothing to review yet!');
+                        } else {
+                            const { stages } = last;
+                            send(chat.id, review(simplify(stages)));
+                        }
                     } else {
-                        const { stages } = last;
-                        send(chat.id, review(simplify(stages)));
+                        const stages = [];
+                        const enter = (name) => { stages.push({ name, timestamp: Date.now() }) };
+                        const leave = (name, fields) => { stages.push({ name, timestamp: Date.now(), ...fields }) };
+                        const delegates = { enter, leave };
+                        const inquiry = text;
+                        console.log(`${YELLOW}>> ${CYAN}${inquiry}${NORMAL}`);
+                        const context = { inquiry, history, delegates };
+                        const start = Date.now();
+                        const pipeline = pipe(reason, search, respond);
+                        const result = await pipeline(context);
+                        const duration = Date.now() - start;
+                        const { topic, thought, keyphrases, references, answer } = result;
+                        console.log(answer);
+                        console.log();
+                        history.push({ inquiry, thought, keyphrases, topic, references, answer, duration, stages });
+                        state[chat.id] = history;
+                        send(chat.id, format(answer, references));
                     }
-                } else {
-                    const stages = [];
-                    const enter = (name) => { stages.push({ name, timestamp: Date.now() }) };
-                    const leave = (name, fields) => { stages.push({ name, timestamp: Date.now(), ...fields }) };
-                    const delegates = { enter, leave };
-                    const inquiry = text;
-                    console.log(`${YELLOW}>> ${CYAN}${inquiry}${NORMAL}`);
-                    const context = { inquiry, history, delegates };
-                    const start = Date.now();
-                    const pipeline = pipe(reason, search, respond);
-                    const result = await pipeline(context);
-                    const duration = Date.now() - start;
-                    const { topic, thought, keyphrases, references, answer } = result;
-                    console.log(answer);
-                    console.log();
-                    history.push({ inquiry, thought, keyphrases, topic, references, answer, duration, stages });
-                    state[chat.id] = history;
-                    send(chat.id, format(answer, references));
-                }
-            })
+                })
+            }
+        } catch (error) {
+            console.error(`Failed to get Telegram updates: ${error}`);
+        } finally {
+            setTimeout(() => { check(offset) }, 200);
         }
 
-        setTimeout(() => { check(offset) }, 200);
     }
 
     check(0);
