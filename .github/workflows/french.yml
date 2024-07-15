@@ -1,0 +1,31 @@
+name: French versions
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+
+  canary-multi-turn:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 2
+    steps:
+      - uses: actions/checkout@v4
+      - run: ./gamal.js tests/fr/canary-multi-turn.txt
+        env:
+          LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
+          BRAVE_SEARCH_API_KEY: ${{ secrets.BRAVE_SEARCH_API_KEY }}
+
+  high-school-stem:
+    runs-on: ubuntu-22.04
+    needs: canary-multi-turn
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - run: ./gamal.js tests/fr/high-school-stem.txt
+        env:
+          LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
+          BRAVE_SEARCH_API_KEY: ${{ secrets.BRAVE_SEARCH_API_KEY }}

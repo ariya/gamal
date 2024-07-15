@@ -1,0 +1,11 @@
+User: Quelle est la plus grande planète de notre système solaire ?
+Assistant: /Jupiter/ est la plus grande planète de notre système solaire.
+
+User: et la plus chaude ?
+Assistant: /Vénus/ est la planète la plus chaude de notre système solaire.
+
+User: et celle qui est surnommée la "Planète Rouge" ?
+Assistant:  /Mars/, en raison de son apparence rougeâtre causée par l'oxyde de fer sur sa surface.
+
+User: et laquelle est connue pour son système d'anneaux le plus complexe?
+Assistant: Ce doit être /Saturne/ !
