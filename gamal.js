@@ -41,6 +41,25 @@ const CROSS = '✘';
  */
 const pipe = (...fns) => arg => fns.reduce((d, fn) => d.then(fn), Promise.resolve(arg));
 
+/**
+ * Wraps fetch with a timeout support.
+ *
+ * @param {string} url - The URL to fetch.
+ * @param {number} ms - The timeout duration in milliseconds.
+ * @param {object} options - Additional options for the fetch.
+ * @return {Promise} A promise that resolves with the fetch response or rejects on timeout.
+ */
+
+const xfetch = (url, ms, { signal, ...options } = {}) => {
+    const controller = new AbortController();
+    const promise = fetch(url, { signal: controller.signal, ...options });
+    if (signal) {
+        signal.addEventListener('abort', () => controller.abort());
+    }
+    const timeout = setTimeout(() => controller.abort(), ms);
+    return promise.finally(() => clearTimeout(timeout));
+}
+
 
 const MAX_RETRY_ATTEMPT = 3;
 
@@ -72,13 +91,14 @@ const sleep = async (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
 const chat = async (messages, handler = null, attempt = MAX_RETRY_ATTEMPT) => {
     const url = `${LLM_API_BASE_URL}/chat/completions`;
+    const timeout = 3 * 1000; // 3 seconds
     const auth = LLM_API_KEY ? { 'Authorization': `Bearer ${LLM_API_KEY}` } : {};
     const model = LLM_CHAT_MODEL || 'gpt-3.5-turbo';
     const stop = ['<|im_end|>', '<|end|>', '<|eot_id|>', '<|end_of_turn|>', 'INQUIRY: '];;
     const max_tokens = 400;
     const temperature = 0;
     const stream = LLM_STREAMING && typeof handler === 'function';
-    const response = await fetch(url, {
+    const response = await xfetch(url, timeout, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', ...auth },
         body: JSON.stringify({ messages, model, stop, max_tokens, temperature, stream })
@@ -337,8 +357,9 @@ const you = async (query, attempt = MAX_RETRY_ATTEMPT) => {
     let url = new URL('https://api.ydc-index.io/search');
     url.searchParams.append('query', query);
     url.searchParams.append('num_web_results', TOP_K);
+    const timeout = 5 * 1000; // 5 seconds
 
-    const response = await fetch(url, {
+    const response = await xfetch(url, timeout, {
         method: 'GET',
         headers: {
             'Accept': 'application/json',
@@ -385,8 +406,9 @@ const you = async (query, attempt = MAX_RETRY_ATTEMPT) => {
 const brave = async (query, attempt = MAX_RETRY_ATTEMPT) => {
     let url = new URL('https://api.search.brave.com/res/v1/web/search');
     url.searchParams.append('q', query);
+    const timeout = 5 * 1000; // 5 seconds
 
-    const response = await fetch(url, {
+    const response = await xfetch(url, timeout, {
         method: 'GET',
         headers: {
             'Accept': 'application/json',
@@ -973,12 +995,13 @@ const poll = async () => {
 
     const check = async (offset) => {
 
+        const TIMEOUT = 3 * 1000; // 3 seconds
         const POLL_URL = `https://api.telegram.org/bot${GAMAL_TELEGRAM_TOKEN}/getUpdates?offset=${offset}`;
         const SEND_URL = `https://api.telegram.org/bot${GAMAL_TELEGRAM_TOKEN}/sendMessage`;
 
         const send = async (id, message) => {
             try {
-                await fetch(SEND_URL, {
+                await xfetch(SEND_URL, TIMEOUT, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -993,7 +1016,7 @@ const poll = async () => {
             }
         }
 
-        const response = await fetch(POLL_URL);
+        const response = await xfetch(POLL_URL, TIMEOUT);
         if (!response.ok) {
             console.error(`Error: ${response.status} ${response.statusText}`);
         } else {
