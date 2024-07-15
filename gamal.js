@@ -707,8 +707,8 @@ const evaluate = async (filename) => {
                     const pipeline = pipe(reason, search, respond);
                     const result = await pipeline(context);
                     const duration = Date.now() - start;
-                    const { topic, thought, keyphrases, references, answer } = result;
-                    history.push({ inquiry, thought, keyphrases, topic, references, answer, duration, stages });
+                    const { topic, language, thought, keyphrases, references, answer } = result;
+                    history.push({ inquiry, thought, keyphrases, topic, language, references, answer, duration, stages });
                     ++total;
                 } else if (role === 'Assistant') {
                     const expected = content;
@@ -740,15 +740,15 @@ const evaluate = async (filename) => {
                             LLM_DEBUG_FAIL_EXIT && process.exit(-1);
                         }
                     }
-                } else if (role === 'Pipeline.Reason.Keyphrases' || role === 'Pipeline.Reason.Topic') {
+                } else if (role === 'Pipeline.Reason.Keyphrases' || role === 'Pipeline.Reason.Language') {
                     const expected = content;
                     const last = history.slice(-1).pop();
                     if (!last) {
                         console.error('There is no answer yet!');
                         process.exit(-1);
                     } else {
-                        const { keyphrases, topic, stages } = last;
-                        const target = (role === 'Pipeline.Reason.Keyphrases') ? keyphrases : topic;
+                        const { keyphrases, language, stages } = last;
+                        const target = (role === 'Pipeline.Reason.Keyphrases') ? keyphrases : language;
                         const regexes = regexify(expected);
                         const matches = match(target, regexes);
                         if (matches.length === regexes.length) {
