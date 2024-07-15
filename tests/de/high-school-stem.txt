@@ -27,8 +27,10 @@ Pipeline.Reason.Keyphrases: /force|kraft/
 
 User: Was ist das Elementsymbol für Magnesium?
 Assistant: Das Elementsymbol für Magnesium ist /Mg/.
+Pipeline.Reason.Language: German
 Pipeline.Reason.Keyphrases: /magnesium/
 
 User: Was ist die kleinsten bekannten Bausteine der Materie?
 Assistant: Die kleinsten bekannten Bausteine der Materie sind /Elementarteilchen|Quarks|Quanten|Leptonen/.
+Pipeline.Reason.Language: German
 Pipeline.Reason.Keyphrases: /unit|bausteine|elementary|particle/ 
