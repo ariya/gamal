@@ -1,7 +1,7 @@
 Story: Questions sur les sujets STEM au lycée
 
 User: Quelle force attire les objets vers le centre de la Terre ?
-Assistant:  La force qui attire les objets vers le centre de la Terre est la force d'attraction /gravitationnelle|gravité/.
+Assistant:  La force qui attire les objets vers le centre de la Terre est la force d'/attraction|gravitationnelle|gravité/.
 Pipeline.Reason.Language: /French|Français/
 Pipeline.Reason.Keyphrases: /force|gravity|Earth|gravité|gravitationnelle/
 
