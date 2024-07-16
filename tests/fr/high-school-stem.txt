@@ -32,5 +32,5 @@ Pipeline.Reason.Keyphrases: /magnesium|magnésium/
 
 User: Quels sont les plus petits constituants connus de la matière ?
 Assistant: Les plus petits constituants connus de la matière sont /particules élémentaires|quarks|quanta|leptons/.
-Pipeline.Reason.Language: French
+Pipeline.Reason.Language: /French|Français/
 Pipeline.Reason.Keyphrases: /unit|nucleus|atom|elementary|particle|constituants|élémentaires/
