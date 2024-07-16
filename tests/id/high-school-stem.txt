@@ -3,7 +3,7 @@ Story: Pertanyaan STEM untuk SMA
 User: Apa gaya yang menarik benda-benda menuju pusat Bumi?
 Assistant: Gaya yang menarik benda-benda menuju pusat Bumi dikenal sebagai /gravitasi/.
 Pipeline.Reason.Language: /Indonesia(n)|Bahasa/
-Pipeline.Reason.Keyphrases: /gaya|gravitasi|Bumi/
+Pipeline.Reason.Keyphrases: /gaya|gravitasi|Earth|gravity|Bumi/
 
 User: Berapakah nomor atom karbon?
 Assistant: Nomor atom karbon adalah /6|enam/.

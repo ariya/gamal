@@ -131,7 +131,7 @@ Assistant: Nasi Lemak is a traditional dish from /Malaysia|Malay/.
 Pipeline.Reason.Keyphrases: /Nasi Lemak/
 
 User: Name some common patties for burger!
-Assistant: Common patty fillings for burgers include /beef|chicken|turkey|veggie|fish|salmon|brisket|ribs|sirloin/.
+Assistant: Common patty fillings for burgers include /beef|chicken|turkey|veggie|fish|salmon|hamburger|brisket|ribs|sirloin/.
 Pipeline.Reason.Keyphrases: /patties|patty/ /burger/
 
 User: Who created KFC?

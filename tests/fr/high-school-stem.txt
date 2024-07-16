@@ -18,7 +18,7 @@ Pipeline.Reason.Keyphrases: /plant|photosynthesis|photosynthèse|photsynthèse/
 User: Quelle est la somme (en degrés) des angles internes d'un triangle ?
 Assistant: La somme des angles internes d'un triangle est de /180/ degrés.
 Pipeline.Reason.Language: /French|Français/
-Pipeline.Reason.Keyphrases: /angles/ /triangle/
+Pipeline.Reason.Keyphrases: /angles/ /triangle|triangulaire/
 
 User: Quelle est l'unité de mesure de la force  ?
 Assistant: L'unité de mesure de la force est le /Newton/ (N).
