@@ -13,7 +13,7 @@ For instant answers, you can pipe your questions directly into Gamal:
 echo "List 5 Indonesia's best travel destinations" | ./gamal.js
 ```
 
-Gamal is also compatible with local LLM inference tools such as [llama.cpp](https://github.com/ggerganov/llama.cpp), [Jan](https://jan.ai), [Ollama](https://ollama.com), and [LocalAI](https://localai.io). For instructions on how to set up the environment variables for these services, please refer to the documentation of the sister project, [Ask LLM](https://github.com/ariya/ask-llm?tab=readme-ov-file#using-local-llm-servers). For optimal performance, it is recommended to use an instruction-following LLM with 7B parameters or more, such as Mistral 7B, Llama-3 8B, Gemma-2 9B, etc.
+Gamal is also compatible with local LLM inference tools such as [llama.cpp](https://github.com/ggerganov/llama.cpp), [Jan](https://jan.ai), [Ollama](https://ollama.com), and [LocalAI](https://localai.io). For instructions on how to set up the environment variables for these services, please refer to the documentation of the sister project, [Ask LLM](https://github.com/ariya/ask-llm?tab=readme-ov-file#using-local-llm-servers). For optimal performance, it is recommended to use an instruction-following LLM with 7B parameters or more, such as Mistral 7B, Qwen-2 7B, Llama-3 8B, Gemma-2 9B, etc.
 
 If the `GAMAL_HTTP_PORT` environment variable is specified, Gamal can be accessed through its minimalist front-end web interface. For example:
 ```bash
