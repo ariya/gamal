@@ -21,4 +21,4 @@ GAMAL_HTTP_PORT=5000 ./gamal.js
 ```
 Then, open a web browser and navigate to `localhost:5000`.
 
-If the `GAMAL_TELEGRAM_TOKEN` environment variable is provided (refer to [Telegram documentation](https://core.telegram.org/bots/tutorial#obtain-your-bot-token) for more details), Gamal functions as a [Telegram bot](https://core.telegram.org/bots). lease note that the conversation history in the Telegram chats is stored in memory and not persisted to disk.
+If the `GAMAL_TELEGRAM_TOKEN` environment variable is provided (refer to [Telegram documentation](https://core.telegram.org/bots/tutorial#obtain-your-bot-token) for more details), Gamal functions as a [Telegram bot](https://core.telegram.org/bots). Please note that the conversation history in the Telegram chats is stored in memory and not persisted to disk.
