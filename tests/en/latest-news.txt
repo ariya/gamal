@@ -1,10 +1,6 @@
-User: Who won women's singles at Australia Open 2024?
-Assistant: /(Aryna )?Sabalenka/ won that title.
-Pipeline.Reason.Keyphrases: /win(ner)?|win|Australia/
-
-User: and men's singles?
-Assistant: /(Jannik )?Sinner/ won the men's singles title at the 2024 Australian Open
-Pipeline.Reason.Keyphrases: /win(ner)?|won|Australia/
+User: Who won the Copa America 2024?
+Assistant: /Argentina/ won the Copa America 2024.
+Pipeline.Reason.Keyphrases: /win(ner)?|win|won|Copa|America/
 
 User: Where was the 20th Edition International Conference on Applied Business & Economics held?
 Assistant: The conference was held at the University of /Szczecin(, Poland)?/.
