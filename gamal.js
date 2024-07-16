@@ -91,7 +91,7 @@ const sleep = async (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
 const chat = async (messages, handler = null, attempt = MAX_RETRY_ATTEMPT) => {
     const url = `${LLM_API_BASE_URL}/chat/completions`;
-    const timeout = 3 * 1000; // 3 seconds
+    const timeout = 10 * 1000; // 10 seconds
     const auth = LLM_API_KEY ? { 'Authorization': `Bearer ${LLM_API_KEY}` } : {};
     const model = LLM_CHAT_MODEL || 'gpt-3.5-turbo';
     const stop = ['<|im_end|>', '<|end|>', '<|eot_id|>', '<|end_of_turn|>', 'INQUIRY: '];;
