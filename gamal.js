@@ -793,44 +793,43 @@ const evaluate = async (filename) => {
     }
 }
 
+const MAX_LOOKAHEAD = 3 * '[citation:x]'.length;
+
+const push = (display, text) => {
+    let { buffer, refs, print, cite } = display;
+    buffer += text;
+    let match;
+    const PATTERN = /\[citation:(\d+)\]/g;
+    while ((match = PATTERN.exec(buffer)) !== null) {
+        const number = match[1];
+        const { index } = match;
+        if (number >= '0' && number <= '9') {
+            const num = parseInt(number, 10);
+            if (refs.indexOf(num) < 0) {
+                refs.push(num);
+            }
+            const citation = 1 + refs.indexOf(num);
+            buffer = buffer.substr(0, index) + cite(citation) + buffer.substr(index + 12);
+        }
+    }
+    if (buffer.length > MAX_LOOKAHEAD) {
+        const output = buffer.substr(0, buffer.length - MAX_LOOKAHEAD);
+        print && print(output);
+        buffer = buffer.substr(buffer.length - MAX_LOOKAHEAD);
+    }
+    return { buffer, refs, print, cite };
+}
+
+const flush = display => {
+    const { buffer, print, cite } = display;
+    print && print(buffer.trimRight());
+    return { buffer: '', refs: [], print, cite };
+}
+
 const interact = async () => {
     const print = (text) => process.stdout.write(text);
-    let display = { buffer: '', refs: [], print };
-
-    const MAX_LOOKAHEAD = 3 * '[citation:x]'.length;
-
-    const push = (display, text) => {
-        let { buffer, refs, print } = display;
-        buffer += text;
-        let match;
-        const PATTERN = /\[citation:(\d+)\]/g;
-        while ((match = PATTERN.exec(buffer)) !== null) {
-            const number = match[1];
-            const { index } = match;
-            if (number >= '0' && number <= '9') {
-                const num = parseInt(number, 10);
-                if (refs.indexOf(num) < 0) {
-                    refs.push(num);
-                }
-                const citation = 1 + refs.indexOf(num);
-                const ref = `${GRAY}[${citation}]${NORMAL}`;
-                buffer = buffer.substr(0, index) + ref + buffer.substr(index + 12);
-            }
-        }
-        if (buffer.length > MAX_LOOKAHEAD) {
-            const output = buffer.substr(0, buffer.length - MAX_LOOKAHEAD);
-            print && print(output);
-            buffer = buffer.substr(buffer.length - MAX_LOOKAHEAD);
-        }
-        return { buffer, refs, print };
-    }
-
-    const flush = display => {
-        const { buffer, print } = display;
-        print && print(buffer.trimRight());
-        return { buffer: '', refs: [], print };
-    }
-
+    const cite = (citation) => `${GRAY}[${citation}]${NORMAL}`;
+    let display = { buffer: '', refs: [], print, cite };
 
     let history = [];
 
@@ -932,21 +931,38 @@ const serve = async (port) => {
             } else if (inquiry.length > 0) {
                 console.log(`${YELLOW}>> ${CYAN}${inquiry}${NORMAL}`);
                 response.writeHead(200, { 'Content-Type': 'text/plain' });
+
+                const print = (text) => {
+                    process.stdout.write(text);
+                    response.write(text);
+                }
+                const cite = (citation) => `[${citation}]`;
+                let display = { buffer: '', refs: [], print, cite };
+
                 const stages = [];
                 const enter = (name) => { stages.push({ name, timestamp: Date.now() }) };
                 const leave = (name, fields) => { stages.push({ name, timestamp: Date.now(), ...fields }) };
-                const stream = (text) => response.write(text);
+                const stream = (text) => display = push(display, text);
                 const delegates = { enter, leave, stream };
                 const context = { inquiry, history, delegates };
                 const start = Date.now();
                 const pipeline = pipe(reason, search, respond);
-                const result = await pipeline(context);
+                const { topic, thought, keyphrases, answer, references } = await pipeline(context);
+                const refs = display.refs.slice();
+                flush(display);
+                console.log();
+                if (references && Array.isArray(references) && references.length >= refs.length) {
+                    response.write('\n\n');
+                    console.log();
+                    refs.forEach((ref, i) => {
+                        const { url } = references[ref - 1];
+                        response.write(`[${i + 1}] ${url}\n`);
+                        console.log(`[${i + 1}] ${url}`);
+                    });
+                }
                 response.end();
                 const duration = Date.now() - start;
-                const { topic, thought, keyphrases, answer } = result;
                 history.push({ inquiry, thought, keyphrases, topic, answer, duration, stages });
-                console.log(answer);
-                console.log();
             } else {
                 response.writeHead(400).end();
             }
