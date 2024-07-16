@@ -1,0 +1,11 @@
+User: Sebutkan planet terbesar di tata surya kita!
+Assistant: Planet terbesar di tata surya kita adalah /Jupiter/.
+
+User: kalau yang terpanas?
+Assistant: /Venus/ adalah planet terpanas di tata surya, dengan suhu rata-rata 460 °C.
+
+User: dan yang mana yang dijuluki sebagai Planet Merah?
+Assistant: /Mars/ dijuluki sebagai "Planet Merah" karena permukaannya berwarna kemerah-merahan.
+
+User: dan planet mana yang tersohor dengan cincin yang sangat kompleks?
+Assistant: Planet /Saturnus/ terkenal dengan cincin yang sangat kompleks dan terlihat sangat spektakuler.
