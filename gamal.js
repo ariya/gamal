@@ -794,12 +794,13 @@ const evaluate = async (filename) => {
 }
 
 const interact = async () => {
-    let display = { buffer: '', refs: [] };
+    const print = (text) => process.stdout.write(text);
+    let display = { buffer: '', refs: [], print };
 
     const MAX_LOOKAHEAD = 3 * '[citation:x]'.length;
 
     const push = (display, text) => {
-        let { buffer, refs } = display;
+        let { buffer, refs, print } = display;
         buffer += text;
         let match;
         const PATTERN = /\[citation:(\d+)\]/g;
@@ -818,16 +819,16 @@ const interact = async () => {
         }
         if (buffer.length > MAX_LOOKAHEAD) {
             const output = buffer.substr(0, buffer.length - MAX_LOOKAHEAD);
-            process.stdout.write(output);
+            print && print(output);
             buffer = buffer.substr(buffer.length - MAX_LOOKAHEAD);
         }
-        return { buffer, refs };
+        return { buffer, refs, print };
     }
 
     const flush = display => {
-        const { buffer } = display;
-        process.stdout.write(buffer.trimRight());
-        return { buffer: '', refs: [] };
+        const { buffer, print } = display;
+        print && print(buffer.trimRight());
+        return { buffer: '', refs: [], print };
     }
 
 
