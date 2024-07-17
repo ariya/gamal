@@ -888,7 +888,6 @@ const interact = async () => {
                 }
                 history.push({ inquiry, thought, keyphrases, topic, answer, duration, stages });
                 console.log();
-                console.log();
             }
             loop && qa();
         })
