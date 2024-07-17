@@ -15,10 +15,10 @@ echo "List 5 Indonesia's best travel destinations" | ./gamal.js
 
 Gamal is also compatible with local LLM inference tools such as [llama.cpp](https://github.com/ggerganov/llama.cpp), [Jan](https://jan.ai), [Ollama](https://ollama.com), and [LocalAI](https://localai.io). For instructions on how to set up the environment variables for these services, please refer to the documentation of the sister project, [Ask LLM](https://github.com/ariya/ask-llm?tab=readme-ov-file#using-local-llm-servers). For optimal performance, it is recommended to use an instruction-following LLM with 7B parameters or more, such as Mistral 7B, Qwen-2 7B, Llama-3 8B, Gemma-2 9B, etc.
 
-If the `GAMAL_HTTP_PORT` environment variable is specified, Gamal can be accessed through its minimalist front-end web interface. For example:
+Gamal also includes a minimalist front-end web interface. To launch it, specify the environment variable `GAMAL_HTTP_PORT`, for example:
 ```bash
 GAMAL_HTTP_PORT=5000 ./gamal.js
 ```
-Then, open a web browser and navigate to `localhost:5000`.
+Then, open a web browser and go to `localhost:5000`.
 
-If the `GAMAL_TELEGRAM_TOKEN` environment variable is provided (refer to [Telegram documentation](https://core.telegram.org/bots/tutorial#obtain-your-bot-token) for more details), Gamal functions as a [Telegram bot](https://core.telegram.org/bots). Please note that the conversation history in the Telegram chats is stored in memory and not persisted to disk.
+Gamal is capable of functioning as a [Telegram bot](https://core.telegram.org/bots). Obtain a token (refer to [Telegram documentation](https://core.telegram.org/bots/tutorial#obtain-your-bot-token) for details) and set it as the environment variable `GAMAL_TELEGRAM_TOKEN` before launching Gamal. Note that conversation history in Telegram chats is stored in memory and not persisted to disk.
