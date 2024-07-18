@@ -425,6 +425,15 @@ const brave = async (query, attempt = MAX_RETRY_ATTEMPT) => {
         }
     }
     const { web } = await response.json();
+    if (!web || !web.type || web.type !== 'search') {
+        if (attempt > 1) {
+            LLM_DEBUG_SEARCH && console.log('Brave search returns no result. Retrying...');
+            await sleep((MAX_RETRY_ATTEMPT - attempt + 1) * 1500);
+            return await brave(query, attempt - 1);
+        } else {
+            throw new Error(`Brave search failed with status: ${response.status}`);
+        }
+    }
     const { results = [] } = web;
     LLM_DEBUG_SEARCH && console.log('Brave search result: ', { query, results });
     let references = [];
