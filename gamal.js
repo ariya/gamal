@@ -12,7 +12,6 @@ const LLM_API_BASE_URL = process.env.LLM_API_BASE_URL || 'https://openrouter.ai/
 const LLM_CHAT_MODEL = process.env.LLM_CHAT_MODEL || 'meta-llama/llama-3-8b-instruct';
 const LLM_STREAMING = process.env.LLM_STREAMING !== 'no';
 
-const YOU_API_KEY = process.env.YOU_API_KEY;
 const BRAVE_SEARCH_API_KEY = process.env.BRAVE_SEARCH_API_KEY;
 const TOP_K = 3;
 
@@ -347,56 +346,6 @@ const reason = async (context) => {
 }
 
 /**
- * Searches for relevant information using You.com search engine.
- *
- * @param {string} query - The search query.
- * @return {Array} Array of references containing search results.
- * @throws {Error} - If the search fails with a non-200 status.
- */
-const you = async (query, attempt = MAX_RETRY_ATTEMPT) => {
-    let url = new URL('https://api.ydc-index.io/search');
-    url.searchParams.append('query', query);
-    url.searchParams.append('num_web_results', TOP_K);
-    const timeout = 5 * 1000; // 5 seconds
-
-    const response = await xfetch(url, timeout, {
-        method: 'GET',
-        headers: {
-            'Accept': 'application/json',
-            'X-API-Key': YOU_API_KEY
-        }
-    });
-    if (!response.ok) {
-        if (attempt > 1) {
-            LLM_DEBUG_SEARCH && console.log('You.com failed. Retrying...');
-            await sleep((MAX_RETRY_ATTEMPT - attempt + 1) * 1500);
-            return await you(query, attempt - 1);
-        } else {
-            throw new Error(`You.com call failed with status: ${response.status}`);
-        }
-    }
-    const data = await response.json();
-    const { hits = [] } = data;
-    LLM_DEBUG_SEARCH && console.log('Search result: ', { query, hits });
-    let references = [];
-    if (Array.isArray(hits) && hits.length > 0) {
-        const MAX_CHARS = 1000;
-        references = hits.slice(0, TOP_K).map((hit, i) => {
-            const { title, url, description = '', snippets = [] } = hit;
-            const snippet = description + snippets.join('\n').substring(0, MAX_CHARS);
-            return { position: i + 1, title, url, snippet };
-        });
-    } else {
-        if (attempt > 1) {
-            LLM_DEBUG_SEARCH && console.log('Something is wrong, search gives no result. Retrying...');
-            await sleep((MAX_RETRY_ATTEMPT - attempt + 1) * 1500);
-            return await you(query, attempt - 1);
-        }
-    }
-    return references;
-}
-
-/**
  * Searches for relevant information using Brave search engine.
  *
  * @param {string} query - The search query.
@@ -470,10 +419,6 @@ const search = async (context) => {
 
     if (BRAVE_SEARCH_API_KEY && BRAVE_SEARCH_API_KEY.length >= 31) {
         const references = await brave(query);
-        leave && leave('Search', { references });
-        return { ...context, references };
-    } else if (YOU_API_KEY && YOU_API_KEY.length >= 64) {
-        const references = await you(query);
         leave && leave('Search', { references });
         return { ...context, references };
     }
