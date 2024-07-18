@@ -24,3 +24,29 @@ GAMAL_HTTP_PORT=5000 ./gamal.js
 Then, open a web browser and go to `localhost:5000`.
 
 Gamal is capable of functioning as a [Telegram bot](https://core.telegram.org/bots). Obtain a token (refer to [Telegram documentation](https://core.telegram.org/bots/tutorial#obtain-your-bot-token) for details) and set it as the environment variable `GAMAL_TELEGRAM_TOKEN` before launching Gamal. Note that conversation history in Telegram chats is stored in memory and not persisted to disk.
+
+
+## Evaluating Questions
+
+Gamal includes a built-in evaluation tool. For instance, if a text file named `qa.txt` contains pairs of `User` and `Assistant` messages:
+
+```
+User: Which planet is the largest?
+Assistant: The largest planet is /Jupiter/.
+
+User: and the smallest?
+Assistant: The smallest planet is /Mercury/.
+```
+
+executing the following command will sequentially search for these questions and verify the answers using regular expressions:
+```bash
+./gamal.js qa.txt
+```
+
+Additional examples can be found in the `tests/` subdirectory.
+
+Two environment variables can modify the behavior:
+
+* `LLM_DEBUG_FAIL_EXIT`: When set, Gamal will exit immediately upon encountering an incorrect answer, and subsequent questions in the file will not be processed.
+
+* `LLM_DEBUG_PIPELINE`: When set, if the expected regular expression does not match the answer, the internal LLM pipeline will be printed to stdout.
