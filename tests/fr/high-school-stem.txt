@@ -15,13 +15,13 @@ Assistant: Les plantes produisent leur propre nourriture par le processus de la 
 Pipeline.Reason.Language: /French|Français/
 Pipeline.Reason.Keyphrases: /plant|photosynthesis|photosynthèse|photsynthèse/
 
-User: Quelle est la somme (en degrés) des angles internes d'un triangle ?
+User: Quelle est la mesure totale (en degrés) des angles internes d'un triangle ?
 Assistant: La somme des angles internes d'un triangle est de /180/ degrés.
 Pipeline.Reason.Language: /French|Français/
 Pipeline.Reason.Keyphrases: /angles/ /triangle|triangulaire/
 
 User: Quelle est l'unité de mesure de la force  ?
-Assistant: L'unité de mesure de la force est le /Newton/ (N).
+Assistant: L'unité de mesure de la force est le /Newton|Kip/.
 Pipeline.Reason.Language: /French|Français/
 Pipeline.Reason.Keyphrases: /force|Newton/
 
@@ -31,6 +31,6 @@ Pipeline.Reason.Language: /French|Français/
 Pipeline.Reason.Keyphrases: /magnesium|magnésium/
 
 User: Quels sont les plus petits constituants connus de la matière ?
-Assistant: Les plus petits constituants connus de la matière sont /particules élémentaires|quarks|quanta|leptons/.
+Assistant: Les plus petits constituants connus de la matière sont /élémentaires|atom(es)?|proton(s)?|neutron(s)?|quark(s)?|électron(s)?|quanta|lepton(s)?/.
 Pipeline.Reason.Language: /French|Français/
-Pipeline.Reason.Keyphrases: /unit|nucleus|atom|elementary|particle|constituants|élémentaires/
+Pipeline.Reason.Keyphrases: /unit|nucleus|atom|constituents|elementary|particle|constituants|élémentaires/
