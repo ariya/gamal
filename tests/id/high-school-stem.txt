@@ -30,7 +30,7 @@ Assistant: Simbol kimia untuk magnesium adalah /Mg/.
 Pipeline.Reason.Language: /Indonesia(n)|Bahasa/
 Pipeline.Reason.Keyphrases: /magnesium/
 
-User: Apa unit terkecil dari materi?
+User: Apakah komponent subatomik dari materi?
 Assistant: Unit terkecil dari materi adalah /atom|proton|quark|lepton|partikel/.
 Pipeline.Reason.Language: /Indonesia(n)|Bahasa/
 Pipeline.Reason.Keyphrases: /unit|inti|atom|partikel/
