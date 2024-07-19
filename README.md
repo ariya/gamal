@@ -11,21 +11,26 @@ Gamal is a simple, zero-dependency tool designed to quickly provide answers to q
 
 [![asciicast](https://asciinema.org/a/668554.svg)](https://asciinema.org/a/668554)
 
-To run Gamal, API keys for both [Brave Search API](https://brave.com/search/api/) and [OpenRouter](https://openrouter.ai) are required (both offer generous free credits). Store these keys as `BRAVE_SEARCH_API_KEY` and `LLM_API_KEY` environment variables, respectively. Then use either [Node.js](https://nodejs.org) (>= v18) or [Bun](https://bun.sh) to run Gamal:
+Gamal utilizes [SearXNG](https://searxng.org) for web searches and requires an LLM to generate responses based on search results. By default, Gamal integrates with [OpenRouter](https://openrouter.ai) as its LLM service, requiring the configuration of an API key in the `LLM_API_KEY` environment variable. Please continue reading for detailed instructions on configuring Gamal to use either a local LLM ([llama.cpp](https://github.com/ggerganov/llama.cpp), [Jan](https://jan.ai), and [Ollama](https://ollama.com)) or other managed LLM services (offering over half a dozen options, including [OpenAI](https://platform.openai.com), [Fireworks](https://fireworks.ai), and [Groq](https://groq.com)).
+
+To execute Gamal as a CLI tool, run it with [Node.js](https://nodejs.org) (version >= 18) or [Bun](https://bun.sh):
 
 ```bash
 ./gamal.js
 ```
 
-For instant answers, you can pipe your questions directly into Gamal:
+For instant answers, pipe the questions directly into Gamal:
+
 ```bash
 echo "List 5 Indonesia's best travel destinations" | ./gamal.js
 ```
 
 Gamal also includes a minimalist front-end web interface. To launch it, specify the environment variable `GAMAL_HTTP_PORT`, for example:
+
 ```bash
 GAMAL_HTTP_PORT=5000 ./gamal.js
 ```
+
 Then, open a web browser and go to `localhost:5000`.
 
 Gamal is capable of functioning as a [Telegram bot](https://core.telegram.org/bots). Obtain a token (refer to [Telegram documentation](https://core.telegram.org/bots/tutorial#obtain-your-bot-token) for details) and set it as the environment variable `GAMAL_TELEGRAM_TOKEN` before launching Gamal. Note that conversation history in Telegram chats is stored in memory and not persisted to disk.
@@ -181,3 +186,12 @@ Two environment variables can modify the behavior:
 * `LLM_DEBUG_FAIL_EXIT`: When set, Gamal will exit immediately upon encountering an incorrect answer, and subsequent questions in the file will not be processed.
 
 * `LLM_DEBUG_PIPELINE`: When set, if the expected regular expression does not match the answer, the internal LLM pipeline will be printed to stdout.
+
+
+## Improving Search Quality
+
+By default, Gamal utilizes the [public SearXNG instance](https://searx.space/) at `searxng.online`. To switch to a different SearXNG instance, such as a private one capable of searching additional custom data sources, configure the URL using the `SEARXNG_URL` environment variable.
+
+For more frequent searches, obtain an API key for [JINA reader](https://jina.ai/reader/) (its free tier is generous) and set it as `JINA_API_KEY`. This will increase the rate limit from 20 requests per minute to 200 requests per minute.
+
+To leverage the [Brave Search API](https://brave.com/search/api), a paid search API offering a free trial, acquire the API key and store it as the `BRAVE_SEARCH_API_KEY` environment variable. With this key configured, Gamal will prioritize Brave Search over SearXNG.

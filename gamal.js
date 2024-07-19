@@ -12,6 +12,8 @@ const LLM_API_BASE_URL = process.env.LLM_API_BASE_URL || 'https://openrouter.ai/
 const LLM_CHAT_MODEL = process.env.LLM_CHAT_MODEL || 'meta-llama/llama-3-8b-instruct';
 const LLM_STREAMING = process.env.LLM_STREAMING !== 'no';
 
+const SEARXNG_URL = process.env.SEARXNG_URL || 'https://searxng.online';
+const JINA_API_KEY = process.env.JINA_API_KEY;
 const BRAVE_SEARCH_API_KEY = process.env.BRAVE_SEARCH_API_KEY;
 const TOP_K = 3;
 
@@ -404,6 +406,67 @@ const brave = async (query, attempt = MAX_RETRY_ATTEMPT) => {
 }
 
 /**
+ * Searches for relevant information using SearXNG.
+ *
+ * @param {string} query - The search query.
+ * @return {Array} Array of references containing search results.
+ * @throws {Error} - If the search fails with a non-200 status.
+ */
+const searxng = async (query, attempt = MAX_RETRY_ATTEMPT) => {
+
+    const parse = (content) => {
+        return content.split('[https://')
+            .filter(line => !line.includes('SearXNG'))
+            .map((line, i) => {
+                const fragments = line.split('###').slice(1).join().split('\n');
+                const header = fragments.shift();
+                const description = fragments.join('').trim();
+                const title = header?.match(/\[(.*?)\]/)?.pop().trim();
+                const url = header?.match(/\((.*?)\)/)?.pop().trim();
+                return { title, url, description };
+            }).filter(({ url }) => url && url.length > 0)
+            .slice(0, TOP_K);
+    }
+
+    const timeout = 7 * 1000; // 7 seconds
+    let url = new URL(`${SEARXNG_URL}/search`);
+    url.searchParams.append('q', query);
+    const auth = JINA_API_KEY ? { 'Authorization': `Bearer ${JINA_API_KEY}` } : {};
+    LLM_DEBUG_CHAT && console.log(`SearXNG request: ${url.toString()}`);
+    const response = await xfetch('https://r.jina.ai/' + url.toString(), timeout, {
+        method: 'GET',
+        headers: { ...auth }
+    });
+    if (!response.ok) {
+        if (attempt > 1) {
+            LLM_DEBUG_SEARCH && console.log(`SearXNG failed (${response.status}). Retrying...`);
+            await sleep((MAX_RETRY_ATTEMPT - attempt + 1) * 1500);
+            return await searxng(query, attempt - 1);
+        } else {
+            throw new Error(`SearXNG failed with status: ${response.status}`);
+        }
+    }
+    const blocks = parse(await response.text());
+    LLM_DEBUG_SEARCH && console.log('SearXNG result: ', { query, blocks });
+    let references = [];
+    if (Array.isArray(blocks) && blocks.length > 0) {
+        const MAX_CHARS = 1000;
+        references = blocks.slice(0, TOP_K).map((result, i) => {
+            const { url, title, description } = result;
+            const snippet = title + description.substring(0, MAX_CHARS);
+            return { position: i + 1, url, title, snippet };
+        });
+    } else {
+        if (attempt > 1) {
+            LLM_DEBUG_SEARCH && console.log('Something is wrong, SearXNG gives no result. Retrying...');
+            await sleep((MAX_RETRY_ATTEMPT - attempt + 1) * 1500);
+            return await searxng(query, attempt - 1);
+        }
+    }
+    return references;
+}
+
+/**
  * Uses the online search engine to collect relevant information based on the keyphrases.
  * The TOP_K most relevant results will be stored in `references`.
  *
@@ -423,7 +486,9 @@ const search = async (context) => {
         return { ...context, references };
     }
 
-    throw new Error('No search engine is configured!');
+    const references = await searxng(query);
+    leave && leave('Search', { references });
+    return { ...context, references };
 }
 
 /**
@@ -1059,10 +1124,6 @@ const canary = async () => {
 }
 
 (async () => {
-    if (!BRAVE_SEARCH_API_KEY || BRAVE_SEARCH_API_KEY.length < 31) {
-        console.error('Fatal error: BRAVE_SEARCH_API_KEY not set!');
-        process.exit(-1);
-    }
     await canary();
 
     const args = process.argv.slice(2);
