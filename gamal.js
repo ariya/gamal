@@ -93,7 +93,7 @@ const chat = async (messages, handler = null, attempt = MAX_RETRY_ATTEMPT) => {
     const timeout = 10 * 1000; // 10 seconds
     const auth = LLM_API_KEY ? { 'Authorization': `Bearer ${LLM_API_KEY}` } : {};
     const model = LLM_CHAT_MODEL || 'gpt-3.5-turbo';
-    const stop = ['<|im_end|>', '<|end|>', '<|eot_id|>', '<|end_of_turn|>', 'INQUIRY: '];;
+    const stop = ['<|im_end|>', '<|end|>', '<|eot_id|>', 'INQUIRY: '];;
     const max_tokens = 400;
     const temperature = 0;
     const stream = LLM_STREAMING && typeof handler === 'function';
