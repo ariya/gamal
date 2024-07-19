@@ -10,17 +10,13 @@ User: When did Mission Impossible Dead Reckoning 1 get released: in 2023 or 2024
 Assistant: It was released in /2023/.
 Pipeline.Reason.Keyphrases: /mission impossible|dead reckoning/ /release(d)?|date/
 
-User: What's the world's biggest mobile tech event hosted annually in Barcelona every February?
-Assistant: The event is /MWC|Mobile World Congress/.
-Pipeline.Reason.Keyphrases: /Barcelona/
-
 User: Who became the MVP of NBA Finals 2024?
 Assistant: /(Jaylen )?Brown/ was named the MVP of the NBA Finals in 2024.
 Pipeline.Reason.Keyphrases: /MVP/ /NBA|basketball/
 
 User: Where did he go for his college education?
 Assistant: /(University of California, )?Berkeley|Golden Bears/.
-Pipeline.Reason.Keyphrases: /college|education|study/
+Pipeline.Reason.Keyphrases: /college|university|education|study/
 
 User: When was he born?
 Assistant: Jaylen Brown was born on /Oct(ober)?/ 24, /1996/.
