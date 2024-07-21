@@ -82,7 +82,7 @@ const chat = async (messages, handler = null, attempt = MAX_RETRY_ATTEMPT) => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', ...auth },
         body: JSON.stringify({ messages, model, stop, max_tokens, temperature, stream }),
-        signal: AbortSignal.timeout(10 * 1000) // 10 seconds
+        signal: AbortSignal.timeout(17 * 1000) // 17 seconds
     });
     if (!response.ok) {
         if (attempt > 1) {
@@ -344,7 +344,7 @@ const brave = async (query, attempt = MAX_RETRY_ATTEMPT) => {
             'Accept': 'application/json',
             'X-Subscription-Token': BRAVE_SEARCH_API_KEY
         },
-        signal: AbortSignal.timeout(5 * 1000) // 5 seconds
+        signal: AbortSignal.timeout(11 * 1000) // 11 seconds
     });
     if (!response.ok) {
         if (attempt > 1) {
@@ -415,7 +415,7 @@ const searxng = async (query, attempt = MAX_RETRY_ATTEMPT) => {
     const response = await fetch('https://r.jina.ai/' + url.toString(), {
         method: 'GET',
         headers: { ...auth },
-        signal: AbortSignal.timeout(7 * 1000) // 7 seconds
+        signal: AbortSignal.timeout(13 * 1000) // 13 seconds
     });
     if (!response.ok) {
         if (attempt > 1) {
