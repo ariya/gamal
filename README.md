@@ -7,6 +7,8 @@
 [![German versions](https://github.com/ariya/gamal/actions/workflows/german.yml/badge.svg)](https://github.com/ariya/gamal/actions/workflows/german.yml)
 [![French versions](https://github.com/ariya/gamal/actions/workflows/french.yml/badge.svg)](https://github.com/ariya/gamal/actions/workflows/french.yml)
 [![Indonesian versions](https://github.com/ariya/gamal/actions/workflows/indonesian.yml/badge.svg)](https://github.com/ariya/gamal/actions/workflows/indonesian.yml)
+[![Language switch](https://github.com/ariya/gamal/actions/workflows/lang-switch.yml/badge.svg)](https://github.com/ariya/gamal/actions/workflows/lang-switch.yml)
+
 
 Gamal is a simple, zero-dependency tool designed to quickly provide answers to questions. It finds relevant web pages and uses an LLM to summarize the content, delivering concise answers.  Gamal is accessible via the terminal (as a CLI tool), through its minimalist web interface, or as a Telegram bot.
 

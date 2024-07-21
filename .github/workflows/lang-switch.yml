@@ -1,0 +1,19 @@
+name: Switch languages
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+
+  lang-switch:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - run: ./gamal.js tests/lang-switch.txt
+        env:
+          LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
