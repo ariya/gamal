@@ -1,0 +1,11 @@
+User: ¿Cuál es el planeta más grande de nuestro sistema solar?
+Assistant: /Júpiter/ es el planeta más grande de nuestro sistema solar.
+
+User: ¿Y el más caliente?
+Assistant: /Venus/ es el planeta más caliente de nuestro sistema solar.
+
+User: ¿Y cuál es conocido como "El Planeta Rojo"?
+Assistant: /Marte/, debido a su apariencia rojiza causada por el óxido de hierro en su superficie.
+
+User: ¿Y cuál es conocido por tener el sistema de anillos más complejo?
+Assistant: ¡Ese debe ser /Saturno/!

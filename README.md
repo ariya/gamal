@@ -3,6 +3,7 @@
 [![Canary Multi-Turn](https://github.com/ariya/gamal/actions/workflows/canary-multi-turn.yml/badge.svg)](https://github.com/ariya/gamal/actions/workflows/canary-multi-turn.yml)
 [![General Knowledge](https://github.com/ariya/gamal/actions/workflows/general-knowledge.yml/badge.svg)](https://github.com/ariya/gamal/actions/workflows/general-knowledge.yml)
 [![Latest News](https://github.com/ariya/gamal/actions/workflows/latest-news.yml/badge.svg)](https://github.com/ariya/gamal/actions/workflows/latest-news.yml)
+[![Spanish versions](https://github.com/ariya/gamal/actions/workflows/spanish.yml/badge.svg)](https://github.com/ariya/gamal/actions/workflows/spanish.yml)
 [![German versions](https://github.com/ariya/gamal/actions/workflows/german.yml/badge.svg)](https://github.com/ariya/gamal/actions/workflows/german.yml)
 [![French versions](https://github.com/ariya/gamal/actions/workflows/french.yml/badge.svg)](https://github.com/ariya/gamal/actions/workflows/french.yml)
 [![Indonesian versions](https://github.com/ariya/gamal/actions/workflows/indonesian.yml/badge.svg)](https://github.com/ariya/gamal/actions/workflows/indonesian.yml)

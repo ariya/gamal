@@ -1,0 +1,36 @@
+Story: Preguntas sobre temas STEM en la escuela secundaria
+
+User: ¿Qué fuerza atrae los objetos hacia el centro de la Tierra?
+Assistant: La /gravedad|fuerza gravitatoria|fuerza gravitacional|atracción terrestre/ atrae los objetos hacia el centro de la Tierra.
+Pipeline.Reason.Language: /Spanish|Español/
+Pipeline.Reason.Keyphrases: /force|gravity|Earth|fuerza|gravedad|gravitacional|gravitatoria|atracción|/
+
+User: ¿Cuál es el número atómico del carbono?
+Assistant: El número atómico del carbono es /6|seis/.
+Pipeline.Reason.Language: /Spanish|Español/
+Pipeline.Reason.Keyphrases: /carbon(o)?/
+
+User: ¿Mediante qué proceso producen las plantas su propio alimento?
+Assistant: Las plantas producen su propio alimento mediante el proceso de /fotosíntesis|fotosintético|metabolismo ácido/.
+Pipeline.Reason.Language: /Spanish|Español/
+Pipeline.Reason.Keyphrases: /photosynthesis|plant(as)?|fotosíntesis|fotodigestión/
+
+User: ¿Cuál es la suma (en grados) de los ángulos internos de un triángulo?
+Assistant: La suma de los ángulos internos de un triángulo es /180/ grados.
+Pipeline.Reason.Language: /Spanish|Español/
+Pipeline.Reason.Keyphrases: /angles|ángulos/ /triangle|triángulo/
+
+User: ¿Cuál es la unidad de medida de la fuerza?
+Assistant: La unidad de medida de la fuerza es el /Newton/ (N).
+Pipeline.Reason.Language: /Spanish|Español/
+Pipeline.Reason.Keyphrases: /force|fuerza/
+
+User: ¿Cuál es el símbolo del elemento magnesio?
+Assistant: El símbolo del elemento magnesio es /Mg/.
+Pipeline.Reason.Language: /Spanish|Español/
+Pipeline.Reason.Keyphrases: /magnesium|magnesio/
+
+User: ¿Cuáles son las partículas más pequeñas conocidas de la materia?
+Assistant: Las partículas más pequeñas conocidas de la materia son /partículas elementales|quarks|quarks|leptones/.
+Pipeline.Reason.Language: /Spanish|Español/
+Pipeline.Reason.Keyphrases: /unit|elementary|particle|unidad|elemental|partícula(s)?/
