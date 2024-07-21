@@ -114,7 +114,7 @@ export LLM_CHAT_MODEL="gpt-4o-mini"
 ```
 </details>
 
-<details>Together</summary>
+<details><summary>Together</summary>
 
 ```bash
 export LLM_API_BASE_URL=https://api.together.xyz/v1
