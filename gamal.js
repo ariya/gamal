@@ -392,7 +392,7 @@ const brave = async (query, attempt = MAX_RETRY_ATTEMPT) => {
  * @return {Array} Array of references containing search results.
  * @throws {Error} - If the search fails with a non-200 status.
  */
-const searxng = async (query, attempt = MAX_RETRY_ATTEMPT) => {
+const searxng = async (query, language, attempt = MAX_RETRY_ATTEMPT) => {
 
     const parse = (content) => {
         return content.split('[https://')
@@ -408,10 +408,13 @@ const searxng = async (query, attempt = MAX_RETRY_ATTEMPT) => {
             .slice(0, TOP_K);
     }
 
+    const lang = /Indonesia|Bahasa/i.test(language) ? 'id' : 'auto'; // specialized for low-resource language(s)
+
     let url = new URL(`${SEARXNG_URL}/search`);
     url.searchParams.append('q', query);
+    url.searchParams.append('language', lang);
     const auth = JINA_API_KEY ? { 'Authorization': `Bearer ${JINA_API_KEY}` } : {};
-    LLM_DEBUG_CHAT && console.log(`SearXNG request: ${url.toString()}`);
+    LLM_DEBUG_SEARCH && console.log(`SearXNG request: ${url.toString()}`);
     const response = await fetch('https://r.jina.ai/' + url.toString(), {
         method: 'GET',
         headers: { ...auth },
@@ -421,7 +424,7 @@ const searxng = async (query, attempt = MAX_RETRY_ATTEMPT) => {
         if (attempt > 1) {
             LLM_DEBUG_SEARCH && console.log(`SearXNG failed (${response.status}). Retrying...`);
             await sleep((MAX_RETRY_ATTEMPT - attempt + 1) * 1500);
-            return await searxng(query, attempt - 1);
+            return await searxng(query, language, attempt - 1);
         } else {
             throw new Error(`SearXNG failed with status: ${response.status}`);
         }
@@ -440,7 +443,7 @@ const searxng = async (query, attempt = MAX_RETRY_ATTEMPT) => {
         if (attempt > 1) {
             LLM_DEBUG_SEARCH && console.log('Something is wrong, SearXNG gives no result. Retrying...');
             await sleep((MAX_RETRY_ATTEMPT - attempt + 1) * 1500);
-            return await searxng(query, attempt - 1);
+            return await searxng(query, language, attempt - 1);
         }
     }
     return references;
@@ -454,11 +457,13 @@ const searxng = async (query, attempt = MAX_RETRY_ATTEMPT) => {
  * @returns {Context} Updated pipeline context.
  */
 const search = async (context) => {
-    const { delegates, keyphrases, observation } = context;
+    const { delegates, keyphrases, topic, language } = context;
     const { enter, leave } = delegates;
     enter && enter('Search');
 
-    const query = keyphrases.replace(/\.$/, "").replace(/^"|"$/g, "");
+    const query = topic.replaceAll('.', '') + ': ' + keyphrases.replace(/\.$/, "").replace(/^"|"$/g, "");
+
+    LLM_DEBUG_SEARCH && console.log(`Language: ${language} Search query: ${query}`);
 
     if (BRAVE_SEARCH_API_KEY && BRAVE_SEARCH_API_KEY.length >= 31) {
         const references = await brave(query);
@@ -466,7 +471,7 @@ const search = async (context) => {
         return { ...context, references };
     }
 
-    const references = await searxng(query);
+    const references = await searxng(query, language);
     leave && leave('Search', { references });
     return { ...context, references };
 }
