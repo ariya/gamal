@@ -2,7 +2,7 @@ User: Who won the Copa America 2024?
 Assistant: /Argentina/ won the Copa America 2024.
 Pipeline.Reason.Keyphrases: /win(ner)?|win|won|Copa|America/
 
-User: Where was the 20th Edition International Conference on Applied Business & Economics held?
+User: Where was the physical venue for the 20th International Conference on Applied Business & Economics?
 Assistant: The conference was held at the University of /Szczecin(, Poland)?/.
 Pipeline.Reason.Keyphrases: /location|conference|business|economics/
 
