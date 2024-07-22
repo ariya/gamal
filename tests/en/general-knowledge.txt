@@ -109,7 +109,7 @@ User: Who painted Mona Lisa?
 Assistant: The Mona Lisa was painted by the renowned Italian polymath, Leonardo /da Vinci/.
 Pipeline.Reason.Keyphrases: /Mona Lisa/
 
-User: Who led the revolution in South Africa
+User: Who led the revolution in South Africa against apartheid
 Assistant: The revolution in South Africa was led by the iconic activitist, Nelson /Mandela/.
 Pipeline.Reason.Keyphrases: /South Africa|apartheid|leader/
 
