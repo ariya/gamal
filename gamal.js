@@ -278,7 +278,7 @@ OBSERVATION: Le lac de Pitch à Trinidad est le plus grand dépôt naturel d'asp
 TOPIC: géographie.`;
 
 const breakdown = (hint, completion) => {
-    const text = hint + completion;
+    const text = completion.startsWith(hint) ? completion : hint + completion;
     let result = deconstruct(text);
     const { topic } = result;
     if (!topic || topic.length === 0) {
