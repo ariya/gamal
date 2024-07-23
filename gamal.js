@@ -413,6 +413,7 @@ const searxng = async (query, language, attempt = MAX_RETRY_ATTEMPT) => {
     let url = new URL(`${SEARXNG_URL}/search`);
     url.searchParams.append('q', query);
     url.searchParams.append('language', lang);
+    url.searchParams.append('safesearch', '0');
     const auth = JINA_API_KEY ? { 'Authorization': `Bearer ${JINA_API_KEY}` } : {};
     LLM_DEBUG_SEARCH && console.log(`SearXNG request: ${url.toString()}`);
     const response = await fetch('https://r.jina.ai/' + url.toString(), {
