@@ -15,10 +15,10 @@ Assistant: Les plantes produisent leur propre nourriture par le processus de la 
 Pipeline.Reason.Language: /French|Français/
 Pipeline.Reason.Keyphrases: /plant|photosynthesis|photosynthèse|photsynthèse/
 
-User: Quelle est la mesure totale (en degrés) des angles internes d'un triangle ?
+User: Quelle est la mesure en degrés de la somme des angles intérieurs d’un triangle ?
 Assistant: La somme des angles internes d'un triangle est de /180/ degrés.
 Pipeline.Reason.Language: /French|Français/
-Pipeline.Reason.Keyphrases: /angles/ /triangle|triangulaire/
+Pipeline.Reason.Keyphrases: /angle(s)?/ /triangle|triangulaire/
 
 User: Quelle est l'unité de mesure de la force  ?
 Assistant: L'unité de mesure de la force est le /Newton|Kip/.

@@ -7,5 +7,5 @@ Assistant: /Venus/ es el planeta más caliente de nuestro sistema solar.
 User: ¿Y cuál es conocido como "El Planeta Rojo"?
 Assistant: /Marte/, debido a su apariencia rojiza causada por el óxido de hierro en su superficie.
 
-User: ¿Y cuál es conocido por tener el sistema de anillos más complejo?
-Assistant: ¡Ese debe ser /Saturno/!
+User: ¿Y cuál es conocido por su prominente sistema de anillos?
+Assistant: ¡Ese debe ser /Saturn(o)?/!
