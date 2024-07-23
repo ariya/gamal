@@ -382,7 +382,7 @@ const brave = async (query, attempt = MAX_RETRY_ATTEMPT) => {
             return await brave(query, attempt - 1);
         }
     }
-    return references;
+    return { url, references };
 }
 
 /**
@@ -446,7 +446,7 @@ const searxng = async (query, language, attempt = MAX_RETRY_ATTEMPT) => {
             return await searxng(query, language, attempt - 1);
         }
     }
-    return references;
+    return { url, references };
 }
 
 /**
@@ -466,13 +466,13 @@ const search = async (context) => {
     LLM_DEBUG_SEARCH && console.log(`Language: ${language} Search query: ${query}`);
 
     if (BRAVE_SEARCH_API_KEY && BRAVE_SEARCH_API_KEY.length >= 31) {
-        const references = await brave(query);
-        leave && leave('Search', { references });
+        const { url, references } = await brave(query);
+        leave && leave('Search', { engine: 'Brave', url, references });
         return { ...context, references };
     }
 
-    const references = await searxng(query, language);
-    leave && leave('Search', { references });
+    const { url, references } = await searxng(query, language);
+    leave && leave('Search', { engine: 'SearXNG', url, references });
     return { ...context, references };
 }
 
