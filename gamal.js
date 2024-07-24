@@ -884,13 +884,15 @@ const interact = async () => {
                 const { topic, thought, keyphrases } = result;
                 const duration = Date.now() - start;
                 const { answer, references } = result;
-                if (references && Array.isArray(references) && references.length >= refs.length) {
-                    console.log();
-                    console.log();
-                    refs.forEach((ref, i) => {
-                        const { url } = references[ref - 1];
-                        console.log(`[${i + 1}] ${GRAY}${url}${NORMAL}`);
-                    });
+                if (references && Array.isArray(references)) {
+                    if (references.length > 0 && references.length >= refs.length) {
+                        console.log();
+                        console.log();
+                        refs.forEach((ref, i) => {
+                            const { url } = references[ref - 1];
+                            console.log(`[${i + 1}] ${GRAY}${url}${NORMAL}`);
+                        });
+                    }
                 }
                 history.push({ inquiry, thought, keyphrases, topic, answer, duration, stages });
                 console.log();
