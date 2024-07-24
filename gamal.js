@@ -675,7 +675,18 @@ const highlight = (text, spans, color = BOLD + GREEN) => {
         const suffix = result.substring(index + length);
         result = `${prefix}${color}${content}${NORMAL}${suffix}`;
     });
-    return result;
+
+    let colored = '';
+    const print = (text) => colored += text;
+    const cite = (citation) => `${GRAY}[${citation}]${NORMAL}`;
+    let display = { buffer: '', refs: [], print, cite };
+    for (let i = 0; i < result.length; ++i) {
+        display = push(display, result[i]);
+    }
+    const refs = display.refs.slice();
+    flush(display);
+
+    return { colored, refs };
 }
 
 /**
@@ -729,12 +740,15 @@ const evaluate = async (filename) => {
                         const matches = match(target, regexes);
                         if (matches.length === regexes.length) {
                             console.log(`${GREEN}${CHECK} ${CYAN}${inquiry} ${GRAY}[${duration} ms]${NORMAL}`);
-                            console.log(' ', highlight(target, matches));
-                            if (references && Array.isArray(references) && references.length > 0) {
-                                references.forEach((reference) => {
-                                    const { position, url } = reference;
-                                    console.log(`  ${GRAY}[${position}] ${url}${NORMAL}`);
-                                })
+                            const { colored, refs } = highlight(target, matches);
+                            console.log(' ', colored);
+                            if (references && Array.isArray(references)) {
+                                if (references.length > 0 && references.length >= refs.length) {
+                                    refs.forEach((ref, i) => {
+                                        const { url } = references[ref - 1];
+                                        console.log(`  ${GRAY}[${i + 1}] ${url}${NORMAL}`);
+                                    });
+                                }
                             }
                             LLM_DEBUG_PIPELINE && review(simplify(stages));
                         } else {
@@ -758,7 +772,8 @@ const evaluate = async (filename) => {
                         const regexes = regexify(expected);
                         const matches = match(target, regexes);
                         if (matches.length === regexes.length) {
-                            console.log(`    ${ARROW} ${GRAY}${role}:`, highlight(target, matches, GREEN));
+                            const { colored } = highlight(target, matches, GREEN);
+                            console.log(`    ${ARROW} ${GRAY}${role}:`, colored);
                         } else {
                             ++failures;
                             console.error(`${RED}Expected ${role} to contain: ${CYAN}${regexes.join(',')}${NORMAL}`);
