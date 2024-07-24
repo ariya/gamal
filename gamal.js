@@ -397,12 +397,13 @@ const searxng = async (query, language, attempt = MAX_RETRY_ATTEMPT) => {
     const parse = (content) => {
         return content.split('[https://')
             .filter(line => !line.includes('SearXNG'))
-            .map((line, i) => {
+            .map(line => {
                 const fragments = line.split('###').slice(1).join().split('\n');
                 const header = fragments.shift();
                 const description = fragments.join('').trim();
                 const title = header?.match(/\[(.*?)\]/)?.pop().trim();
-                const url = header?.match(/\((.*?)\)/)?.pop().trim();
+                const buffer = header?.replace(title, '').trim();
+                const url = buffer?.match(/\((.*?)\)/)?.pop().trim();
                 return { title, url, description };
             }).filter(({ url }) => url && url.length > 0)
             .slice(0, TOP_K);
