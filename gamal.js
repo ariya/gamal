@@ -73,7 +73,7 @@ const sleep = async (ms) => new Promise(resolve => setTimeout(resolve, ms));
 const chat = async (messages, handler = null, attempt = MAX_RETRY_ATTEMPT) => {
     const url = `${LLM_API_BASE_URL}/chat/completions`;
     const auth = LLM_API_KEY ? { 'Authorization': `Bearer ${LLM_API_KEY}` } : {};
-    const model = LLM_CHAT_MODEL || 'gpt-3.5-turbo';
+    const model = LLM_CHAT_MODEL;
     const stop = ['<|im_end|>', '<|end|>', '<|eot_id|>', 'INQUIRY: '];;
     const max_tokens = 400;
     const temperature = 0;
