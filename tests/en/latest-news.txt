@@ -2,10 +2,6 @@ User: Who won the Copa America 2024?
 Assistant: /Argentina/ won the Copa America 2024.
 Pipeline.Reason.Keyphrases: /win(ner)?|win|won|Copa|America/
 
-User: Where was the physical venue for the 20th International Conference on Applied Business & Economics?
-Assistant: The conference was held at the University of /Szczecin(, Poland)?/.
-Pipeline.Reason.Keyphrases: /location|conference|business|economics/
-
 User: When did Mission Impossible Dead Reckoning 1 get released: in 2023 or 2024?
 Assistant: It was released in /2023/.
 Pipeline.Reason.Keyphrases: /mission impossible|dead reckoning/ /release(d)?|date/
