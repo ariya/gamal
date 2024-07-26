@@ -1039,7 +1039,7 @@ const poll = async () => {
 
         const send = async (id, message) => {
             try {
-                await fetch(SEND_URL, TIMEOUT, {
+                await fetch(SEND_URL, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
