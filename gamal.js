@@ -44,6 +44,12 @@ const pipe = (...fns) => arg => fns.reduce((d, fn) => d.then(fn), Promise.resolv
 
 const MAX_RETRY_ATTEMPT = 3;
 
+/**
+ * Suspends the execution for a specified amount of time.
+ *
+ * @param {number} ms - The amount of time to suspend execution in milliseconds.
+ * @returns {Promise<void>} - A promise that resolves after the specified time has elapsed.
+ */
 const sleep = async (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
 /**
@@ -816,6 +822,17 @@ const evaluate = async (filename) => {
 
 const MAX_LOOKAHEAD = 3 * '[citation:x]'.length;
 
+/**
+ * Pushes the given text to the buffer and handles citation references.
+ *
+ * @param {Object} display - The display object.
+ * @param {string} display.buffer - The buffer to push the text to.
+ * @param {Array} display.refs - The array of citation references.
+ * @param {Function} display.print - The function to print the output.
+ * @param {Function} display.cite - The function to cite a reference.
+ * @param {string} text - The text to push to the buffer.
+ * @return {Object} The updated display object.
+ */
 const push = (display, text) => {
     let { buffer, refs, print, cite } = display;
     buffer += text;
@@ -841,12 +858,28 @@ const push = (display, text) => {
     return { buffer, refs, print, cite };
 }
 
+/**
+ * Flushes the buffer and resets the display object.
+ *
+ * @param {Object} display - The display object.
+ * @param {string} display.buffer - The buffer to flush.
+ * @param {Array} display.refs - The array of citation references.
+ * @param {Function} display.print - The function to print the output.
+ * @param {Function} display.cite - The function to cite a reference.
+ * @return {Object} The updated display object with an empty buffer and empty reference array.
+ */
 const flush = display => {
     const { buffer, print, cite } = display;
     print && print(buffer.trimRight());
     return { buffer: '', refs: [], print, cite };
 }
 
+/**
+ * Interacts with the user in the terminal, asking for inquiries and providing answers.
+ * The function uses readline to read user input and prints the output to the console.
+ * The interaction is looped until the user closes the input stream.
+ * The user can reset the history or review the last interaction.
+ */
 const interact = async () => {
     const print = (text) => process.stdout.write(text);
     const cite = (citation) => `${GRAY}[${citation}]${NORMAL}`;
@@ -919,6 +952,11 @@ const interact = async () => {
     qa();
 }
 
+/**
+ * Starts an HTTP server that listens on the specified port and serves requests.
+ *
+ * @param {number} port - The port number to listen on.
+ */
 const serve = async (port) => {
     let history = [];
 
@@ -998,10 +1036,20 @@ const serve = async (port) => {
     console.log('Listening on port', port);
 }
 
+/**
+ * Asynchronously polls the Telegram API for updates and processes them.
+ */
 const poll = async () => {
 
     let state = {};
 
+    /**
+     * Formats the given answer by replacing citation references with formatted citations.
+     *
+     * @param {string} answer - The answer to format.
+     * @param {Array} references - The array of references.
+     * @return {string} The formatted answer with citations.
+     */
     const format = (answer, references) => {
         let buffer = answer;
         let refs = [];
@@ -1032,6 +1080,12 @@ const poll = async () => {
         return buffer;
     }
 
+    /**
+     * Checks for updates from the Telegram API and processes incoming messages.
+     *
+     * @param {number} offset - The offset from which to start fetching updates.
+     * @return {Promise<void>} A promise that resolves when the function completes.
+     */
     const check = async (offset) => {
 
         const POLL_URL = `https://api.telegram.org/bot${GAMAL_TELEGRAM_TOKEN}/getUpdates?offset=${offset}`;
@@ -1112,7 +1166,10 @@ const poll = async () => {
     check(0);
 }
 
-
+/**
+ * Runs a canary test to ensure that the configured LLM service is ready and
+ * terminates the process if it is not.
+ */
 const canary = async () => {
     console.log(`Using LLM at ${LLM_API_BASE_URL} (model: ${GREEN}${LLM_CHAT_MODEL || 'default'}${NORMAL}).`);
     process.stdout.write(`${ARROW} Checking LLM...\r`);
