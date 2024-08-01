@@ -9,9 +9,6 @@
 [![Indonesian versions](https://github.com/ariya/gamal/actions/workflows/indonesian.yml/badge.svg)](https://github.com/ariya/gamal/actions/workflows/indonesian.yml)
 [![Language switch](https://github.com/ariya/gamal/actions/workflows/lang-switch.yml/badge.svg)](https://github.com/ariya/gamal/actions/workflows/lang-switch.yml)
 
-[![Test on Groq](https://github.com/ariya/gamal/actions/workflows/test-groq.yml/badge.svg)](https://github.com/ariya/gamal/actions/workflows/test-groq.yml)
-[![Test on Together](https://github.com/ariya/gamal/actions/workflows/test-together.yml/badge.svg)](https://github.com/ariya/gamal/actions/workflows/test-together.yml)
-
 Gamal is a simple, zero-dependency tool designed to quickly provide answers to questions. It finds relevant web pages and uses an LLM to summarize the content, delivering concise answers.  Gamal is accessible via the terminal (as a CLI tool), through its minimalist web interface, or as a Telegram bot.
 
 [![asciicast](https://asciinema.org/a/668554.svg)](https://asciinema.org/a/668554)
@@ -45,6 +42,9 @@ Gamal is capable of functioning as a [Telegram bot](https://core.telegram.org/bo
 Gamal is designed to be used with OpenRouter by default, but it can also be configured to work with other LLM services by adjusting some environment variables. The correct API key and a suitable model are required.
 
 Compatible LLM services include [Anyscale](https://www.anyscale.com), [Deep Infra](https://deepinfra.com), [Fireworks](https://fireworks.ai), [Groq](https://groq.com), [Lepton](https://lepton.ai), [Novita](https://novita.ai), [Octo](https://octo.ai), [OpenAI](https://platform.openai.com), and [Together](https://www.together.ai).
+
+[![Test on Groq](https://github.com/ariya/gamal/actions/workflows/test-groq.yml/badge.svg)](https://github.com/ariya/gamal/actions/workflows/test-groq.yml)
+[![Test on Together](https://github.com/ariya/gamal/actions/workflows/test-together.yml/badge.svg)](https://github.com/ariya/gamal/actions/workflows/test-together.yml)
 
 Refer to the relevant section for configuration details. The example provided is for Llama-3 8B, though any LLM with 7B parameters should also work, such as Mistral 7B, Qwen-2 7B, or Gemma-2 9B.
 
