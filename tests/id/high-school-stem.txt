@@ -3,27 +3,27 @@ Story: Pertanyaan STEM untuk SMA
 User: Apa gaya yang menarik benda-benda menuju pusat Bumi?
 Assistant: Gaya yang menarik benda-benda menuju pusat Bumi dikenal sebagai /gravitasi/.
 Pipeline.Reason.Language: /Indonesia(n)?|Bahasa/
-Pipeline.Reason.Keyphrases: /gaya|gravitasi|Earth|gravity|Bumi/
+Pipeline.Reason.Keyphrases: /force|gravity|gaya|gravitasi|Earth|gravity|Bumi/
 
 User: Berapakah nomor atom karbon?
 Assistant: Nomor atom karbon adalah /6|enam/.
 Pipeline.Reason.Language: /Indonesia(n)?|Bahasa/
-Pipeline.Reason.Keyphrases: /karbon/
+Pipeline.Reason.Keyphrases: /carbon|karbon/
 
 User: Proses apakah yang digunakan oleh tumbuhan-tumbuhan untuk membuat makanannya sendiri?
 Assistant: Tumbuhan membuat makanannya sendiri menggunakan /fotosintesis/.
 Pipeline.Reason.Language: /Indonesia(n)?|Bahasa/
-Pipeline.Reason.Keyphrases: /tumbuhan|fotosintesis/
+Pipeline.Reason.Keyphrases: /plant(s)?|tumbuhan|fotosintesis/
 
 User: Berapakah jumlah sudut (dalam derajat) pada sebuah segitiga?
 Assistant: Jumlah sudut pada sebuah segitiga adalah /180/ derajat.
 Pipeline.Reason.Language: /Indonesia(n)?|Bahasa/
-Pipeline.Reason.Keyphrases: /sudut/ /segitiga/
+Pipeline.Reason.Keyphrases: /angle|sudut/ /triangle|segitiga/
 
 User: Apa satuan untuk mengukur gaya?
 Assistant: Satuan untuk mengukur gaya adalah /Newton/ (N).
 Pipeline.Reason.Language: /Indonesia(n)?|Bahasa/
-Pipeline.Reason.Keyphrases: /gaya/
+Pipeline.Reason.Keyphrases: /force|gaya/
 
 User: Apa simbol kimia untuk magnesium?
 Assistant: Simbol kimia untuk magnesium adalah /Mg/.
@@ -33,4 +33,4 @@ Pipeline.Reason.Keyphrases: /magnesium/
 User: Apakah komponent subatomik dari materi?
 Assistant: Unit terkecil dari materi adalah /atom|proton|quark|lepton|partikel/.
 Pipeline.Reason.Language: /Indonesia(n)?|Bahasa/
-Pipeline.Reason.Keyphrases: /unit|inti|atom|partikel/
+Pipeline.Reason.Keyphrases: /matter|unit|inti|atom|partikel/
