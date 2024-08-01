@@ -400,6 +400,8 @@ const brave = async (query, attempt = MAX_RETRY_ATTEMPT) => {
  */
 const searxng = async (query, language, attempt = MAX_RETRY_ATTEMPT) => {
 
+    const timeout = 31; // seconds
+
     const parse = (content) => {
         return content.split('[https://')
             .filter(line => !line.includes('SearXNG'))
@@ -423,38 +425,44 @@ const searxng = async (query, language, attempt = MAX_RETRY_ATTEMPT) => {
     url.searchParams.append('safesearch', '0');
     const auth = JINA_API_KEY ? { 'Authorization': `Bearer ${JINA_API_KEY}` } : {};
     LLM_DEBUG_SEARCH && console.log(`SearXNG request: ${url.toString()}`);
-    const response = await fetch('https://r.jina.ai/' + url.toString(), {
-        method: 'GET',
-        headers: { ...auth },
-        signal: AbortSignal.timeout(13 * 1000) // 13 seconds
-    });
-    if (!response.ok) {
-        if (attempt > 1) {
-            LLM_DEBUG_SEARCH && console.log(`SearXNG failed (${response.status}). Retrying...`);
+    try {
+
+        const response = await fetch('https://r.jina.ai/' + url.toString(), {
+            method: 'GET',
+            headers: { ...auth },
+            signal: AbortSignal.timeout(timeout * 1000)
+        });
+        if (!response.ok) {
+            throw new EvalError(`SearXNG failed with status: ${response.status}`);
+        }
+        const blocks = parse(await response.text());
+        LLM_DEBUG_SEARCH && console.log('SearXNG result: ', { query, blocks });
+        let references = [];
+        if (Array.isArray(blocks) && blocks.length > 0) {
+            const MAX_CHARS = 1000;
+            references = blocks.slice(0, TOP_K).map((result, i) => {
+                const { url, title, description } = result;
+                const snippet = title + description.substring(0, MAX_CHARS);
+                return { position: i + 1, url, title, snippet };
+            });
+        } else {
+            throw new EvalError('SearXNG failed, giving no result');
+        }
+        return { url, references };
+    } catch (e) {
+        LLM_DEBUG_SEARCH && console.log();
+        if (e.name === 'TimeoutError') {
+            LLM_DEBUG_SEARCH && console.log(`Timeout with SearXNG after ${timeout} seconds`);
+        }
+        if (attempt > 1 && (e.name === 'TimeoutError' || e.name === 'EvalError')) {
+            LLM_DEBUG_SEARCH && console.log('Retrying...');
             await sleep((MAX_RETRY_ATTEMPT - attempt + 1) * 1500);
             return await searxng(query, language, attempt - 1);
         } else {
-            throw new Error(`SearXNG failed with status: ${response.status}`);
+            throw e;
         }
     }
-    const blocks = parse(await response.text());
-    LLM_DEBUG_SEARCH && console.log('SearXNG result: ', { query, blocks });
-    let references = [];
-    if (Array.isArray(blocks) && blocks.length > 0) {
-        const MAX_CHARS = 1000;
-        references = blocks.slice(0, TOP_K).map((result, i) => {
-            const { url, title, description } = result;
-            const snippet = title + description.substring(0, MAX_CHARS);
-            return { position: i + 1, url, title, snippet };
-        });
-    } else {
-        if (attempt > 1) {
-            LLM_DEBUG_SEARCH && console.log('Something is wrong, SearXNG gives no result. Retrying...');
-            await sleep((MAX_RETRY_ATTEMPT - attempt + 1) * 1500);
-            return await searxng(query, language, attempt - 1);
-        }
-    }
-    return { url, references };
+
 }
 
 /**
