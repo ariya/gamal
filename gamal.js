@@ -434,7 +434,10 @@ const searxng = async (query, language, attempt = MAX_RETRY_ATTEMPT) => {
             .slice(0, TOP_K);
     }
 
-    const lang = /Indonesia|Bahasa/i.test(language) ? 'id' : 'auto'; // specialized for low-resource language(s)
+    const lang = /German|Deutsch/i.test(language) ? 'de' :
+        /French|Français/i.test(language) ? 'fr' :
+        /Spanish|Español/i.test(language) ? 'es' :
+        /Indonesia|Bahasa/i.test(language) ? 'id' : 'auto';
 
     let url = new URL(`${SEARXNG_URL}/search`);
     url.searchParams.append('q', query);
