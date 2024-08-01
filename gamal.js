@@ -569,7 +569,7 @@ const review = (stages) => {
         buffer += `\nStage #${index + 1} ${name} [${duration} ms]\n`;
         Object.keys(fields).map(key => {
             const value = fields[key];
-            const str = Array.isArray(value) ? JSON.stringify(value, null, 2) : value.toString();
+            const str = Array.isArray(value) ? JSON.stringify(value, null, 2) : value?.toString();
             console.log(`${GRAY}${key}: ${NORMAL}${str}`);
             buffer += `${key}: ${str}\n`;
         });
