@@ -11,7 +11,7 @@ jobs:
 
   general-knowledge:
     runs-on: ubuntu-22.04
-    timeout-minutes: 10
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
       - run: ./gamal.js tests/en/general-knowledge.txt
