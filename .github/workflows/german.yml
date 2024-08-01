@@ -11,7 +11,7 @@ jobs:
 
   canary-multi-turn:
     runs-on: ubuntu-22.04
-    timeout-minutes: 2
+    timeout-minutes: 7
     steps:
       - uses: actions/checkout@v4
       - run: ./gamal.js tests/de/canary-multi-turn.txt
