@@ -402,8 +402,22 @@ const searxng = async (query, language, attempt = MAX_RETRY_ATTEMPT) => {
 
     const timeout = 31; // seconds
 
+    const answer = (content) => {
+        let description = content.split(/#+\s+Answers\s+:/i)
+            .filter(line => !line.startsWith('Title'))
+            .shift();
+        if (description) {
+            const url = description?.match(/\((.*?)\)/).pop().trim();
+            if (url && url.length > 0) {
+                description = description.slice(0, description.indexOf(url) - 1).trim();
+            }
+            LLM_DEBUG_SEARCH && console.log(`SearXNG answer: ${description}`);
+            return { title: 'Answers', url, description };
+        }
+    }
+
     const parse = (content) => {
-        return content.split('[https://')
+        const hits = content.split('[https://')
             .filter(line => !line.includes('SearXNG'))
             .map(line => {
                 const fragments = line.split('###').slice(1).join().split('\n');
@@ -413,7 +427,10 @@ const searxng = async (query, language, attempt = MAX_RETRY_ATTEMPT) => {
                 const buffer = header?.replace(title, '').trim();
                 const url = buffer?.match(/\((.*?)\)/)?.pop().trim();
                 return { title, url, description };
-            }).filter(({ url }) => url && url.length > 0)
+            });
+        hits.unshift(answer(content));
+        return hits.filter(i => i)
+            .filter(({ url }) => url && url.length > 0)
             .slice(0, TOP_K);
     }
 
