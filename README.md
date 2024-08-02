@@ -45,6 +45,7 @@ Compatible LLM services include [Anyscale](https://www.anyscale.com), [Deep Infr
 
 [![Test on DeepInfra](https://github.com/ariya/gamal/actions/workflows/test-deepinfra.yml/badge.svg)](https://github.com/ariya/gamal/actions/workflows/test-deepinfra.yml)
 [![Test on Groq](https://github.com/ariya/gamal/actions/workflows/test-groq.yml/badge.svg)](https://github.com/ariya/gamal/actions/workflows/test-groq.yml)
+[![Test on OpenAI](https://github.com/ariya/gamal/actions/workflows/test-openai.yml/badge.svg)](https://github.com/ariya/gamal/actions/workflows/test-openai.yml)
 [![Test on Together](https://github.com/ariya/gamal/actions/workflows/test-together.yml/badge.svg)](https://github.com/ariya/gamal/actions/workflows/test-together.yml)
 
 Refer to the relevant section for configuration details. The example provided is for Llama-3 8B, though any LLM with 7B parameters should also work, such as Mistral 7B, Qwen-2 7B, or Gemma-2 9B.
