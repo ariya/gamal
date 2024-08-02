@@ -264,7 +264,7 @@ Use the same language as the inquiry.
 Always output your thought in the following format:
 
 TOOL: the search engine to use (must be Google).
-LANGUAGE: the language of the inquiry.
+LANGUAGE: the language of the inquiry e.g. French, Spanish, Mandarin, etc.
 THOUGHT: describe your thoughts about the inquiry.
 KEYPHRASES: the important query to give to Google.
 OBSERVATION: the concise result of the search tool.
@@ -284,7 +284,8 @@ OBSERVATION: Le lac de Pitch à Trinidad est le plus grand dépôt naturel d'asp
 TOPIC: géographie.`;
 
 const breakdown = (hint, completion) => {
-    const text = completion.startsWith(hint) ? completion : hint + completion;
+    const remark = completion.replace(/^assistant/, '').trim();
+    const text = remark.startsWith(hint) ? remark : hint + remark;
     let result = deconstruct(text);
     const { topic } = result;
     if (!topic || topic.length === 0) {
