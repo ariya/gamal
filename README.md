@@ -45,6 +45,7 @@ Compatible LLM services include [Anyscale](https://www.anyscale.com), [Deep Infr
 
 [![Test on DeepInfra](https://github.com/ariya/gamal/actions/workflows/test-deepinfra.yml/badge.svg)](https://github.com/ariya/gamal/actions/workflows/test-deepinfra.yml)
 [![Test on Groq](https://github.com/ariya/gamal/actions/workflows/test-groq.yml/badge.svg)](https://github.com/ariya/gamal/actions/workflows/test-groq.yml)
+[![Test on Lepton](https://github.com/ariya/gamal/actions/workflows/test-lepton.yml/badge.svg)](https://github.com/ariya/gamal/actions/workflows/test-lepton.yml)
 [![Test on OpenAI](https://github.com/ariya/gamal/actions/workflows/test-openai.yml/badge.svg)](https://github.com/ariya/gamal/actions/workflows/test-openai.yml)
 [![Test on Together](https://github.com/ariya/gamal/actions/workflows/test-together.yml/badge.svg)](https://github.com/ariya/gamal/actions/workflows/test-together.yml)
 
@@ -89,7 +90,7 @@ export LLM_CHAT_MODEL="llama3-8b-8192"
 <details><summary>Lepton</summary>
 
 ```bash
-export LLM_API_BASE_URL=https://llama3-8b.lepton.run/api/v1/
+export LLM_API_BASE_URL=https://llama3-1-8b.lepton.run/api/v1
 export LLM_API_KEY="yourownapikey"
 ```
 </details>
