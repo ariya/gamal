@@ -1,4 +1,4 @@
-name: High School STEM
+name: English tests
 
 on:
   workflow_dispatch:
@@ -9,8 +9,18 @@ on:
 
 jobs:
 
+  canary-multi-turn:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 7
+    steps:
+      - uses: actions/checkout@v4
+      - run: ./gamal.js tests/en/canary-multi-turn.txt
+        env:
+          LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
+
   high-school-stem:
     runs-on: ubuntu-22.04
+    needs: canary-multi-turn
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
