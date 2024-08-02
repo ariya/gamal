@@ -1,4 +1,4 @@
-name: French versions
+name: French tests
 
 on:
   workflow_dispatch:

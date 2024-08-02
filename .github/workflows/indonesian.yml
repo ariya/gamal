@@ -1,4 +1,4 @@
-name: Indonesian versions
+name: Indonesian tests
 
 on:
   workflow_dispatch:

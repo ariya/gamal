@@ -1,4 +1,4 @@
-name: Spanish versions
+name: Spanish tests
 
 on:
   workflow_dispatch:
