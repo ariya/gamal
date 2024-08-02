@@ -1,14 +1,5 @@
 # Gamal
 
-[![Canary Multi-Turn](https://github.com/ariya/gamal/actions/workflows/canary-multi-turn.yml/badge.svg)](https://github.com/ariya/gamal/actions/workflows/canary-multi-turn.yml)
-[![General Knowledge](https://github.com/ariya/gamal/actions/workflows/general-knowledge.yml/badge.svg)](https://github.com/ariya/gamal/actions/workflows/general-knowledge.yml)
-[![Latest News](https://github.com/ariya/gamal/actions/workflows/latest-news.yml/badge.svg)](https://github.com/ariya/gamal/actions/workflows/latest-news.yml)
-[![Spanish versions](https://github.com/ariya/gamal/actions/workflows/spanish.yml/badge.svg)](https://github.com/ariya/gamal/actions/workflows/spanish.yml)
-[![German versions](https://github.com/ariya/gamal/actions/workflows/german.yml/badge.svg)](https://github.com/ariya/gamal/actions/workflows/german.yml)
-[![French versions](https://github.com/ariya/gamal/actions/workflows/french.yml/badge.svg)](https://github.com/ariya/gamal/actions/workflows/french.yml)
-[![Indonesian versions](https://github.com/ariya/gamal/actions/workflows/indonesian.yml/badge.svg)](https://github.com/ariya/gamal/actions/workflows/indonesian.yml)
-[![Language switch](https://github.com/ariya/gamal/actions/workflows/lang-switch.yml/badge.svg)](https://github.com/ariya/gamal/actions/workflows/lang-switch.yml)
-
 Gamal is a simple, zero-dependency tool designed to quickly provide answers to questions. It finds relevant web pages and uses an LLM to summarize the content, delivering concise answers.  Gamal is accessible via the terminal (as a CLI tool), through its minimalist web interface, or as a Telegram bot.
 
 [![asciicast](https://asciinema.org/a/668554.svg)](https://asciinema.org/a/668554)
@@ -36,6 +27,29 @@ GAMAL_HTTP_PORT=5000 ./gamal.js
 Then, open a web browser and go to `localhost:5000`.
 
 Gamal is capable of functioning as a [Telegram bot](https://core.telegram.org/bots). Obtain a token (refer to [Telegram documentation](https://core.telegram.org/bots/tutorial#obtain-your-bot-token) for details) and set it as the environment variable `GAMAL_TELEGRAM_TOKEN` before launching Gamal. Note that conversation history in Telegram chats is stored in memory and not persisted to disk.
+
+## Multi-language Support
+
+Gamal can converse in many languages besides English. It always tries to respond in the same language as the question. You can freely switch languages between questions, as shown in the following example:
+
+```
+>> Which planet in our solar system is the biggest?
+Jupiter is the largest planet in our solar system [1].
+[1] https://science.nasa.gov/jupiter/
+
+>> ¿Y el más caliente?
+Venus es el planeta más caliente, con hasta 475°C. [1].
+[1] https://www.redastronomy.com/sistema-solar/el-planeta-venus/
+```
+
+Gamal's continuous integration workflows include evaluation tests in English, Spanish, German, French, and Indonesian.
+
+[![English tests](https://github.com/ariya/gamal/actions/workflows/english.yml/badge.svg)](https://github.com/ariya/gamal/actions/workflows/english.yml)
+[![Spanish tests](https://github.com/ariya/gamal/actions/workflows/spanish.yml/badge.svg)](https://github.com/ariya/gamal/actions/workflows/spanish.yml)
+[![French tests](https://github.com/ariya/gamal/actions/workflows/french.yml/badge.svg)](https://github.com/ariya/gamal/actions/workflows/french.yml)
+[![German tests](https://github.com/ariya/gamal/actions/workflows/german.yml/badge.svg)](https://github.com/ariya/gamal/actions/workflows/german.yml)
+[![Indonesian tests](https://github.com/ariya/gamal/actions/workflows/indonesian.yml/badge.svg)](https://github.com/ariya/gamal/actions/workflows/indonesian.yml)
+[![Language switch](https://github.com/ariya/gamal/actions/workflows/lang-switch.yml/badge.svg)](https://github.com/ariya/gamal/actions/workflows/lang-switch.yml)
 
 ## Using Other LLM Services
 
