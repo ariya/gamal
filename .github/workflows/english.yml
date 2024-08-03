@@ -27,3 +27,13 @@ jobs:
       - run: ./gamal.js tests/en/high-school-stem.txt
         env:
           LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
+
+  latest-news:
+    runs-on: ubuntu-22.04
+    needs: canary-multi-turn
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - run: ./gamal.js tests/en/latest-news.txt
+        env:
+          LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
