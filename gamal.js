@@ -441,7 +441,7 @@ const searxng = async (query, language, attempt = MAX_RETRY_ATTEMPT) => {
         /Indonesia|Bahasa/i.test(language) ? 'id' : 'auto';
 
     let url = new URL(`${SEARXNG_URL}/search`);
-    url.searchParams.append('q', query);
+    url.searchParams.append('q', lang === 'auto' ? query : 'wikipedia ' + query);
     url.searchParams.append('language', lang);
     url.searchParams.append('safesearch', '0');
     const auth = JINA_API_KEY ? { 'Authorization': `Bearer ${JINA_API_KEY}` } : {};
