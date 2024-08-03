@@ -1,0 +1,29 @@
+name: Italian tests
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+
+  canary-multi-turn:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 7
+    steps:
+      - uses: actions/checkout@v4
+      - run: ./gamal.js tests/it/canary-multi-turn.txt
+        env:
+          LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
+
+  high-school-stem:
+    runs-on: ubuntu-22.04
+    needs: canary-multi-turn
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - run: ./gamal.js tests/it/high-school-stem.txt
+        env:
+          LLM_API_KEY: ${{ secrets.LLM_API_KEY }}

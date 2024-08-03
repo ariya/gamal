@@ -42,12 +42,13 @@ Venus es el planeta más caliente, con hasta 475°C. [1].
 [1] https://www.redastronomy.com/sistema-solar/el-planeta-venus/
 ```
 
-Gamal's continuous integration workflows include evaluation tests in English, Spanish, German, French, and Indonesian.
+Gamal's continuous integration workflows include evaluation tests in English, Spanish, German, French, Italian, and Indonesian.
 
 [![English tests](https://github.com/ariya/gamal/actions/workflows/english.yml/badge.svg)](https://github.com/ariya/gamal/actions/workflows/english.yml)
 [![Spanish tests](https://github.com/ariya/gamal/actions/workflows/spanish.yml/badge.svg)](https://github.com/ariya/gamal/actions/workflows/spanish.yml)
 [![French tests](https://github.com/ariya/gamal/actions/workflows/french.yml/badge.svg)](https://github.com/ariya/gamal/actions/workflows/french.yml)
 [![German tests](https://github.com/ariya/gamal/actions/workflows/german.yml/badge.svg)](https://github.com/ariya/gamal/actions/workflows/german.yml)
+[![Italian tests](https://github.com/ariya/gamal/actions/workflows/italian.yml/badge.svg)](https://github.com/ariya/gamal/actions/workflows/italian.yml)
 [![Indonesian tests](https://github.com/ariya/gamal/actions/workflows/indonesian.yml/badge.svg)](https://github.com/ariya/gamal/actions/workflows/indonesian.yml)
 [![Language switch](https://github.com/ariya/gamal/actions/workflows/lang-switch.yml/badge.svg)](https://github.com/ariya/gamal/actions/workflows/lang-switch.yml)
 

@@ -1,0 +1,36 @@
+Story: Domande sui temi STEM a livello liceale
+
+User: Quale forza attrae gli oggetti verso il centro della Terra?
+Assistant: La /gravità|forza di gravità|forza gravitazionale/ attrae gli oggetti verso il centro della Terra.
+Pipeline.Reason.Language: /Italian(o)?/
+Pipeline.Reason.Keyphrases: /force|gravity|forza|gravità|gravitazionale/
+
+User: Qual è il numero atomico del carbonio?
+Assistant: Il numero atomico del carbonio è /6|sei/.
+Pipeline.Reason.Language: /Italian(o)?/
+Pipeline.Reason.Keyphrases: /carbon/
+
+User: Attraverso quale processo le piante producono il proprio cibo?
+Assistant: Le piante producono il proprio cibo attraverso il processo della /fotosintesi|fotosintesi clorofilliana/.
+Pipeline.Reason.Language: /Italian(o)?/
+Pipeline.Reason.Keyphrases: /plant|photosynthesis|piante|fotosintesi/
+
+User: Qual è la somma (in gradi) degli angoli interni di un triangolo?
+Assistant: La somma degli angoli interni di un triangolo è /180/ gradi.
+Pipeline.Reason.Language: /Italian(o)?/
+Pipeline.Reason.Keyphrases: /angles|angoli/ /triangle|triangolo/
+
+User: Qual è l'unità di misura della forza?
+Assistant: L'unità di misura della forza è il /newton/ (N).
+Pipeline.Reason.Language: /Italian(o)?/
+Pipeline.Reason.Keyphrases: /force|forza/
+
+User: Qual è il simbolo chimico del magnesio?
+Assistant: Il simbolo chimico del magnesio è /Mg/.
+Pipeline.Reason.Language: /Italian(o)?/
+Pipeline.Reason.Keyphrases: /magnesium|magnesio/
+
+User: Quali sono i più piccoli costituenti conosciuti della materia?
+Assistant: I più piccoli costituenti conosciuti della materia sono /particelle elementari|quark|quant|leptoni/.
+Pipeline.Reason.Language: /Italian(o)?/
+Pipeline.Reason.Keyphrases: /unit|nucleus|atom|elementary|particle|materia|particelle|elementar/

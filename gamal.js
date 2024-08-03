@@ -440,7 +440,8 @@ const searxng = async (query, language, attempt = MAX_RETRY_ATTEMPT) => {
     const lang = /German|Deutsch/i.test(language) ? 'de' :
         /French|Français/i.test(language) ? 'fr' :
         /Spanish|Español/i.test(language) ? 'es' :
-        /Indonesia|Bahasa/i.test(language) ? 'id' : 'auto';
+        /Indonesia|Bahasa/i.test(language) ? 'id' :
+        /Italian/i.test(language) ? 'it' : 'auto';
 
     let url = new URL(`${SEARXNG_URL}/search`);
     url.searchParams.append('q', lang === 'auto' ? query : 'wikipedia ' + query);

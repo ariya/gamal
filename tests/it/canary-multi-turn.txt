@@ -1,0 +1,11 @@
+User: Quale pianeta del nostro sistema solare è il più grande?
+Assistant: /Giove/ è il pianeta più grande del nostro sistema solare.
+
+User: E il più caldo?
+Assistant: /Venere/ è il pianeta più caldo del nostro sistema solare.
+
+User: E quale ha il soprannome "Il Pianeta Rosso"?
+Assistant: /Marte/, a causa del suo aspetto rossastro causato dall'ossido di ferro sulla sua superficie.
+
+User: E quale è noto per il sistema di anelli più complesso?
+Assistant: Deve essere /Saturno/!
