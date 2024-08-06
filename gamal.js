@@ -77,6 +77,7 @@ const sleep = async (ms) => new Promise(resolve => setTimeout(resolve, ms));
  */
 
 const chat = async (messages, handler = null, attempt = MAX_RETRY_ATTEMPT) => {
+    const timeout = 17; // seconds
     const url = `${LLM_API_BASE_URL}/chat/completions`;
     const auth = LLM_API_KEY ? { 'Authorization': `Bearer ${LLM_API_KEY}` } : {};
     const model = LLM_CHAT_MODEL;
@@ -84,96 +85,104 @@ const chat = async (messages, handler = null, attempt = MAX_RETRY_ATTEMPT) => {
     const max_tokens = 400;
     const temperature = 0;
     const stream = LLM_STREAMING && typeof handler === 'function';
-    const response = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', ...auth },
-        body: JSON.stringify({ messages, model, stop, max_tokens, temperature, stream }),
-        signal: AbortSignal.timeout(17 * 1000) // 17 seconds
-    });
-    if (!response.ok) {
-        if (attempt > 1) {
-            LLM_DEBUG_CHAT && console.log(`${RED}LLM chat() failed. Retrying...${NORMAL}`);
-            await sleep((MAX_RETRY_ATTEMPT - attempt + 1) * 1000);
-            return await chat(messages, handler, attempt - 1);
-        } else {
-            throw new Error(`LLM chat() failed with HTTP status: ${response.status} ${response.statusText}`);
+
+    try {
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', ...auth },
+            body: JSON.stringify({ messages, model, stop, max_tokens, temperature, stream }),
+            signal: AbortSignal.timeout(timeout * 1000)
+        });
+        if (!response.ok) {
+            throw new EvalError(`LLM chat() failed with HTTP status: ${response.status} ${response.statusText}`);
         }
-    }
 
-    LLM_DEBUG_CHAT && messages.forEach(({ role, content }) => {
-        console.log(`${MAGENTA}${role}:${NORMAL} ${content}`);
-    });
+        LLM_DEBUG_CHAT && messages.forEach(({ role, content }) => {
+            console.log(`${MAGENTA}${role}:${NORMAL} ${content}`);
+        });
 
-    if (!stream) {
-        const data = await response.json();
-        const { choices } = data;
-        const first = choices[0];
-        const { message } = first;
-        const { content } = message;
-        const answer = content.trim();
-        handler && handler(answer);
-        LLM_DEBUG_CHAT && console.log(`${YELLOW}${answer}${NORMAL}`);
-        return answer;
-    }
+        if (!stream) {
+            const data = await response.json();
+            const { choices } = data;
+            const first = choices[0];
+            const { message } = first;
+            const { content } = message;
+            const answer = content.trim();
+            handler && handler(answer);
+            LLM_DEBUG_CHAT && console.log(`${YELLOW}${answer}${NORMAL}`);
+            return answer;
+        }
 
-    const parse = (line) => {
-        let partial = null;
-        const prefix = line.substring(0, 6);
-        if (prefix === 'data: ') {
-            const payload = line.substring(6);
-            try {
-                const { choices } = JSON.parse(payload);
-                const [choice] = choices;
-                const { delta } = choice;
-                partial = delta?.content;
-            } catch (e) {
-                // ignore
-            } finally {
-                return partial;
+        const parse = (line) => {
+            let partial = null;
+            const prefix = line.substring(0, 6);
+            if (prefix === 'data: ') {
+                const payload = line.substring(6);
+                try {
+                    const { choices } = JSON.parse(payload);
+                    const [choice] = choices;
+                    const { delta } = choice;
+                    partial = delta?.content;
+                } catch (e) {
+                    // ignore
+                } finally {
+                    return partial;
+                }
             }
+            return partial;
         }
-        return partial;
-    }
 
-    const reader = response.body.getReader();
-    const decoder = new TextDecoder();
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
 
-    let answer = '';
-    let buffer = '';
-    while (true) {
-        const { value, done } = await reader.read();
-        if (done) {
-            break;
-        }
-        const lines = decoder.decode(value).split('\n');
-        for (let i = 0; i < lines.length; ++i) {
-            const line = buffer + lines[i];
-            if (line[0] === ':') {
-                buffer = '';
-                continue;
-            }
-            if (line === 'data: [DONE]') {
+        let answer = '';
+        let buffer = '';
+        while (true) {
+            const { value, done } = await reader.read();
+            if (done) {
                 break;
             }
-            if (line.length > 0) {
-                const partial = parse(line);
-                if (partial === null) {
-                    buffer = line;
-                } else if (partial && partial.length > 0) {
+            const lines = decoder.decode(value).split('\n');
+            for (let i = 0; i < lines.length; ++i) {
+                const line = buffer + lines[i];
+                if (line[0] === ':') {
                     buffer = '';
-                    if (answer.length < 1) {
-                        const leading = partial.trim();
-                        answer = leading;
-                        handler && (leading.length > 0) && handler(leading);
-                    } else {
-                        answer += partial;
-                        handler && handler(partial);
+                    continue;
+                }
+                if (line === 'data: [DONE]') {
+                    break;
+                }
+                if (line.length > 0) {
+                    const partial = parse(line);
+                    if (partial === null) {
+                        buffer = line;
+                    } else if (partial && partial.length > 0) {
+                        buffer = '';
+                        if (answer.length < 1) {
+                            const leading = partial.trim();
+                            answer = leading;
+                            handler && (leading.length > 0) && handler(leading);
+                        } else {
+                            answer += partial;
+                            handler && handler(partial);
+                        }
                     }
                 }
             }
         }
+        return answer;
+    } catch (e) {
+        if (e.name === 'TimeoutError') {
+            LLM_DEBUG_CHAT && console.log(`Timeout with LLM chat after ${timeout} seconds`);
+        }
+        if (attempt > 1 && (e.name === 'TimeoutError' || e.name === 'EvalError')) {
+            LLM_DEBUG_CHAT && console.log('Retrying...');
+            await sleep((MAX_RETRY_ATTEMPT - attempt + 1) * 1500);
+            return await chat(messages, handler, attempt - 1);
+        } else {
+            throw e;
+        }
     }
-    return answer;
 }
 
 const PREDEFINED_KEYS = ['INQUIRY', 'TOOL', 'LANGUAGE', 'THOUGHT', 'KEYPHRASES', 'OBSERVATION', 'TOPIC'];
