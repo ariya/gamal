@@ -16,7 +16,9 @@ jobs:
       - uses: actions/checkout@v4
       - run: ./gamal.js tests/en/canary-multi-turn.txt
         env:
+          LLM_API_BASE_URL: ${{ secrets.LLM_API_BASE_URL }}
           LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
+          LLM_CHAT_MODEL: ${{ secrets.LLM_CHAT_MODEL }}
 
   high-school-stem:
     runs-on: ubuntu-22.04
@@ -26,14 +28,18 @@ jobs:
       - uses: actions/checkout@v4
       - run: ./gamal.js tests/en/high-school-stem.txt
         env:
+          LLM_API_BASE_URL: ${{ secrets.LLM_API_BASE_URL }}
           LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
+          LLM_CHAT_MODEL: ${{ secrets.LLM_CHAT_MODEL }}
 
   latest-news:
     runs-on: ubuntu-22.04
-    needs: canary-multi-turn
+    needs: high-school-stem
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
       - run: ./gamal.js tests/en/latest-news.txt
         env:
+          LLM_API_BASE_URL: ${{ secrets.LLM_API_BASE_URL }}
           LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
+          LLM_CHAT_MODEL: ${{ secrets.LLM_CHAT_MODEL }}

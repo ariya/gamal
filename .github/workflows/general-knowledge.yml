@@ -16,4 +16,6 @@ jobs:
       - uses: actions/checkout@v4
       - run: ./gamal.js tests/en/general-knowledge.txt
         env:
+          LLM_API_BASE_URL: ${{ secrets.LLM_API_BASE_URL }}
           LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
+          LLM_CHAT_MODEL: ${{ secrets.LLM_CHAT_MODEL }}

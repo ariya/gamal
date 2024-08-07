@@ -16,7 +16,9 @@ jobs:
       - uses: actions/checkout@v4
       - run: ./gamal.js tests/es/canary-multi-turn.txt
         env:
+          LLM_API_BASE_URL: ${{ secrets.LLM_API_BASE_URL }}
           LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
+          LLM_CHAT_MODEL: ${{ secrets.LLM_CHAT_MODEL }}
 
   high-school-stem:
     runs-on: ubuntu-22.04
@@ -26,4 +28,6 @@ jobs:
       - uses: actions/checkout@v4
       - run: ./gamal.js tests/es/high-school-stem.txt
         env:
+          LLM_API_BASE_URL: ${{ secrets.LLM_API_BASE_URL }}
           LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
+          LLM_CHAT_MODEL: ${{ secrets.LLM_CHAT_MODEL }}
