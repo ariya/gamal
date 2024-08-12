@@ -406,6 +406,18 @@ const brave = async (query, attempt = MAX_RETRY_ATTEMPT) => {
 }
 
 /**
+ * Determines the ISO 639-1 language code based on the input language string.
+ *
+ * @param {string} language - The language string to be checked.
+ * @return {string} The corresponding ISO 639-1 language code or null if not found.
+ */
+const iso6391 = (language) => /German|Deutsch/i.test(language) ? 'de' :
+    /French|Français/i.test(language) ? 'fr' :
+        /Spanish|Español/i.test(language) ? 'es' :
+            /Indonesia|Bahasa/i.test(language) ? 'id' :
+                /Italian/i.test(language) ? 'it' : null;
+
+/**
  * Searches for relevant information using SearXNG.
  *
  * @param {string} query - The search query.
@@ -448,12 +460,7 @@ const searxng = async (query, language, attempt = MAX_RETRY_ATTEMPT) => {
             .slice(0, TOP_K);
     }
 
-    const lang = /German|Deutsch/i.test(language) ? 'de' :
-        /French|Français/i.test(language) ? 'fr' :
-        /Spanish|Español/i.test(language) ? 'es' :
-        /Indonesia|Bahasa/i.test(language) ? 'id' :
-        /Italian/i.test(language) ? 'it' : 'auto';
-
+    const lang = iso6391(language) || 'auto';
     let url = new URL(`${SEARXNG_URL}/search`);
     url.searchParams.append('q', lang === 'auto' ? query : 'wikipedia ' + query);
     url.searchParams.append('language', lang);
