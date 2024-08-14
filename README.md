@@ -59,6 +59,7 @@ Gamal is designed to be used with OpenRouter by default, but it can also be conf
 Compatible LLM services include [Anyscale](https://www.anyscale.com), [Deep Infra](https://deepinfra.com), [Fireworks](https://fireworks.ai), [Groq](https://groq.com), [Lepton](https://lepton.ai), [Novita](https://novita.ai), [Octo](https://octo.ai), [OpenAI](https://platform.openai.com), and [Together](https://www.together.ai).
 
 [![Test on DeepInfra](https://github.com/ariya/gamal/actions/workflows/test-deepinfra.yml/badge.svg)](https://github.com/ariya/gamal/actions/workflows/test-deepinfra.yml)
+[![Test on Fireworks](https://github.com/ariya/gamal/actions/workflows/test-fireworks.yml/badge.svg)](https://github.com/ariya/gamal/actions/workflows/test-fireworks.yml)
 [![Test on Groq](https://github.com/ariya/gamal/actions/workflows/test-groq.yml/badge.svg)](https://github.com/ariya/gamal/actions/workflows/test-groq.yml)
 [![Test on Lepton](https://github.com/ariya/gamal/actions/workflows/test-lepton.yml/badge.svg)](https://github.com/ariya/gamal/actions/workflows/test-lepton.yml)
 [![Test on Octo](https://github.com/ariya/gamal/actions/workflows/test-octo.yml/badge.svg)](https://github.com/ariya/gamal/actions/workflows/test-octo.yml)

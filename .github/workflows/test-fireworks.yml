@@ -1,0 +1,19 @@
+name: Test on Fireworks
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - run: ./gamal.js tests/en/canary-multi-turn.txt
+        env:
+          LLM_API_BASE_URL: 'https://api.fireworks.ai/inference/v1'
+          LLM_API_KEY: ${{ secrets.FIREWORKS_API_KEY }}
+          LLM_CHAT_MODEL: 'accounts/fireworks/models/llama-v3p1-8b-instruct'
