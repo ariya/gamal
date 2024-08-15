@@ -942,66 +942,76 @@ const interact = async () => {
     io.on('close', () => { loop = false; });
     console.log();
 
+    const answer = async (inquiry) => {
+        process.stdout.write(NORMAL);
+
+        if (inquiry === '!reset' || inquiry === '/reset') {
+            history = [];
+            console.log('History cleared.');
+            console.log();
+        } else if (inquiry === '!review' || inquiry === '/review') {
+            const last = history.slice(-1).pop();
+            if (!last) {
+                console.log('Nothing to review yet!');
+                console.log();
+            } else {
+                const { stages } = last;
+                review(simplify(stages));
+            }
+
+        } else {
+            const stages = [];
+            const update = (stage, fields) => {
+                if (stage === 'Reason') {
+                    const { keyphrases } = fields;
+                    if (keyphrases && keyphrases.length > 0) {
+                        console.log(`${GRAY}${ARROW} Searching for ${keyphrases}...${NORMAL}`);
+                    }
+                }
+            }
+
+            const stream = (text) => display = push(display, text);
+            const enter = (name) => { stages.push({ name, timestamp: Date.now() }) };
+            const leave = (name, fields) => { update(name, fields); stages.push({ name, timestamp: Date.now(), ...fields }) };
+            const delegates = { stream, enter, leave };
+            const context = { inquiry, history, delegates };
+            const start = Date.now();
+            const pipeline = pipe(reason, search, respond);
+            const result = await pipeline(context);
+            const refs = display.refs.slice();
+            display = flush(display);
+            const { topic, thought, keyphrases } = result;
+            const duration = Date.now() - start;
+            const { answer, language, references } = result;
+            if (references && Array.isArray(references)) {
+                if (references.length > 0 && references.length >= refs.length) {
+                    console.log();
+                    console.log();
+                    refs.forEach((ref, i) => {
+                        const entry = references[ref - 1];
+                        if (entry && entry.url) {
+                            console.log(`[${i + 1}] ${GRAY}${entry.url}${NORMAL}`);
+                        }
+                    });
+                }
+            }
+            history.push({ inquiry, thought, keyphrases, topic, answer, duration, stages });
+            console.log();
+        }
+    }
+
     const qa = () => {
         io.question(`${YELLOW}>> ${CYAN}`, async (inquiry) => {
-            process.stdout.write(NORMAL);
-            if (inquiry === '!reset' || inquiry === '/reset') {
-                history = [];
-                console.log('History cleared.');
-                console.log();
-            } else if (inquiry === '!review' || inquiry === '/review') {
-                const last = history.slice(-1).pop();
-                if (!last) {
-                    console.log('Nothing to review yet!');
-                    console.log();
-                } else {
-                    const { stages } = last;
-                    review(simplify(stages));
-                }
-
-            } else {
-                const stages = [];
-                const update = (stage, fields) => {
-                    if (stage === 'Reason') {
-                        const { keyphrases } = fields;
-                        if (keyphrases && keyphrases.length > 0) {
-                            console.log(`${GRAY}${ARROW} Searching for ${keyphrases}...${NORMAL}`);
-                        }
-                    }
-                }
-                const stream = (text) => display = push(display, text);
-                const enter = (name) => { stages.push({ name, timestamp: Date.now() }) };
-                const leave = (name, fields) => { update(name, fields); stages.push({ name, timestamp: Date.now(), ...fields }) };
-                const delegates = { stream, enter, leave };
-                const context = { inquiry, history, delegates };
-                const start = Date.now();
-                const pipeline = pipe(reason, search, respond);
-                const result = await pipeline(context);
-                const refs = display.refs.slice();
-                display = flush(display);
-                const { topic, thought, keyphrases } = result;
-                const duration = Date.now() - start;
-                const { answer, references } = result;
-                if (references && Array.isArray(references)) {
-                    if (references.length > 0 && references.length >= refs.length) {
-                        console.log();
-                        console.log();
-                        refs.forEach((ref, i) => {
-                            const entry = references[ref - 1];
-                            if (entry && entry.url) {
-                                console.log(`[${i + 1}] ${GRAY}${entry.url}${NORMAL}`);
-                            }
-                        });
-                    }
-                }
-                history.push({ inquiry, thought, keyphrases, topic, answer, duration, stages });
-                console.log();
-            }
-            loop && qa();
+            await answer(inquiry);
+            loop && setImmediate(setup);
         })
     }
 
-    qa();
+    const setup = () => {
+        qa();
+    }
+
+    setup();
 }
 
 /**
