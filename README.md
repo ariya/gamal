@@ -56,7 +56,7 @@ Gamal's continuous integration workflows include evaluation tests in English, Sp
 
 Gamal is designed to be used with OpenRouter by default, but it can also be configured to work with other LLM services by adjusting some environment variables. The correct API key and a suitable model are required.
 
-Compatible LLM services include [Anyscale](https://www.anyscale.com), [Deep Infra](https://deepinfra.com), [Fireworks](https://fireworks.ai), [Groq](https://groq.com), [Lepton](https://lepton.ai), [Novita](https://novita.ai), [Octo](https://octo.ai), [OpenAI](https://platform.openai.com), and [Together](https://www.together.ai).
+Compatible LLM services include [Deep Infra](https://deepinfra.com), [Fireworks](https://fireworks.ai), [Groq](https://groq.com), [Lepton](https://lepton.ai), [Novita](https://novita.ai), [Octo](https://octo.ai), [OpenAI](https://platform.openai.com), and [Together](https://www.together.ai).
 
 [![Test on DeepInfra](https://github.com/ariya/gamal/actions/workflows/test-deepinfra.yml/badge.svg)](https://github.com/ariya/gamal/actions/workflows/test-deepinfra.yml)
 [![Test on Fireworks](https://github.com/ariya/gamal/actions/workflows/test-fireworks.yml/badge.svg)](https://github.com/ariya/gamal/actions/workflows/test-fireworks.yml)
@@ -67,15 +67,6 @@ Compatible LLM services include [Anyscale](https://www.anyscale.com), [Deep Infr
 [![Test on Together](https://github.com/ariya/gamal/actions/workflows/test-together.yml/badge.svg)](https://github.com/ariya/gamal/actions/workflows/test-together.yml)
 
 Refer to the relevant section for configuration details. The example provided is for Llama-3 8B, though any LLM with 7B parameters should also work, such as Mistral 7B, Qwen-2 7B, or Gemma-2 9B.
-
-<details><summary>Anyscale</summary>
-
-```bash
-export LLM_API_BASE_URL=https://api.endpoints.anyscale.com/v1
-export LLM_API_KEY="yourownapikey"
-export LLM_CHAT_MODEL="meta-llama/Llama-3-8b-chat-hf"
-```
-</details>
 
 <details><summary>Deep Infra</summary>
 
