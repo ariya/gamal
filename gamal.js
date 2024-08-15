@@ -987,8 +987,10 @@ const interact = async () => {
                         console.log();
                         console.log();
                         refs.forEach((ref, i) => {
-                            const { url } = references[ref - 1];
-                            console.log(`[${i + 1}] ${GRAY}${url}${NORMAL}`);
+                            const entry = references[ref - 1];
+                            if (entry && entry.url) {
+                                console.log(`[${i + 1}] ${GRAY}${entry.url}${NORMAL}`);
+                            }
                         });
                     }
                 }
