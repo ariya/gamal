@@ -14,7 +14,6 @@ const LLM_STREAMING = process.env.LLM_STREAMING !== 'no';
 
 const SEARXNG_URL = process.env.SEARXNG_URL || 'https://searx.work';
 const JINA_API_KEY = process.env.JINA_API_KEY;
-const BRAVE_SEARCH_API_KEY = process.env.BRAVE_SEARCH_API_KEY;
 const TOP_K = 3;
 
 const LLM_DEBUG_CHAT = process.env.LLM_DEBUG_CHAT;
