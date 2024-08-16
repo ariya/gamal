@@ -94,7 +94,9 @@ const chat = async (messages, handler = null, attempt = MAX_RETRY_ATTEMPT) => {
             signal: AbortSignal.timeout(timeout * 1000)
         });
         if (!response.ok) {
-            throw new EvalError(`LLM chat() failed with HTTP status: ${response.status} ${response.statusText}`);
+            const msg = `LLM chat() failed with HTTP status: ${response.status} ${response.statusText}`;
+            LLM_DEBUG_CHAT && console.log(`${RED}Error${NORMAL}: ${msg}.`);
+            throw new EvalError(msg);
         }
 
         LLM_DEBUG_CHAT && messages.forEach(({ role, content }) => {
