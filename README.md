@@ -67,14 +67,14 @@ Compatible LLM services include [Deep Infra](https://deepinfra.com), [Fireworks]
 [![Test on OpenAI](https://github.com/ariya/gamal/actions/workflows/test-openai.yml/badge.svg)](https://github.com/ariya/gamal/actions/workflows/test-openai.yml)
 [![Test on Together](https://github.com/ariya/gamal/actions/workflows/test-together.yml/badge.svg)](https://github.com/ariya/gamal/actions/workflows/test-together.yml)
 
-Refer to the relevant section for configuration details. The example provided is for Llama-3 8B, though any LLM with 7B parameters should also work, such as Mistral 7B, Qwen-2 7B, or Gemma-2 9B.
+Refer to the relevant section for configuration details. The example provided is for Llama-3.1 8B, though any LLM with 7B parameters should also work, such as Mistral 7B, Qwen-2 7B, or Gemma-2 9B.
 
 <details><summary>Deep Infra</summary>
 
 ```bash
 export LLM_API_BASE_URL=https://api.deepinfra.com/v1/openai
 export LLM_API_KEY="yourownapikey"
-export LLM_CHAT_MODEL="meta-llama/Meta-Llama-3-8B-Instruct"
+export LLM_CHAT_MODEL="meta-llama/Meta-Llama-3.1-8B-Instruct"
 ```
 </details>
 
@@ -83,7 +83,7 @@ export LLM_CHAT_MODEL="meta-llama/Meta-Llama-3-8B-Instruct"
 ```bash
 export LLM_API_BASE_URL=https://api.fireworks.ai/inference/v1
 export LLM_API_KEY="yourownapikey"
-export LLM_CHAT_MODEL="accounts/fireworks/models/llama-v3-8b-instruct"
+export LLM_CHAT_MODEL="accounts/fireworks/models/llama-v3p1-8b-instruct"
 ```
 </details>
 
@@ -92,7 +92,7 @@ export LLM_CHAT_MODEL="accounts/fireworks/models/llama-v3-8b-instruct"
 ```bash
 export LLM_API_BASE_URL=https://api.groq.com/openai/v1
 export LLM_API_KEY="yourownapikey"
-export LLM_CHAT_MODEL="llama3-8b-8192"
+export LLM_CHAT_MODEL="llama-3.1-8b-instant"
 ```
 </details>
 
@@ -101,6 +101,7 @@ export LLM_CHAT_MODEL="llama3-8b-8192"
 ```bash
 export LLM_API_BASE_URL=https://llama3-1-8b.lepton.run/api/v1
 export LLM_API_KEY="yourownapikey"
+export LLM_CHAT_MODEL="llama3-1-8b"
 ```
 </details>
 
@@ -109,7 +110,7 @@ export LLM_API_KEY="yourownapikey"
 ```bash
 export LLM_API_BASE_URL=https://api.novita.ai/v3/openai
 export LLM_API_KEY="yourownapikey"
-export LLM_CHAT_MODEL="meta-llama/llama-3-8b-instruct"
+export LLM_CHAT_MODEL="meta-llama/llama-3.1-8b-instruct"
 ```
 </details>
 
@@ -118,7 +119,7 @@ export LLM_CHAT_MODEL="meta-llama/llama-3-8b-instruct"
 ```bash
 export LLM_API_BASE_URL=https://text.octoai.run/v1/
 export LLM_API_KEY="yourownapikey"
-export LLM_CHAT_MODEL="meta-llama-3-8b-instruct"
+export LLM_CHAT_MODEL="meta-llama-3.1-8b-instruct"
 ```
 </details>
 
@@ -136,7 +137,7 @@ export LLM_CHAT_MODEL="gpt-4o-mini"
 ```bash
 export LLM_API_BASE_URL=https://api.together.xyz/v1
 export LLM_API_KEY="yourownapikey"
-export LLM_CHAT_MODEL="meta-llama/Llama-3-8b-chat-hf"
+export LLM_CHAT_MODEL="meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo"
 ```
 </details>
 
@@ -174,7 +175,7 @@ Load a model and configure the environment variables:
 ```bash
 ollama pull llama3
 export LLM_API_BASE_URL=http://127.0.0.1:11434/v1
-export LLM_CHAT_MODEL='llama3'
+export LLM_CHAT_MODEL='llama3.1'
 ```
 </details>
 
