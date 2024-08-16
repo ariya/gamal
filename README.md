@@ -210,5 +210,3 @@ Two environment variables can modify the behavior:
 By default, Gamal utilizes the [public SearXNG instance](https://searx.space/) at `searx.work`. To switch to a different SearXNG instance, such as a private one capable of searching additional custom data sources, configure the URL using the `SEARXNG_URL` environment variable.
 
 For more frequent searches, obtain an API key for [JINA reader](https://jina.ai/reader/) (its free tier is generous) and set it as `JINA_API_KEY`. This will increase the rate limit from 20 requests per minute to 200 requests per minute.
-
-To leverage the [Brave Search API](https://brave.com/search/api), a paid search API offering a free trial, acquire the API key and store it as the `BRAVE_SEARCH_API_KEY` environment variable. With this key configured, Gamal will prioritize Brave Search over SearXNG.

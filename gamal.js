@@ -348,64 +348,6 @@ const reason = async (context) => {
 }
 
 /**
- * Searches for relevant information using Brave search engine.
- *
- * @param {string} query - The search query.
- * @return {Array} Array of references containing search results.
- * @throws {Error} - If the search fails with a non-200 status.
- */
-const brave = async (query, attempt = MAX_RETRY_ATTEMPT) => {
-    let url = new URL('https://api.search.brave.com/res/v1/web/search');
-    url.searchParams.append('q', query);
-
-    const response = await fetch(url, {
-        method: 'GET',
-        headers: {
-            'Accept': 'application/json',
-            'X-Subscription-Token': BRAVE_SEARCH_API_KEY
-        },
-        signal: AbortSignal.timeout(11 * 1000) // 11 seconds
-    });
-    if (!response.ok) {
-        if (attempt > 1) {
-            LLM_DEBUG_SEARCH && console.log('Brave search failed. Retrying...');
-            await sleep((MAX_RETRY_ATTEMPT - attempt + 1) * 1500);
-            return await brave(query, attempt - 1);
-        } else {
-            throw new Error(`Brave search failed with status: ${response.status}`);
-        }
-    }
-    const { web } = await response.json();
-    if (!web || !web.type || web.type !== 'search') {
-        if (attempt > 1) {
-            LLM_DEBUG_SEARCH && console.log('Brave search returns no result. Retrying...');
-            await sleep((MAX_RETRY_ATTEMPT - attempt + 1) * 1500);
-            return await brave(query, attempt - 1);
-        } else {
-            throw new Error(`Brave search failed with status: ${response.status}`);
-        }
-    }
-    const { results = [] } = web;
-    LLM_DEBUG_SEARCH && console.log('Brave search result: ', { query, results });
-    let references = [];
-    if (Array.isArray(results) && results.length > 0) {
-        const MAX_CHARS = 1000;
-        references = results.slice(0, TOP_K).map((result, i) => {
-            const { title, url, description = '', extra_snippets = [] } = result;
-            const snippet = description + extra_snippets.join('\n').substring(0, MAX_CHARS);
-            return { position: i + 1, title, url, snippet };
-        });
-    } else {
-        if (attempt > 1) {
-            LLM_DEBUG_SEARCH && console.log('Something is wrong, Brave search gives no result. Retrying...');
-            await sleep((MAX_RETRY_ATTEMPT - attempt + 1) * 1500);
-            return await brave(query, attempt - 1);
-        }
-    }
-    return { url, references };
-}
-
-/**
  * Determines the ISO 639-1 language code based on the input language string.
  *
  * @param {string} language - The language string to be checked.
@@ -522,12 +464,6 @@ const search = async (context) => {
     const query = topic.replaceAll('.', '') + ': ' + keyphrases.replace(/\.$/, "").replace(/^"|"$/g, "");
 
     LLM_DEBUG_SEARCH && console.log(`Language: ${language} Search query: ${query}`);
-
-    if (BRAVE_SEARCH_API_KEY && BRAVE_SEARCH_API_KEY.length >= 31) {
-        const { url, references } = await brave(query);
-        leave && leave('Search', { engine: 'Brave', url, references });
-        return { ...context, references };
-    }
 
     const { url, references } = await searxng(query, language);
     leave && leave('Search', { engine: 'SearXNG', url, references });
