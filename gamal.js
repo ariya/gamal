@@ -825,7 +825,7 @@ const push = (display, text) => {
     let { buffer, refs, print, cite } = display;
     buffer += text;
     let match;
-    const PATTERN = /\[citation:(\d+)\]/g;
+    const PATTERN = /[\[\(]citation:? ?\d+[\]\)]/gi;
     while ((match = PATTERN.exec(buffer)) !== null) {
         const number = match[1];
         const { index } = match;
