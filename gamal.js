@@ -3,9 +3,13 @@
 const fs = require('fs');
 const http = require('http');
 const readline = require('readline');
+const { spawn } = require('child_process');
 
 const GAMAL_HTTP_PORT = process.env.GAMAL_HTTP_PORT;
 const GAMAL_TELEGRAM_TOKEN = process.env.GAMAL_TELEGRAM_TOKEN;
+
+const WHISPER_STREAM = process.env.WHISPER_STREAM || 'whisper-cpp-stream';
+const WHISPER_MODEL = process.env.WHISPER_MODEL;
 
 const LLM_API_KEY = process.env.LLM_API_KEY;
 const LLM_API_BASE_URL = process.env.LLM_API_BASE_URL || 'https://openrouter.ai/api/v1';
@@ -16,6 +20,7 @@ const SEARXNG_URL = process.env.SEARXNG_URL || 'https://searx.work';
 const JINA_API_KEY = process.env.JINA_API_KEY;
 const TOP_K = 3;
 
+const VOICE_DEBUG = process.env.VOICE_DEBUG;
 const LLM_DEBUG_CHAT = process.env.LLM_DEBUG_CHAT;
 const LLM_DEBUG_PIPELINE = process.env.LLM_DEBUG_PIPELINE;
 const LLM_DEBUG_SEARCH = process.env.LLM_DEBUG_SEARCH;
@@ -32,6 +37,127 @@ const GRAY = '\x1b[90m';
 const ARROW = '⇢';
 const CHECK = '✓';
 const CROSS = '✘';
+
+const TRANSCRIPTION_END_MARKER = /Transcription \d+ END/i;
+
+/**
+ * Starts a new speech recognition process.
+ *
+ * @param {function} handler - callback function to handle the transcribed text
+ * @return {childProcess} the spawned process
+ */
+const listen = (handler) => {
+    if (!WHISPER_MODEL) {
+        VOICE_DEBUG && console.error('No whisper model is specified!');
+        return;
+    }
+
+    try {
+        VOICE_DEBUG && console.log(`Starting ${WHISPER_STREAM} with model ${WHISPER_MODEL}...`);
+        const process = spawn(WHISPER_STREAM, ['-m', WHISPER_MODEL, '--step', '0'],
+            { stdio: ['pipe', 'pipe', 'ignore'] });
+
+        let buffer = '';
+
+        process.stdout.on('data', (data) => {
+            VOICE_DEBUG && console.log(`whisper-cpp-stream: ${data.length} bytes`);
+            buffer += data.toString();
+            if (buffer.match(TRANSCRIPTION_END_MARKER)) {
+                const transcript = buffer.split('\n')
+                    .filter(line => line && line.length > 0)
+                    .filter(line => !line.startsWith('###'))
+                    .join('\n')
+                    .replace(/\n/g, ' ')
+                    .replace(/\./g, '')
+                    .replace(/\[.*?\]/g, '')
+                    .replace(/\(.*?\)/g, '')
+                    .trim();
+                if (transcript.length > 0 && handler) {
+                    handler && handler(transcript);
+                }
+                buffer = '';
+            }
+        });
+
+        process.on('exit', (code) => {
+            VOICE_DEBUG && console.log('whisper-cpp-stream finished with', code);
+        });
+
+        return process;
+    } catch (e) {
+        VOICE_DEBUG && console.error('ASR failed:', e);
+    }
+
+}
+
+/**
+ * Speaks the given text in the specified language using a text-to-speech model.
+ *
+ * @param {string} text - the text to be spoken
+ * @param {string} language - the language of the text
+ * @return {object} an object containing the speaker and piper processes
+ */
+const speak = (text, language) => {
+    const lang = language.toUpperCase();
+    const ref = `PIPER_MODEL_${lang}`;
+    let model = process.env[ref];
+    if (!model || model.length <= 0) {
+        model = process.env.PIPER_MODEL;
+        if (model && model.length > 0) {
+            VOICE_DEBUG && console.log('Using fallback TTS model for', lang, model);
+        } else {
+            VOICE_DEBUG && console.log('TTS model is not available for', lang);
+        }
+    }
+
+    if (!model) {
+        return;
+    }
+
+    let buffer = text;
+    while (true) {
+        const index = buffer.indexOf('[citation:');
+        if (index < 0) {
+            break;
+        }
+        const number = buffer[index + 10];
+        if (number >= '0' && number <= '9') {
+            buffer = buffer.slice(0, index) + buffer.slice(index + 12);
+        }
+    }
+
+    try {
+        VOICE_DEBUG && console.log('Setting up play (from sox) for audio output...');
+
+        // quiet, lowest verbosity, pipe to stdin
+        const speaker = spawn('play', ['-q', '-V0', '-'],
+            { stdio: ['pipe', 'pipe', 'inherit'] });
+        speaker.on('error', (err) => {
+            VOICE_DEBUG && console.log('play failed to run', err);
+        });
+        speaker.on('exit', (code) => {
+            VOICE_DEBUG && console.log('play finished with', code);
+        });
+
+        // quiet, pipe to stdout
+        const piper = spawn('piper', ['--quiet', '--model', model, '-f', '-'],
+            { stdio: ['pipe', 'pipe', 'inherit'] });
+        piper.on('error', (err) => {
+            VOICE_DEBUG && console.log('piper failed to run', err);
+        });
+        piper.on('exit', (code) => {
+            VOICE_DEBUG && console.log('piper finished with', code);
+        });
+        piper.stdout.pipe(speaker.stdin);
+        piper.stdin.write(buffer);
+        piper.stdin.end();
+
+        return { speaker, piper };
+
+    } catch (e) {
+        VOICE_DEBUG && console.error('TTS failed:', e);
+    }
+}
 
 /**
  * Creates a new function by chaining multiple async functions from left to right.
@@ -879,8 +1005,25 @@ const interact = async () => {
     io.on('close', () => { loop = false; });
     console.log();
 
+    let asr = null;
+
+    const prepare = async () => {
+        asr = listen(async (text) => {
+            console.log(text);
+            await answer(text);
+            process.stdout.write(`${YELLOW}>> ${CYAN} ***`);
+            loop && setImmediate(setup);
+        });
+        return asr;
+    }
+
     const answer = async (inquiry) => {
         process.stdout.write(NORMAL);
+        if (asr) {
+            try {
+                asr.kill();
+            } catch (e) { }
+        }
 
         if (inquiry === '!reset' || inquiry === '/reset') {
             history = [];
@@ -920,6 +1063,12 @@ const interact = async () => {
             const { topic, thought, keyphrases } = result;
             const duration = Date.now() - start;
             const { answer, language, references } = result;
+            const tts = speak(answer, iso6391(language) || 'en');
+            if (tts) {
+                tts.speaker.on('exit', prepare);
+            } else {
+                prepare();
+            }
             if (references && Array.isArray(references)) {
                 if (references.length > 0 && references.length >= refs.length) {
                     console.log();
@@ -946,6 +1095,9 @@ const interact = async () => {
 
     const setup = () => {
         qa();
+        if (!asr) {
+            prepare();
+        }
     }
 
     setup();

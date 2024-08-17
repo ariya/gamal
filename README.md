@@ -52,6 +52,16 @@ Gamal's continuous integration workflows include evaluation tests in English, Sp
 [![Indonesian tests](https://github.com/ariya/gamal/actions/workflows/indonesian.yml/badge.svg)](https://github.com/ariya/gamal/actions/workflows/indonesian.yml)
 [![Language switch](https://github.com/ariya/gamal/actions/workflows/lang-switch.yml/badge.svg)](https://github.com/ariya/gamal/actions/workflows/lang-switch.yml)
 
+## Conversational Interface
+
+With the integration of third-party tools, Gamal can engage in conversations using voice (both input and output) rather than just text.
+
+For automatic speech recognition (ASR), also known as speech-to-text (STT), Gamal leverages the streaming tool from [whisper.cpp](https://github.com/ggerganov/whisper.cpp). Ensure that `whisper-cpp-stream`, or the custom executable specified in the `WHISPER_STREAM` environment variable, is available in your system's path. Whisper requires a GGML model, which can be downloaded from [Hugging Face](https://huggingface.co/ggerganov/whisper.cpp). The [base model](https://huggingface.co/ggerganov/whisper.cpp/blob/main/ggml-base.en-q5_1.bin) (60 MB) is generally a good balance between accuracy and speed for most modern computers. Set the `WHISPER_MODEL` environment variable to the full path of the downloaded model.
+
+To enable Gamal to respond with voice instead of just text, install [Piper](https://github.com/rhasspy/piper) for text-to-speech (TTS) conversion. Piper can be installed via Nixpkg (the `piper-tts` package). Piper also requires a [voice model](https://huggingface.co/rhasspy/piper-voices), which can be downloaded from sources like [ryan-medium](https://huggingface.co/rhasspy/piper-voices/tree/main/en/en_US/ryan/medium). Make sure to download both the ONNX model file (63 MB) and the corresponding config JSON. Before running Gamal, set the `PIPER_MODEL` environment variable to the full path of the voice model.
+
+The synthesized audio will be played back through the speaker or other audio output using the `play` utility from the [SOX (Sound eXchange project)](https://sourceforge.net/projects/sox/). Ensure that SOX is installed and available in your system's path.
+
 ## Using Other LLM Services
 
 Gamal is designed to be used with OpenRouter by default, but it can also be configured to work with other LLM services by adjusting some environment variables. The correct API key and a suitable model are required.
