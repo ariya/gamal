@@ -87,7 +87,7 @@ const listen = (handler) => {
     } catch (e) {
         VOICE_DEBUG && console.error('ASR failed:', e);
     }
-}
+};
 
 /**
  * Speaks the given text in the specified language using a text-to-speech model.
@@ -154,7 +154,7 @@ const speak = (text, language) => {
     } catch (e) {
         VOICE_DEBUG && console.error('TTS failed:', e);
     }
-}
+};
 
 /**
  * Creates a new function by chaining multiple async functions from left to right.
@@ -254,7 +254,7 @@ const chat = async (messages, handler = null, attempt = MAX_RETRY_ATTEMPT) => {
                 }
             }
             return partial;
-        }
+        };
 
         const reader = response.body.getReader();
         const decoder = new TextDecoder();
@@ -307,7 +307,7 @@ const chat = async (messages, handler = null, attempt = MAX_RETRY_ATTEMPT) => {
             throw e;
         }
     }
-}
+};
 
 const PREDEFINED_KEYS = ['INQUIRY', 'TOOL', 'LANGUAGE', 'THOUGHT', 'KEYPHRASES', 'OBSERVATION', 'TOPIC'];
 
@@ -339,7 +339,7 @@ const deconstruct = (text, markers = PREDEFINED_KEYS) => {
         }
     }
     return parts;
-}
+};
 
 /**
  * Constructs a multi-line text based on a number of key-value pairs.
@@ -355,7 +355,7 @@ const construct = (kv) => {
         }
         return null;
     }).join('\n');
-}
+};
 
 /**
  * Represents the record of an atomic processing.
@@ -429,7 +429,7 @@ const breakdown = (hint, completion) => {
         result = deconstruct(text + '\n' + 'TOPIC: general knowledge.');
     }
     return result;
-}
+};
 
 const reason = async (context) => {
     const { history, delegates } = context;
@@ -469,7 +469,7 @@ const reason = async (context) => {
     const { language, topic, thought, keyphrases, observation } = result;
     leave && leave('Reason', { language, topic, thought, keyphrases, observation });
     return { language, topic, thought, keyphrases, observation, ...context };
-}
+};
 
 /**
  * Determines the ISO 639-1 language code based on the input language string.
@@ -490,10 +490,9 @@ const iso6391 = (language) => {
         Italian: 'it',
         Italiano: 'it'
     };
-    const name = Object.keys(CODE)
-        .find((key) => language.toLowerCase().startsWith(key.toLowerCase()));
+    const name = Object.keys(CODE).find((key) => language.toLowerCase().startsWith(key.toLowerCase()));
     return name ? CODE[name] : null;
-}
+};
 
 /**
  * Searches for relevant information using SearXNG.
@@ -517,7 +516,7 @@ const searxng = async (query, language, attempt = MAX_RETRY_ATTEMPT) => {
             LLM_DEBUG_SEARCH && console.log(`SearXNG answer: ${description}`);
             return { title: 'Answers', url, description };
         }
-    }
+    };
 
     const parse = (content) => {
         const hits = content.split('[https://')
@@ -535,7 +534,7 @@ const searxng = async (query, language, attempt = MAX_RETRY_ATTEMPT) => {
         return hits.filter((i) => i)
             .filter(({ url }) => url && url.length > 0)
             .slice(0, TOP_K);
-    }
+    };
 
     const lang = iso6391(language) || 'auto';
     let url = new URL(`${SEARXNG_URL}/search`);
@@ -580,8 +579,7 @@ const searxng = async (query, language, attempt = MAX_RETRY_ATTEMPT) => {
             throw e;
         }
     }
-
-}
+};
 
 /**
  * Uses the online search engine to collect relevant information based on the keyphrases.
@@ -602,7 +600,7 @@ const search = async (context) => {
     const { url, references } = await searxng(query, language);
     leave && leave('Search', { engine: 'SearXNG', url, references });
     return { ...context, references };
-}
+};
 
 /**
  * Responds to the user's recent message using an LLM.
@@ -663,7 +661,7 @@ const respond = async (context) => {
     const answer = await chat(messages, stream);
     leave && leave('Respond', { inquiry });
     return { answer, ...context };
-}
+};
 
 /**
  * Prints the pipeline stages, mostly for troubleshooting.
@@ -688,7 +686,7 @@ const review = (stages) => {
     });
     console.log();
     return buffer;
-}
+};
 
 /**
  * Collapses every pair of stages (enter and leave) into one stage,
@@ -707,7 +705,7 @@ const simplify = (stages) => {
         }
         return stage;
     }).filter((_, index) => isOdd(index));
-}
+};
 
 /**
  * Converts an expected answer into a suitable regular expression array.
@@ -761,7 +759,7 @@ const regexify = (match) => {
     }
 
     return regexes;
-}
+};
 
 /**
  * Returns all possible matches given a list of regular expressions.
@@ -781,7 +779,7 @@ const match = (text, regexes) => {
         const { length } = first;
         return { index, length };
     }).filter(span => span !== null);
-}
+};
 
 /**
  * Formats the input (using ANSI colors) to highlight the spans.
@@ -813,7 +811,7 @@ const highlight = (text, spans, color = BOLD + GREEN) => {
     flush(display);
 
     return { colored, refs };
-}
+};
 
 /**
  * Evaluates a test file and executes the test cases.
@@ -922,7 +920,7 @@ const evaluate = async (filename) => {
                 return text.substr(0, marker).trim();
             }
             return text;
-        }
+        };
 
         const lines = fs.readFileSync(filename, 'utf-8').split('\n').map(trim);
         for (const i in lines) {
@@ -939,7 +937,7 @@ const evaluate = async (filename) => {
         console.error('ERROR:', e.toString());
         process.exit(-1);
     }
-}
+};
 
 const MAX_LOOKAHEAD = 3 * '[citation:x]'.length;
 
@@ -977,7 +975,7 @@ const push = (display, text) => {
         buffer = buffer.substr(buffer.length - MAX_LOOKAHEAD);
     }
     return { buffer, refs, print, cite };
-}
+};
 
 /**
  * Flushes the buffer and resets the display object.
@@ -993,7 +991,7 @@ const flush = (display) => {
     const { buffer, print, cite } = display;
     print && print(buffer.trimEnd());
     return { buffer: '', refs: [], print, cite };
-}
+};
 
 /**
  * Interacts with the user in the terminal, asking for inquiries and providing answers.
@@ -1023,7 +1021,7 @@ const interact = async () => {
             loop && setImmediate(setup);
         });
         return asr;
-    }
+    };
 
     const answer = async (inquiry) => {
         process.stdout.write(NORMAL);
@@ -1055,7 +1053,7 @@ const interact = async () => {
                         console.log(`${GRAY}${ARROW} Searching for ${keyphrases}...${NORMAL}`);
                     }
                 }
-            }
+            };
 
             const stream = (text) => display = push(display, text);
             const enter = (name) => { stages.push({ name, timestamp: Date.now() }) };
@@ -1091,24 +1089,24 @@ const interact = async () => {
             history.push({ inquiry, thought, keyphrases, topic, answer, duration, stages });
             console.log();
         }
-    }
+    };
 
     const qa = () => {
         io.question(`${YELLOW}>> ${CYAN}`, async (inquiry) => {
             await answer(inquiry);
             loop && setImmediate(setup);
-        })
-    }
+        });
+    };
 
     const setup = () => {
         qa();
         if (!asr) {
             prepare();
         }
-    }
+    };
 
     setup();
-}
+};
 
 /**
  * Starts an HTTP server that listens on the specified port and serves requests.
@@ -1122,7 +1120,7 @@ const serve = async (port) => {
         const parsedUrl = new URL(`http://localhost/${url}`);
         const { search } = parsedUrl;
         return decodeURIComponent(search.substring(1)).trim();
-    }
+    };
 
     const server = http.createServer(async (request, response) => {
         const { url } = request;
@@ -1153,7 +1151,7 @@ const serve = async (port) => {
                 const print = (text) => {
                     process.stdout.write(text);
                     response.write(text);
-                }
+                };
                 const cite = (citation) => `[${citation}]`;
                 let display = { buffer: '', refs: [], print, cite };
 
@@ -1185,14 +1183,14 @@ const serve = async (port) => {
                 response.writeHead(400).end();
             }
         } else {
-            console.error(`${url} is 404!`)
+            console.error(`${url} is 404!`);
             response.writeHead(404);
             response.end();
         }
     });
     server.listen(port);
     console.log('Listening on port', port);
-}
+};
 
 /**
  * Asynchronously polls the Telegram API for updates and processes them.
@@ -1235,7 +1233,7 @@ const poll = async () => {
             });
         }
         return buffer;
-    }
+    };
 
     /**
      * Checks for updates from the Telegram API and processes incoming messages.
@@ -1263,7 +1261,7 @@ const poll = async () => {
             } catch (error) {
                 console.error(`Unable to send message to ${id}: ${error}`);
             }
-        }
+        };
 
         try {
             const response = await fetch(POLL_URL, {
@@ -1309,17 +1307,17 @@ const poll = async () => {
                         state[chat.id] = history;
                         send(chat.id, format(answer, references));
                     }
-                })
+                });
             }
         } catch (error) {
             console.error(`Failed to get Telegram updates: ${error}`);
         } finally {
             setTimeout(() => { check(offset) }, 200);
         }
-    }
+    };
 
     check(0);
-}
+};
 
 /**
  * Runs a canary test to ensure that the configured LLM service is ready and
@@ -1339,7 +1337,7 @@ const canary = async () => {
         console.error(error);
         process.exit(-1);
     }
-}
+};
 
 (async () => {
     await canary();
