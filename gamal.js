@@ -285,7 +285,7 @@ const chat = async (messages, handler = null, attempt = MAX_RETRY_ATTEMPT) => {
                         if (answer.length < 1) {
                             const leading = partial.trim();
                             answer = leading;
-                            handler && (leading.length > 0) && handler(leading);
+                            handler && leading.length > 0 && handler(leading);
                         } else {
                             answer += partial;
                             handler && handler(partial);
@@ -803,7 +803,7 @@ const highlight = (text, spans, color = BOLD + GREEN) => {
     });
 
     let colored = '';
-    const print = (text) => colored += text;
+    const print = (text) => (colored += text);
     const cite = (citation) => `${GRAY}[${citation}]${NORMAL}`;
     let display = { buffer: '', refs: [], print, cite };
     for (let i = 0; i < result.length; ++i) {
@@ -827,7 +827,7 @@ const evaluate = async (filename) => {
         let failures = 0;
 
         const handle = async (line) => {
-            const parts = (line && line.length > 0) ? line.split(':') : [];
+            const parts = line && line.length > 0 ? line.split(':') : [];
             if (parts.length >= 2) {
                 const role = parts[0];
                 const content = line.slice(role.length + 1).trim();
