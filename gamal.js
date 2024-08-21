@@ -479,11 +479,23 @@ const reason = async (context) => {
  * @param {string} language - The language string to be checked.
  * @return {string} The corresponding ISO 639-1 language code or null if not found.
  */
-const iso6391 = (language) => /German|Deutsch/i.test(language) ? 'de' :
-    /French|Français/i.test(language) ? 'fr' :
-        /Spanish|Español/i.test(language) ? 'es' :
-            /Indonesia|Bahasa/i.test(language) ? 'id' :
-                /Italian/i.test(language) ? 'it' : null;
+const iso6391 = (language) => {
+    const CODE = {
+        'German': 'de',
+        'Deutsch': 'de',
+        'French': 'fr',
+        'Français': 'fr',
+        'Spanish': 'es',
+        'Español': 'es',
+        'Indonesia': 'id',
+        'Bahasa': 'id',
+        'Italian': 'it',
+        'Italiano': 'it'
+    };
+    const name = Object.keys(CODE)
+        .find(key => language.toLowerCase().startsWith(key.toLowerCase()));
+    return name ? CODE[name] : null;
+}
 
 /**
  * Searches for relevant information using SearXNG.
