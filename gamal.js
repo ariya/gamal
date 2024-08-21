@@ -54,8 +54,8 @@ const listen = (handler) => {
 
     try {
         VOICE_DEBUG && console.log(`Starting ${WHISPER_STREAM} with model ${WHISPER_MODEL}...`);
-        const process = spawn(WHISPER_STREAM, ['-m', WHISPER_MODEL, '--step', '0'],
-            { stdio: ['pipe', 'pipe', 'ignore'] });
+        const options = { stdio: ['pipe', 'pipe', 'ignore'] };
+        const process = spawn(WHISPER_STREAM, ['-m', WHISPER_MODEL, '--step', '0'], options);
 
         let buffer = '';
 
@@ -130,8 +130,8 @@ const speak = (text, language) => {
         VOICE_DEBUG && console.log('Setting up play (from sox) for audio output...');
 
         // quiet, lowest verbosity, pipe to stdin
-        const speaker = spawn('play', ['-q', '-V0', '-'],
-            { stdio: ['pipe', 'pipe', 'inherit'] });
+        const options = { stdio: ['pipe', 'pipe', 'inherit'] };
+        const speaker = spawn('play', ['-q', '-V0', '-'], options);
         speaker.on('error', (err) => {
             VOICE_DEBUG && console.log('play failed to run', err);
         });
@@ -140,8 +140,7 @@ const speak = (text, language) => {
         });
 
         // quiet, pipe to stdout
-        const piper = spawn('piper', ['--quiet', '--model', model, '-f', '-'],
-            { stdio: ['pipe', 'pipe', 'inherit'] });
+        const piper = spawn('piper', ['--quiet', '--model', model, '-f', '-'], options);
         piper.on('error', (err) => {
             VOICE_DEBUG && console.log('piper failed to run', err);
         });
