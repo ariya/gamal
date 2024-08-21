@@ -481,16 +481,16 @@ const reason = async (context) => {
  */
 const iso6391 = (language) => {
     const CODE = {
-        'German': 'de',
-        'Deutsch': 'de',
-        'French': 'fr',
-        'Français': 'fr',
-        'Spanish': 'es',
-        'Español': 'es',
-        'Indonesia': 'id',
-        'Bahasa': 'id',
-        'Italian': 'it',
-        'Italiano': 'it'
+        German: 'de',
+        Deutsch: 'de',
+        French: 'fr',
+        Français: 'fr',
+        Spanish: 'es',
+        Español: 'es',
+        Indonesia: 'id',
+        Bahasa: 'id',
+        Italian: 'it',
+        Italiano: 'it'
     };
     const name = Object.keys(CODE)
         .find(key => language.toLowerCase().startsWith(key.toLowerCase()));
