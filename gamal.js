@@ -599,7 +599,7 @@ const search = async (context) => {
     const { enter, leave } = delegates;
     enter && enter('Search');
 
-    const query = topic.replaceAll('.', '') + ': ' + keyphrases.replace(/\.$/, "").replace(/^"|"$/g, "");
+    const query = topic.replaceAll('.', '') + ': ' + keyphrases.replace(/\.$/, '').replace(/^"|"$/g, '');
 
     LLM_DEBUG_SEARCH && console.log(`Language: ${language} Search query: ${query}`);
 
