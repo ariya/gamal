@@ -994,7 +994,7 @@ const push = (display, text) => {
  */
 const flush = display => {
     const { buffer, print, cite } = display;
-    print && print(buffer.trimRight());
+    print && print(buffer.trimEnd());
     return { buffer: '', refs: [], print, cite };
 }
 
