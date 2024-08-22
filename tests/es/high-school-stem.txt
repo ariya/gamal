@@ -1,9 +1,9 @@
 Story: Preguntas sobre temas STEM en la escuela secundaria
 
 User: ¿Qué fuerza atrae los objetos hacia el centro de la Tierra?
-Assistant: La /gravedad|fuerza gravitatoria|fuerza gravitacional|atracción terrestre/ atrae los objetos hacia el centro de la Tierra.
+Assistant: La /gravedad|fuerza gravitatoria|fuerza gravitacional|atracción terrestre|gravitación/ atrae los objetos hacia el centro de la Tierra.
 Pipeline.Reason.Language: /Spanish|Español/
-Pipeline.Reason.Keyphrases: /force|gravity|Earth|fuerza|gravedad|gravitacional|gravitatoria|atracción|/
+Pipeline.Reason.Keyphrases: /force|gravity|Earth|fuerza|gravedad|gravitacional|gravitatoria|gravitación|atracción|/
 
 User: ¿Cuál es el número atómico del carbono?
 Assistant: El número atómico del carbono es /6|seis/.
