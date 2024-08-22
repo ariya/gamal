@@ -87,7 +87,6 @@ const listen = (handler) => {
     } catch (e) {
         VOICE_DEBUG && console.error('ASR failed:', e);
     }
-
 }
 
 /**
@@ -152,7 +151,6 @@ const speak = (text, language) => {
         piper.stdin.end();
 
         return { speaker, piper };
-
     } catch (e) {
         VOICE_DEBUG && console.error('TTS failed:', e);
     }
@@ -505,7 +503,6 @@ const iso6391 = (language) => {
  * @throws {Error} - If the search fails with a non-200 status.
  */
 const searxng = async (query, language, attempt = MAX_RETRY_ATTEMPT) => {
-
     const timeout = 31; // seconds
 
     const answer = (content) => {
@@ -548,7 +545,6 @@ const searxng = async (query, language, attempt = MAX_RETRY_ATTEMPT) => {
     const auth = JINA_API_KEY ? { Authorization: `Bearer ${JINA_API_KEY}` } : {};
     LLM_DEBUG_SEARCH && console.log(`SearXNG request: ${url.toString()}`);
     try {
-
         const response = await fetch('https://r.jina.ai/' + url.toString(), {
             method: 'GET',
             headers: { ...auth },
@@ -1033,7 +1029,7 @@ const interact = async () => {
         if (asr) {
             try {
                 asr.kill();
-            } catch (e) { }
+            } catch (e) {}
         }
 
         if (inquiry === '!reset' || inquiry === '/reset') {
@@ -1049,7 +1045,6 @@ const interact = async () => {
                 const { stages } = last;
                 review(simplify(stages));
             }
-
         } else {
             const stages = [];
             const update = (stage, fields) => {
@@ -1202,7 +1197,6 @@ const serve = async (port) => {
  * Asynchronously polls the Telegram API for updates and processes them.
  */
 const poll = async () => {
-
     let state = {};
 
     /**
@@ -1249,7 +1243,6 @@ const poll = async () => {
      * @return {Promise<void>} A promise that resolves when the function completes.
      */
     const check = async (offset) => {
-
         const POLL_URL = `https://api.telegram.org/bot${GAMAL_TELEGRAM_TOKEN}/getUpdates?offset=${offset}`;
         const SEND_URL = `https://api.telegram.org/bot${GAMAL_TELEGRAM_TOKEN}/sendMessage`;
 
@@ -1322,7 +1315,6 @@ const poll = async () => {
         } finally {
             setTimeout(() => { check(offset) }, 200);
         }
-
     }
 
     check(0);
