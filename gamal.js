@@ -545,7 +545,7 @@ const searxng = async (query, language, attempt = MAX_RETRY_ATTEMPT) => {
     url.searchParams.append('q', lang === 'auto' ? query : 'wikipedia ' + query);
     url.searchParams.append('language', lang);
     url.searchParams.append('safesearch', '0');
-    const auth = JINA_API_KEY ? { 'Authorization': `Bearer ${JINA_API_KEY}` } : {};
+    const auth = JINA_API_KEY ? { Authorization: `Bearer ${JINA_API_KEY}` } : {};
     LLM_DEBUG_SEARCH && console.log(`SearXNG request: ${url.toString()}`);
     try {
 
