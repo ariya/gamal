@@ -164,7 +164,7 @@ const speak = (text, language) => {
  * @param  {...any} fns - Functions to chain
  * @returns {function}
  */
-const pipe = (...fns) => arg => fns.reduce((d, fn) => d.then(fn), Promise.resolve(arg));
+const pipe = (...fns) => (arg) => fns.reduce((d, fn) => d.then(fn), Promise.resolve(arg));
 
 const MAX_RETRY_ATTEMPT = 3;
 
@@ -174,7 +174,7 @@ const MAX_RETRY_ATTEMPT = 3;
  * @param {number} ms - The amount of time to suspend execution in milliseconds.
  * @returns {Promise<void>} - A promise that resolves after the specified time has elapsed.
  */
-const sleep = async (ms) => new Promise(resolve => setTimeout(resolve, ms));
+const sleep = async (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 /**
  * Represents a chat message.
@@ -350,7 +350,7 @@ const deconstruct = (text, markers = PREDEFINED_KEYS) => {
  * @return {text}
  */
 const construct = (kv) => {
-    return PREDEFINED_KEYS.filter(key => kv[key.toLowerCase()]).map(key => {
+    return PREDEFINED_KEYS.filter((key) => kv[key.toLowerCase()]).map(key => {
         const value = kv[key.toLowerCase()];
         if (value && value.length > 0) {
             return `${key.toUpperCase()}: ${value}`;
@@ -446,7 +446,7 @@ const reason = async (context) => {
 
     const messages = [];
     messages.push({ role: 'system', content: prompt });
-    relevant.forEach(msg => {
+    relevant.forEach((msg) => {
         const { inquiry, topic, thought, keyphrases, answer } = msg;
         const observation = answer;
         messages.push({ role: 'user', content: inquiry });
@@ -493,7 +493,7 @@ const iso6391 = (language) => {
         Italiano: 'it'
     };
     const name = Object.keys(CODE)
-        .find(key => language.toLowerCase().startsWith(key.toLowerCase()));
+        .find((key) => language.toLowerCase().startsWith(key.toLowerCase()));
     return name ? CODE[name] : null;
 }
 
@@ -510,7 +510,7 @@ const searxng = async (query, language, attempt = MAX_RETRY_ATTEMPT) => {
 
     const answer = (content) => {
         let description = content.split(/#+\s+Answers\s+:/i)
-            .filter(line => !line.startsWith('Title'))
+            .filter((line) => !line.startsWith('Title'))
             .shift();
         if (description) {
             const url = description?.match(/\((.*?)\)/).pop().trim();
@@ -524,8 +524,8 @@ const searxng = async (query, language, attempt = MAX_RETRY_ATTEMPT) => {
 
     const parse = (content) => {
         const hits = content.split('[https://')
-            .filter(line => !line.includes('SearXNG'))
-            .map(line => {
+            .filter((line) => !line.includes('SearXNG'))
+            .map((line) => {
                 const fragments = line.split('###').slice(1).join().split('\n');
                 const header = fragments.shift();
                 const description = fragments.join('').trim();
@@ -535,7 +535,7 @@ const searxng = async (query, language, attempt = MAX_RETRY_ATTEMPT) => {
                 return { title, url, description };
             });
         hits.unshift(answer(content));
-        return hits.filter(i => i)
+        return hits.filter((i) => i)
             .filter(({ url }) => url && url.length > 0)
             .slice(0, TOP_K);
     }
@@ -652,7 +652,7 @@ const respond = async (context) => {
 
     const messages = [];
     if (references && Array.isArray(references) && references.length > 0) {
-        const refs = references.map(ref => {
+        const refs = references.map((ref) => {
             const { position, title, snippet } = ref;
             return `[citation:${position}] ${title} - ${snippet}`;
         });
@@ -683,7 +683,7 @@ const review = (stages) => {
         const { name, duration, timestamp, ...fields } = stage;
         console.log(`${GREEN}${ARROW} Stage #${index + 1} ${YELLOW}${name} ${GRAY}[${duration} ms]${NORMAL}`);
         buffer += `\nStage #${index + 1} ${name} [${duration} ms]\n`;
-        Object.keys(fields).map(key => {
+        Object.keys(fields).map((key) => {
             const value = fields[key];
             const str = Array.isArray(value) ? JSON.stringify(value, null, 2) : value?.toString();
             console.log(`${GRAY}${key}: ${NORMAL}${str}`);
@@ -775,7 +775,7 @@ const regexify = (match) => {
  * @returns {Array<Span>}
  */
 const match = (text, regexes) => {
-    return regexes.map(regex => {
+    return regexes.map((regex) => {
         const match = regex.exec(text);
         if (!match) {
             return null;
@@ -992,7 +992,7 @@ const push = (display, text) => {
  * @param {Function} display.cite - The function to cite a reference.
  * @return {Object} The updated display object with an empty buffer and empty reference array.
  */
-const flush = display => {
+const flush = (display) => {
     const { buffer, print, cite } = display;
     print && print(buffer.trimEnd());
     return { buffer: '', refs: [], print, cite };
@@ -1122,7 +1122,7 @@ const interact = async () => {
 const serve = async (port) => {
     let history = [];
 
-    const decode = url => {
+    const decode = (url) => {
         const parsedUrl = new URL(`http://localhost/${url}`);
         const { search } = parsedUrl;
         return decodeURIComponent(search.substring(1)).trim();
