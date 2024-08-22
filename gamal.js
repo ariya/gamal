@@ -931,7 +931,8 @@ const evaluate = async (filename) => {
         if (failures <= 0) {
             console.log(`${GREEN}${CHECK}${NORMAL} SUCCESS: ${GREEN}${total} test(s)${NORMAL}.`);
         } else {
-            console.log(`${RED}${CROSS}${NORMAL} FAIL: ${GRAY}${total} test(s), ${RED}${failures} failure(s)${NORMAL}.`);
+            const count = `${GRAY}${total} test(s), ${RED}${failures} failure(s)`;
+            console.log(`${RED}${CROSS}${NORMAL} FAIL: ${count}${NORMAL}.`);
             process.exit(-1);
         }
     } catch (e) {
