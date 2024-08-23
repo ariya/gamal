@@ -490,6 +490,7 @@ const reason = async (context) => {
  * @return {string} The corresponding ISO 639-1 language code or null if not found.
  */
 const iso6391 = (language) => {
+    const lang = language || 'Unknown';
     const CODE = {
         German: 'de',
         Deutsch: 'de',
@@ -502,7 +503,7 @@ const iso6391 = (language) => {
         Italian: 'it',
         Italiano: 'it'
     };
-    const name = Object.keys(CODE).find((key) => language.toLowerCase().startsWith(key.toLowerCase()));
+    const name = Object.keys(CODE).find((key) => lang.toLowerCase().startsWith(key.toLowerCase()));
     return name ? CODE[name] : null;
 };
 
