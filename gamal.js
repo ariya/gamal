@@ -560,6 +560,8 @@ const searxng = async (query, language, attempt = MAX_RETRY_ATTEMPT) => {
             .slice(0, TOP_K);
     };
 
+    LLM_DEBUG_SEARCH && console.log(`SearXNG search with language: ${language}, query: ${query}`);
+
     const lang = iso6391(language) || 'auto';
     let url = new URL(`${SEARXNG_URL}/search`);
     url.searchParams.append('q', lang === 'auto' ? query : 'wikipedia ' + query);
@@ -618,8 +620,6 @@ const search = async (context) => {
     enter && enter('Search');
 
     const query = topic.replaceAll('.', '') + ': ' + keyphrases.replace(/\.$/, '').replace(/^"|"$/g, '');
-
-    LLM_DEBUG_SEARCH && console.log(`Language: ${language} Search query: ${query}`);
 
     const { url, references } = await searxng(query, language);
     leave && leave('Search', { engine: 'SearXNG', url, references });
