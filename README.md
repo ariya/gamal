@@ -156,25 +156,25 @@ export LLM_CHAT_MODEL="meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo"
 
 Gamal is compatible with local LLM inference tools such as [llama.cpp](https://github.com/ggerganov/llama.cpp), [Jan](https://jan.ai), and [Ollama](https://ollama.com). Refer to the relevant section for configuration details.
 
-The example provided uses Llama-3 8B. For optimal performance, an instruction-following LLM with 7B parameters or more is recommended. Suitable models include Mistral 7B, Qwen-2 7B, and Gemma-2 9B.
+The example provided uses Llama-3.1 8B. For optimal performance, an instruction-following LLM with 7B parameters or more is recommended. Suitable models include Mistral 7B, Qwen-2 7B, and Gemma-2 9B.
 
 <details><summary>llama.cpp</summary>
 
-First, load a quantized model such as [Llama-3 8B](https://huggingface.co/QuantFactory/Meta-Llama-3-8B-Instruct-GGUF). Then, adjust the `LLM_API_BASE_URL` environment variable accordingly:
+First, load a quantized model such as [Llama-3.1 8B](https://huggingface.co/lmstudio-community/Meta-Llama-3.1-8B-Instruct-GGUF). Then, adjust the `LLM_API_BASE_URL` environment variable accordingly:
 
 ```bash
-/path/to/llama-server -m Meta-Llama-3-8B-Instruct.Q4_K_M.gguf
+/path/to/llama-server -m Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf
 export LLM_API_BASE_URL=http://127.0.0.1:8080/v1
 ```
 </details>
 
 <details><summary>Jan</summary>
 
-Refer to [the documentation](https://jan.ai/docs/local-api) and load a model like [Llama-3 8B](https://huggingface.co/QuantFactory/Meta-Llama-3-8B-Instruct-GGUF). Then, set the environment variable:
+Refer to [the documentation](https://jan.ai/docs/local-api) and load a model like [Llama-3.1 8B](https://huggingface.co/lmstudio-community/Meta-Llama-3.1-8B-Instruct-GGUF). Then, set the environment variable:
 
 ```bash
 export LLM_API_BASE_URL=http://127.0.0.1:1337/v1
-export LLM_CHAT_MODEL='llama3-8b-instruct'
+export LLM_CHAT_MODEL='llama3.1'
 ```
 </details>
 
@@ -183,7 +183,7 @@ export LLM_CHAT_MODEL='llama3-8b-instruct'
 Load a model and configure the environment variables:
 
 ```bash
-ollama pull llama3
+ollama pull llama3.1
 export LLM_API_BASE_URL=http://127.0.0.1:11434/v1
 export LLM_CHAT_MODEL='llama3.1'
 ```
