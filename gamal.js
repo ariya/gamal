@@ -63,9 +63,10 @@ const listen = (handler) => {
             VOICE_DEBUG && console.log(`whisper-cpp-stream: ${data.length} bytes`);
             buffer += data.toString();
             if (buffer.match(TRANSCRIPTION_END_MARKER)) {
-                const transcript = buffer.split('\n')
-                    .filter(line => line && line.length > 0)
-                    .filter(line => !line.startsWith('###'))
+                const transcript = buffer
+                    .split('\n')
+                    .filter((line) => line && line.length > 0)
+                    .filter((line) => !line.startsWith('###'))
                     .join('\n')
                     .replace(/\n/g, ' ')
                     .replace(/\./g, '')
@@ -162,7 +163,10 @@ const speak = (text, language) => {
  * @param  {...any} fns - Functions to chain
  * @returns {function}
  */
-const pipe = (...fns) => (arg) => fns.reduce((d, fn) => d.then(fn), Promise.resolve(arg));
+const pipe =
+    (...fns) =>
+    (arg) =>
+        fns.reduce((d, fn) => d.then(fn), Promise.resolve(arg));
 
 const MAX_RETRY_ATTEMPT = 3;
 
@@ -221,9 +225,10 @@ const chat = async (messages, handler = null, attempt = MAX_RETRY_ATTEMPT) => {
             throw new EvalError(msg);
         }
 
-        LLM_DEBUG_CHAT && messages.forEach(({ role, content }) => {
-            console.log(`${MAGENTA}${role}:${NORMAL} ${content}`);
-        });
+        LLM_DEBUG_CHAT &&
+            messages.forEach(({ role, content }) => {
+                console.log(`${MAGENTA}${role}:${NORMAL} ${content}`);
+            });
 
         if (!stream) {
             const data = await response.json();
@@ -324,7 +329,10 @@ const deconstruct = (text, markers = PREDEFINED_KEYS) => {
     const anchor = markers.slice().pop();
     const start = text.lastIndexOf(anchor + ':');
     if (start >= 0) {
-        parts[anchor.toLowerCase()] = text.substring(start).replace(anchor + ':', '').trim();
+        parts[anchor.toLowerCase()] = text
+            .substring(start)
+            .replace(anchor + ':', '')
+            .trim();
         let str = text.substring(0, start);
         for (let i = 0; i < keys.length; ++i) {
             const marker = keys[i];
@@ -348,13 +356,15 @@ const deconstruct = (text, markers = PREDEFINED_KEYS) => {
  * @return {text}
  */
 const construct = (kv) => {
-    return PREDEFINED_KEYS.filter((key) => kv[key.toLowerCase()]).map(key => {
-        const value = kv[key.toLowerCase()];
-        if (value && value.length > 0) {
-            return `${key.toUpperCase()}: ${value}`;
-        }
-        return null;
-    }).join('\n');
+    return PREDEFINED_KEYS.filter((key) => kv[key.toLowerCase()])
+        .map((key) => {
+            const value = kv[key.toLowerCase()];
+            if (value && value.length > 0) {
+                return `${key.toUpperCase()}: ${value}`;
+            }
+            return null;
+        })
+        .join('\n');
 };
 
 /**
@@ -419,9 +429,11 @@ OBSERVATION: Le lac de Pitch à Trinidad est le plus grand dépôt naturel d'asp
 TOPIC: géographie.`;
 
 const breakdown = (hint, completion) => {
-    const remark = completion.replace('<|start_header_id|>', '')
+    const remark = completion
+        .replace('<|start_header_id|>', '')
         .replace('<|end_header_id|>', '')
-        .replace(/^assistant/, '').trim();
+        .replace(/^assistant/, '')
+        .trim();
     const text = remark.startsWith(hint) ? remark : hint + remark;
     let result = deconstruct(text);
     const { topic } = result;
@@ -505,11 +517,15 @@ const searxng = async (query, language, attempt = MAX_RETRY_ATTEMPT) => {
     const timeout = 31; // seconds
 
     const answer = (content) => {
-        let description = content.split(/#+\s+Answers\s+:/i)
+        let description = content
+            .split(/#+\s+Answers\s+:/i)
             .filter((line) => !line.startsWith('Title'))
             .shift();
         if (description) {
-            const url = description?.match(/\((.*?)\)/).pop().trim();
+            const url = description
+                ?.match(/\((.*?)\)/)
+                .pop()
+                .trim();
             if (url && url.length > 0) {
                 description = description.slice(0, description.indexOf(url) - 1).trim();
             }
@@ -519,19 +535,27 @@ const searxng = async (query, language, attempt = MAX_RETRY_ATTEMPT) => {
     };
 
     const parse = (content) => {
-        const hits = content.split('[https://')
+        const hits = content
+            .split('[https://')
             .filter((line) => !line.includes('SearXNG'))
             .map((line) => {
                 const fragments = line.split('###').slice(1).join().split('\n');
                 const header = fragments.shift();
                 const description = fragments.join('').trim();
-                const title = header?.match(/\[(.*?)\]/)?.pop().trim();
+                const title = header
+                    ?.match(/\[(.*?)\]/)
+                    ?.pop()
+                    .trim();
                 const buffer = header?.replace(title, '').trim();
-                const url = buffer?.match(/\((.*?)\)/)?.pop().trim();
+                const url = buffer
+                    ?.match(/\((.*?)\)/)
+                    ?.pop()
+                    .trim();
                 return { title, url, description };
             });
         hits.unshift(answer(content));
-        return hits.filter((i) => i)
+        return hits
+            .filter((i) => i)
             .filter(({ url }) => url && url.length > 0)
             .slice(0, TOP_K);
     };
@@ -651,8 +675,7 @@ const respond = async (context) => {
             return `[citation:${position}] ${title} - ${snippet}`;
         });
 
-        const prompt = RESPOND_PROMPT.replace('{LANGUAGE}', language).
-            replace('{REFERENCES}', refs.join('\n'));
+        const prompt = RESPOND_PROMPT.replace('{LANGUAGE}', language).replace('{REFERENCES}', refs.join('\n'));
         messages.push({ role: 'system', content: prompt });
         messages.push({ role: 'user', content: inquiry });
     } else {
@@ -696,15 +719,19 @@ const review = (stages) => {
  * @returns {Array<object>}
  */
 const simplify = (stages) => {
-    const isOdd = (x) => { return (x % 2) !== 0 };
-    return stages.map((stage, index) => {
-        if (isOdd(index)) {
-            const before = stages[index - 1];
-            const duration = stage.timestamp - before.timestamp;
-            return { ...stage, duration };
-        }
-        return stage;
-    }).filter((_, index) => isOdd(index));
+    const isOdd = (x) => {
+        return x % 2 !== 0;
+    };
+    return stages
+        .map((stage, index) => {
+            if (isOdd(index)) {
+                const before = stages[index - 1];
+                const duration = stage.timestamp - before.timestamp;
+                return { ...stage, duration };
+            }
+            return stage;
+        })
+        .filter((_, index) => isOdd(index));
 };
 
 /**
@@ -769,16 +796,18 @@ const regexify = (match) => {
  * @returns {Array<Span>}
  */
 const match = (text, regexes) => {
-    return regexes.map((regex) => {
-        const match = regex.exec(text);
-        if (!match) {
-            return null;
-        }
-        const [first] = match;
-        const { index } = match;
-        const { length } = first;
-        return { index, length };
-    }).filter(span => span !== null);
+    return regexes
+        .map((regex) => {
+            const match = regex.exec(text);
+            if (!match) {
+                return null;
+            }
+            const [first] = match;
+            const { index } = match;
+            const { length } = first;
+            return { index, length };
+        })
+        .filter((span) => span !== null);
 };
 
 /**
@@ -792,13 +821,15 @@ const match = (text, regexes) => {
 
 const highlight = (text, spans, color = BOLD + GREEN) => {
     let result = text;
-    spans.sort((p, q) => q.index - p.index).forEach((span) => {
-        const { index, length } = span;
-        const prefix = result.substring(0, index);
-        const content = result.substring(index, index + length);
-        const suffix = result.substring(index + length);
-        result = `${prefix}${color}${content}${NORMAL}${suffix}`;
-    });
+    spans
+        .sort((p, q) => q.index - p.index)
+        .forEach((span) => {
+            const { index, length } = span;
+            const prefix = result.substring(0, index);
+            const content = result.substring(index, index + length);
+            const suffix = result.substring(index + length);
+            result = `${prefix}${color}${content}${NORMAL}${suffix}`;
+        });
 
     let colored = '';
     const print = (text) => (colored += text);
@@ -838,8 +869,12 @@ const evaluate = async (filename) => {
                 } else if (role === 'User') {
                     const inquiry = content;
                     const stages = [];
-                    const enter = (name) => { stages.push({ name, timestamp: Date.now() }) };
-                    const leave = (name, fields) => { stages.push({ name, timestamp: Date.now(), ...fields }) };
+                    const enter = (name) => {
+                        stages.push({ name, timestamp: Date.now() });
+                    };
+                    const leave = (name, fields) => {
+                        stages.push({ name, timestamp: Date.now(), ...fields });
+                    };
                     const delegates = { enter, leave };
                     const context = { inquiry, history, delegates };
                     console.log();
@@ -849,7 +884,17 @@ const evaluate = async (filename) => {
                     const result = await pipeline(context);
                     const duration = Date.now() - start;
                     const { topic, language, thought, keyphrases, references, answer } = result;
-                    history.push({ inquiry, thought, keyphrases, topic, language, references, answer, duration, stages });
+                    history.push({
+                        inquiry,
+                        thought,
+                        keyphrases,
+                        topic,
+                        language,
+                        references,
+                        answer,
+                        duration,
+                        stages
+                    });
                     ++total;
                 } else if (role === 'Assistant') {
                     const expected = content;
@@ -892,7 +937,7 @@ const evaluate = async (filename) => {
                         process.exit(-1);
                     } else {
                         const { keyphrases, language, stages } = last;
-                        const target = (role === 'Pipeline.Reason.Keyphrases') ? keyphrases : language;
+                        const target = role === 'Pipeline.Reason.Keyphrases' ? keyphrases : language;
                         const regexes = regexify(expected);
                         const matches = match(target, regexes);
                         if (matches.length === regexes.length) {
@@ -1008,7 +1053,9 @@ const interact = async () => {
 
     let loop = true;
     const io = readline.createInterface({ input: process.stdin, output: process.stdout });
-    io.on('close', () => { loop = false; });
+    io.on('close', () => {
+        loop = false;
+    });
     console.log();
 
     let asr = null;
@@ -1055,9 +1102,14 @@ const interact = async () => {
                 }
             };
 
-            const stream = (text) => display = push(display, text);
-            const enter = (name) => { stages.push({ name, timestamp: Date.now() }) };
-            const leave = (name, fields) => { update(name, fields); stages.push({ name, timestamp: Date.now(), ...fields }) };
+            const stream = (text) => (display = push(display, text));
+            const enter = (name) => {
+                stages.push({ name, timestamp: Date.now() });
+            };
+            const leave = (name, fields) => {
+                update(name, fields);
+                stages.push({ name, timestamp: Date.now(), ...fields });
+            };
             const delegates = { stream, enter, leave };
             const context = { inquiry, history, delegates };
             const start = Date.now();
@@ -1156,9 +1208,13 @@ const serve = async (port) => {
                 let display = { buffer: '', refs: [], print, cite };
 
                 const stages = [];
-                const enter = (name) => { stages.push({ name, timestamp: Date.now() }) };
-                const leave = (name, fields) => { stages.push({ name, timestamp: Date.now(), ...fields }) };
-                const stream = (text) => display = push(display, text);
+                const enter = (name) => {
+                    stages.push({ name, timestamp: Date.now() });
+                };
+                const leave = (name, fields) => {
+                    stages.push({ name, timestamp: Date.now(), ...fields });
+                };
+                const stream = (text) => (display = push(display, text));
                 const delegates = { enter, leave, stream };
                 const context = { inquiry, history, delegates };
                 const start = Date.now();
@@ -1290,8 +1346,12 @@ const poll = async () => {
                         }
                     } else {
                         const stages = [];
-                        const enter = (name) => { stages.push({ name, timestamp: Date.now() }) };
-                        const leave = (name, fields) => { stages.push({ name, timestamp: Date.now(), ...fields }) };
+                        const enter = (name) => {
+                            stages.push({ name, timestamp: Date.now() });
+                        };
+                        const leave = (name, fields) => {
+                            stages.push({ name, timestamp: Date.now(), ...fields });
+                        };
                         const delegates = { enter, leave };
                         const inquiry = text;
                         console.log(`${YELLOW}>> ${CYAN}${inquiry}${NORMAL}`);
@@ -1312,7 +1372,9 @@ const poll = async () => {
         } catch (error) {
             console.error(`Failed to get Telegram updates: ${error}`);
         } finally {
-            setTimeout(() => { check(offset) }, 200);
+            setTimeout(() => {
+                check(offset);
+            }, 200);
         }
     };
 
