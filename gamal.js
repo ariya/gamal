@@ -16,7 +16,7 @@ const LLM_API_BASE_URL = process.env.LLM_API_BASE_URL || 'https://openrouter.ai/
 const LLM_CHAT_MODEL = process.env.LLM_CHAT_MODEL || 'meta-llama/llama-3.1-8b-instruct';
 const LLM_STREAMING = process.env.LLM_STREAMING !== 'no';
 
-const SEARXNG_URL = process.env.SEARXNG_URL || 'https://searx.work';
+const SEARXNG_URL = process.env.SEARXNG_URL || 'https://baresearch.org';
 const JINA_API_KEY = process.env.JINA_API_KEY;
 const TOP_K = 3;
 
