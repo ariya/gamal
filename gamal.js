@@ -444,7 +444,7 @@ const breakdown = (hint, completion) => {
 };
 
 const reason = async (context) => {
-    const { history, delegates } = context;
+    const { history, delegates = {} } = context;
     const { enter, leave } = delegates;
     enter && enter('Reason');
 
@@ -663,11 +663,11 @@ Your answer must be in the same language as the inquiry, i.e. {LANGUAGE}.
 And here is the user question:`;
 
 const respond = async (context) => {
-    const { delegates } = context;
+    const { delegates = {} } = context;
     const { enter, leave, stream } = delegates;
     enter && enter('Respond');
 
-    const { inquiry, language, references } = context;
+    const { inquiry, language, references = [] } = context;
 
     const messages = [];
     if (references && Array.isArray(references) && references.length > 0) {
@@ -678,10 +678,10 @@ const respond = async (context) => {
 
         const prompt = RESPOND_PROMPT.replace('{LANGUAGE}', language).replace('{REFERENCES}', refs.join('\n'));
         messages.push({ role: 'system', content: prompt });
-        messages.push({ role: 'user', content: inquiry });
     } else {
         console.error('No references to cite');
     }
+    messages.push({ role: 'user', content: inquiry });
     const answer = await chat(messages, stream);
     leave && leave('Respond', { inquiry });
     return { answer, ...context };
