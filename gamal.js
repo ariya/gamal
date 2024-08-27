@@ -667,7 +667,7 @@ const respond = async (context) => {
     const { enter, leave, stream } = delegates;
     enter && enter('Respond');
 
-    const { inquiry, language, references = [] } = context;
+    const { inquiry, language = 'English', references = [] } = context;
 
     const messages = [];
     if (references && Array.isArray(references) && references.length > 0) {
