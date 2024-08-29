@@ -8,7 +8,6 @@ on:
   pull_request:
 
 jobs:
-
   canary-multi-turn:
     runs-on: ubuntu-22.04
     timeout-minutes: 7

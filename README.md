@@ -1,6 +1,6 @@
 # Gamal
 
-Gamal is a simple, zero-dependency tool designed to quickly provide answers to questions. It finds relevant web pages and uses an LLM to summarize the content, delivering concise answers.  Gamal is accessible via the terminal (as a CLI tool), through its minimalist web interface, or as a Telegram bot.
+Gamal is a simple, zero-dependency tool designed to quickly provide answers to questions. It finds relevant web pages and uses an LLM to summarize the content, delivering concise answers. Gamal is accessible via the terminal (as a CLI tool), through its minimalist web interface, or as a Telegram bot.
 
 [![asciicast](https://asciinema.org/a/668554.svg)](https://asciinema.org/a/668554)
 
@@ -86,6 +86,7 @@ export LLM_API_BASE_URL=https://api.deepinfra.com/v1/openai
 export LLM_API_KEY="yourownapikey"
 export LLM_CHAT_MODEL="meta-llama/Meta-Llama-3.1-8B-Instruct"
 ```
+
 </details>
 
 <details><summary>Fireworks</summary>
@@ -95,6 +96,7 @@ export LLM_API_BASE_URL=https://api.fireworks.ai/inference/v1
 export LLM_API_KEY="yourownapikey"
 export LLM_CHAT_MODEL="accounts/fireworks/models/llama-v3p1-8b-instruct"
 ```
+
 </details>
 
 <details><summary>Groq</summary>
@@ -104,6 +106,7 @@ export LLM_API_BASE_URL=https://api.groq.com/openai/v1
 export LLM_API_KEY="yourownapikey"
 export LLM_CHAT_MODEL="llama-3.1-8b-instant"
 ```
+
 </details>
 
 <details><summary>Lepton</summary>
@@ -113,6 +116,7 @@ export LLM_API_BASE_URL=https://llama3-1-8b.lepton.run/api/v1
 export LLM_API_KEY="yourownapikey"
 export LLM_CHAT_MODEL="llama3-1-8b"
 ```
+
 </details>
 
 <details><summary>Novita</summary>
@@ -122,6 +126,7 @@ export LLM_API_BASE_URL=https://api.novita.ai/v3/openai
 export LLM_API_KEY="yourownapikey"
 export LLM_CHAT_MODEL="meta-llama/llama-3.1-8b-instruct"
 ```
+
 </details>
 
 <details><summary>Octo</summary>
@@ -131,6 +136,7 @@ export LLM_API_BASE_URL=https://text.octoai.run/v1/
 export LLM_API_KEY="yourownapikey"
 export LLM_CHAT_MODEL="meta-llama-3.1-8b-instruct"
 ```
+
 </details>
 
 <details><summary>OpenAI</summary>
@@ -140,6 +146,7 @@ export LLM_API_BASE_URL=https://api.openai.com/v1
 export LLM_API_KEY="yourownapikey"
 export LLM_CHAT_MODEL="gpt-4o-mini"
 ```
+
 </details>
 
 <details><summary>Together</summary>
@@ -149,8 +156,8 @@ export LLM_API_BASE_URL=https://api.together.xyz/v1
 export LLM_API_KEY="yourownapikey"
 export LLM_CHAT_MODEL="meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo"
 ```
-</details>
 
+</details>
 
 ## Using Local LLM Servers
 
@@ -166,6 +173,7 @@ First, load a quantized model such as [Llama-3.1 8B](https://huggingface.co/lmst
 /path/to/llama-server -m Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf
 export LLM_API_BASE_URL=http://127.0.0.1:8080/v1
 ```
+
 </details>
 
 <details><summary>Jan</summary>
@@ -176,6 +184,7 @@ Refer to [the documentation](https://jan.ai/docs/local-api) and load a model lik
 export LLM_API_BASE_URL=http://127.0.0.1:1337/v1
 export LLM_CHAT_MODEL='llama3.1'
 ```
+
 </details>
 
 <details><summary>Ollama</summary>
@@ -187,8 +196,8 @@ ollama pull llama3.1
 export LLM_API_BASE_URL=http://127.0.0.1:11434/v1
 export LLM_CHAT_MODEL='llama3.1'
 ```
-</details>
 
+</details>
 
 ## Evaluating Questions
 
@@ -203,6 +212,7 @@ Assistant: The smallest planet is /Mercury/.
 ```
 
 executing the following command will sequentially search for these questions and verify the answers using regular expressions:
+
 ```bash
 ./gamal.js qa.txt
 ```
@@ -211,10 +221,9 @@ Additional examples can be found in the `tests/` subdirectory.
 
 Two environment variables can modify the behavior:
 
-* `LLM_DEBUG_FAIL_EXIT`: When set, Gamal will exit immediately upon encountering an incorrect answer, and subsequent questions in the file will not be processed.
+- `LLM_DEBUG_FAIL_EXIT`: When set, Gamal will exit immediately upon encountering an incorrect answer, and subsequent questions in the file will not be processed.
 
-* `LLM_DEBUG_PIPELINE`: When set, if the expected regular expression does not match the answer, the internal LLM pipeline will be printed to stdout.
-
+- `LLM_DEBUG_PIPELINE`: When set, if the expected regular expression does not match the answer, the internal LLM pipeline will be printed to stdout.
 
 ## Improving Search Quality
 

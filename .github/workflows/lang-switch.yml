@@ -8,7 +8,6 @@ on:
   pull_request:
 
 jobs:
-
   lang-switch:
     runs-on: ubuntu-22.04
     timeout-minutes: 5

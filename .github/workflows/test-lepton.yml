@@ -14,6 +14,6 @@ jobs:
 
       - run: ./gamal.js tests/en/canary-multi-turn.txt
         env:
-          LLM_API_BASE_URL: 'https://llama3-1-8b.lepton.run/api/v1'
+          LLM_API_BASE_URL: "https://llama3-1-8b.lepton.run/api/v1"
           LLM_API_KEY: ${{ secrets.LEPTON_API_KEY }}
-          LLM_CHAT_MODEL: 'llama3-1-8b'
+          LLM_CHAT_MODEL: "llama3-1-8b"
