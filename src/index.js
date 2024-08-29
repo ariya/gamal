@@ -1,11 +1,8 @@
-#!/usr/bin/env node
+import { fs, http, readline, spawn } from './support/node-builtins';
+import { pipe } from './support/pipe';
+import { sleep } from './support/sleep';
 
-const fs = require('fs');
-const http = require('http');
-const readline = require('readline');
-const { spawn } = require('child_process');
-
-const GAMAL_HTTP_PORT = process.env.GAMAL_HTTP_PORT;
+const GAMAL_HTTP_PORT = process.env.GAMAL_HTTP_PORT ?? '';
 const GAMAL_TELEGRAM_TOKEN = process.env.GAMAL_TELEGRAM_TOKEN;
 
 const WHISPER_STREAM = process.env.WHISPER_STREAM || 'whisper-cpp-stream';
@@ -157,26 +154,7 @@ const speak = (text, language) => {
     }
 };
 
-/**
- * Creates a new function by chaining multiple async functions from left to right.
- *
- * @param  {...any} fns - Functions to chain
- * @returns {function}
- */
-const pipe =
-    (...fns) =>
-    (arg) =>
-        fns.reduce((d, fn) => d.then(fn), Promise.resolve(arg));
-
 const MAX_RETRY_ATTEMPT = 3;
-
-/**
- * Suspends the execution for a specified amount of time.
- *
- * @param {number} ms - The amount of time to suspend execution in milliseconds.
- * @returns {Promise<void>} - A promise that resolves after the specified time has elapsed.
- */
-const sleep = async (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 /**
  * Represents a chat message.
@@ -217,7 +195,7 @@ const chat = async (messages, handler = null, attempt = MAX_RETRY_ATTEMPT) => {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', ...auth },
             body: JSON.stringify({ messages, model, stop, max_tokens, temperature, stream }),
-            signal: AbortSignal.timeout(timeout * 1000)
+            signal: AbortSignal.timeout(timeout * 1000),
         });
         if (!response.ok) {
             const msg = `LLM chat() failed with HTTP status: ${response.status} ${response.statusText}`;
@@ -501,7 +479,7 @@ const iso6391 = (language) => {
         Indonesia: 'id',
         Bahasa: 'id',
         Italian: 'it',
-        Italiano: 'it'
+        Italiano: 'it',
     };
     const name = Object.keys(CODE).find((key) => lang.toLowerCase().startsWith(key.toLowerCase()));
     return name ? CODE[name] : null;
@@ -574,7 +552,7 @@ const searxng = async (query, language, attempt = MAX_RETRY_ATTEMPT) => {
         const response = await fetch('https://r.jina.ai/' + url.toString(), {
             method: 'GET',
             headers: { ...auth },
-            signal: AbortSignal.timeout(timeout * 1000)
+            signal: AbortSignal.timeout(timeout * 1000),
         });
         if (!response.ok) {
             throw new EvalError(`SearXNG failed with status: ${response.status}`);
@@ -894,7 +872,7 @@ const evaluate = async (filename) => {
                         references,
                         answer,
                         duration,
-                        stages
+                        stages,
                     });
                     ++total;
                 } else if (role === 'Assistant') {
@@ -1307,13 +1285,13 @@ const poll = async () => {
                 await fetch(SEND_URL, {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
                         chat_id: id,
-                        text: message
+                        text: message,
                     }),
-                    signal: AbortSignal.timeout(5 * 1000) // 5 seconds
+                    signal: AbortSignal.timeout(5 * 1000), // 5 seconds
                 });
             } catch (error) {
                 console.error(`Unable to send message to ${id}: ${error}`);
@@ -1322,7 +1300,7 @@ const poll = async () => {
 
         try {
             const response = await fetch(POLL_URL, {
-                signal: AbortSignal.timeout(5 * 1000) // 5 seconds
+                signal: AbortSignal.timeout(5 * 1000), // 5 seconds
             });
             if (!response.ok) {
                 console.error(`Error: ${response.status} ${response.statusText}`);
