@@ -13,6 +13,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - run: ./gamal.js tests/en/canary-multi-turn.txt
+        if: ${{ env.LLM_API_KEY != '' }}
         env:
           LLM_API_BASE_URL: "https://api.fireworks.ai/inference/v1"
           LLM_API_KEY: ${{ secrets.FIREWORKS_API_KEY }}
