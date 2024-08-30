@@ -444,7 +444,7 @@ const breakdown = (hint, completion) => {
 };
 
 const reason = async (context) => {
-    const { history, delegates = {} } = context;
+    const { history = [], delegates = {} } = context;
     const { enter, leave } = delegates;
     enter && enter('Reason');
 
