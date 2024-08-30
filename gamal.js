@@ -11,7 +11,7 @@ const GAMAL_TELEGRAM_TOKEN = process.env.GAMAL_TELEGRAM_TOKEN;
 const WHISPER_STREAM = process.env.WHISPER_STREAM || 'whisper-cpp-stream';
 const WHISPER_MODEL = process.env.WHISPER_MODEL;
 
-const LLM_API_KEY = process.env.LLM_API_KEY;
+const LLM_API_KEY = process.env.LLM_API_KEY || process.env.OPENROUTER_API_KEY;
 const LLM_API_BASE_URL = process.env.LLM_API_BASE_URL || 'https://openrouter.ai/api/v1';
 const LLM_CHAT_MODEL = process.env.LLM_CHAT_MODEL || 'meta-llama/llama-3.1-8b-instruct';
 const LLM_STREAMING = process.env.LLM_STREAMING !== 'no';
