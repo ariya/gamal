@@ -97,7 +97,7 @@ const listen = (handler) => {
  * @param {string} language - the language of the text
  * @return {object} an object containing the speaker and piper processes
  */
-const speak = (text, language) => {
+const speak = (text, language = 'en') => {
     const lang = language.toUpperCase();
     const ref = `PIPER_MODEL_${lang}`;
     let model = process.env[ref];
