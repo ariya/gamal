@@ -19,5 +19,5 @@ Assistant: Jaylen Brown was born on /Oct(ober)?/ 24, /1996/.
 Pipeline.Reason.Keyphrases: /birth(date)?|born/
 
 User: and where?
-Assistant: He was born in /(Marietta, )?Georgia/.
+Assistant: He was born in /Marietta/, Georgia.
 Pipeline.Reason.Keyphrases: /birth(place)?|born/
