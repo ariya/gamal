@@ -218,6 +218,15 @@ Two environment variables can modify the behavior:
 
 ## Improving Search Quality
 
-By default, Gamal utilizes the [public SearXNG instance](https://searx.space/). To switch to a different SearXNG instance, such as a private one capable of searching additional custom data sources, configure the URL using the `SEARXNG_URL` environment variable.
+By default, Gamal uses the [public SearXNG instance](https://searx.space/). However, public instances typically apply aggressive rate limiting. To avoid this, it is recommended to run a local SearXNG instance, such as via a Docker container, following the steps in [its documentation](https://docs.searxng.org/admin/installation-docker.html). Ensure that the local instance is configured to support JSON format by including the following block in the `settings.yml` file:
 
-For more frequent searches, obtain an API key for [JINA reader](https://jina.ai/reader/) (its free tier is generous) and set it as `JINA_API_KEY`. This will increase the rate limit from 20 requests per minute to 200 requests per minute.
+```yaml
+search:
+  formats:
+    - html
+    - json
+```
+
+Before starting Gamal, the `SEARXNG_URL` environment variable should be set to the URL of the local SearXNG instance (e.g., `localhost:8080` if running locally).
+
+Additionally, connecting Gamal to a private SearXNG instance allows integration with [custom data sources](https://docs.searxng.org/dev/engines/offline/search-indexer-engines.html), enabling enhanced search capabilities.

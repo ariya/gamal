@@ -16,8 +16,7 @@ const LLM_API_BASE_URL = process.env.LLM_API_BASE_URL || 'https://openrouter.ai/
 const LLM_CHAT_MODEL = process.env.LLM_CHAT_MODEL || 'meta-llama/llama-3.1-8b-instruct';
 const LLM_STREAMING = process.env.LLM_STREAMING !== 'no';
 
-const SEARXNG_URL = process.env.SEARXNG_URL || 'https://baresearch.org';
-const JINA_API_KEY = process.env.JINA_API_KEY;
+const SEARXNG_URL = process.env.SEARXNG_URL || 'https://searx.foss.family'; // alternatively: 'https://search.mdosch.de'
 const TOP_K = 3;
 
 const VOICE_DEBUG = process.env.VOICE_DEBUG;
@@ -517,79 +516,39 @@ const iso6391 = (language) => {
 const searxng = async (query, language, attempt = MAX_RETRY_ATTEMPT) => {
     const timeout = 31; // seconds
 
-    const answer = (content) => {
-        let description = content
-            .split(/#+\s+Answers\s+:/i)
-            .filter((line) => !line.startsWith('Title'))
-            .shift();
-        if (description) {
-            const url = description
-                ?.match(/\((.*?)\)/)
-                .pop()
-                .trim();
-            if (url && url.length > 0) {
-                description = description.slice(0, description.indexOf(url) - 1).trim();
-            }
-            LLM_DEBUG_SEARCH && console.log(`SearXNG answer: ${description}`);
-            return { title: 'Answers', url, description };
-        }
-    };
-
-    const parse = (content) => {
-        const hits = content
-            .split('[https://')
-            .filter((line) => !line.includes('SearXNG'))
-            .map((line) => {
-                const fragments = line.split('###').slice(1).join().split('\n');
-                const header = fragments.shift();
-                const description = fragments.join('').trim();
-                const title = header
-                    ?.match(/\[(.*?)\]/)
-                    ?.pop()
-                    .trim();
-                const buffer = header?.replace(title, '').trim();
-                const url = buffer
-                    ?.match(/\((.*?)\)/)
-                    ?.pop()
-                    .trim();
-                return { title, url, description };
-            });
-        hits.unshift(answer(content));
-        return hits
-            .filter((i) => i)
-            .filter(({ url }) => url && url.length > 0)
-            .slice(0, TOP_K);
-    };
-
-    LLM_DEBUG_SEARCH && console.log(`SearXNG search with language: ${language}, query: ${query}`);
+    LLM_DEBUG_SEARCH && console.log(`SearXNG search at ${SEARXNG_URL} with language: ${language}, query: ${query}`);
 
     const lang = iso6391(language) || 'auto';
     let url = new URL(`${SEARXNG_URL}/search`);
-    url.searchParams.append('q', lang === 'auto' ? query : 'wikipedia ' + query);
+    url.searchParams.append('q', query);
     url.searchParams.append('language', lang);
+    url.searchParams.append('categories', 'web');
+    url.searchParams.append('engines', 'go,ddg,bi,br,yh,qw,sp,mjk');
     url.searchParams.append('safesearch', '0');
-    const auth = JINA_API_KEY ? { Authorization: `Bearer ${JINA_API_KEY}` } : {};
+    url.searchParams.append('format', 'json');
     LLM_DEBUG_SEARCH && console.log(`SearXNG request: ${url.toString()}`);
     try {
-        const response = await fetch('https://r.jina.ai/' + url.toString(), {
+        const response = await fetch(url, {
             method: 'GET',
-            headers: { ...auth },
             signal: AbortSignal.timeout(timeout * 1000)
         });
         if (!response.ok) {
             throw new EvalError(`SearXNG failed with status: ${response.status}`);
         }
-        const blocks = parse(await response.text());
-        LLM_DEBUG_SEARCH && console.log('SearXNG result: ', { query, blocks });
-        let references = [];
-        if (Array.isArray(blocks) && blocks.length > 0) {
-            const MAX_CHARS = 1000;
-            references = blocks.slice(0, TOP_K).map((result, i) => {
-                const { url, title, description } = result;
-                const snippet = title + description.substring(0, MAX_CHARS);
-                return { position: i + 1, url, title, snippet };
+        const { results = [] } = await response.json();
+        const references = results
+            .filter((entry) => {
+                const { url, content } = entry;
+                return url && url.length > 0 && content && content.length > 0;
+            })
+            .slice(0, TOP_K)
+            .map((entry, i) => {
+                const { url, title, content } = entry;
+                const position = i + 1;
+                const snippet = content;
+                return { position, url, title, snippet };
             });
-        } else {
+        if (references.length <= 0) {
             throw new EvalError('SearXNG failed, giving no result');
         }
         return { url, references };
@@ -599,7 +558,7 @@ const searxng = async (query, language, attempt = MAX_RETRY_ATTEMPT) => {
             LLM_DEBUG_SEARCH && console.log(`Timeout with SearXNG after ${timeout} seconds`);
         }
         if (attempt > 1 && (e.name === 'TimeoutError' || e.name === 'EvalError')) {
-            LLM_DEBUG_SEARCH && console.log('Retrying...');
+            LLM_DEBUG_SEARCH && console.log(`Retrying... (due to error: ${e.toString()})`);
             await sleep((MAX_RETRY_ATTEMPT - attempt + 1) * 1500);
             return await searxng(query, language, attempt - 1);
         } else {
@@ -1413,7 +1372,7 @@ const canary = async () => {
             await serve(port);
         } else if (GAMAL_TELEGRAM_TOKEN && GAMAL_TELEGRAM_TOKEN.length >= 40) {
             console.log('Running as a Telegram bot...');
-            await poll();
+                await poll();
         } else {
             await interact();
         }

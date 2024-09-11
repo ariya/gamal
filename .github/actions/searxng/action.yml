@@ -1,0 +1,31 @@
+name: Run SearxNG
+description: Configure and launch SearXNG
+runs:
+  using: "composite"
+  steps:
+    - name: Launch SearXNG container
+      shell: bash
+      run: docker run -d --name searxng -p 8080:8080 -v /home/runner/work/_temp/searxng:/etc/searxng searxng/searxng:2024.9.6-153a28ccd
+
+    - name: Wait until SearXNG is ready
+      shell: bash
+      run: while ! curl -s 'http://localhost:8080' | grep 'searxng'; do sleep 1; done
+
+    - name: Modify SearXNG to allow JSON format
+      shell: bash
+      run: |
+        cd ${RUNNER_TEMP}/searxng
+        ls -l
+        file settings.yml
+        readlink -f settings.yml
+        sudo sed -i 's/formats:$/#  formats:/' settings.yml
+        sudo sed -i 's/  - html/#  - html/' settings.yml
+        sudo sed -i 's/# formats: \[html/formats: \[html/' settings.yml
+
+    - name: Restart SearXNG container
+      shell: bash
+      run: docker restart $(docker ps --format="{{.ID}} {{.Image}}" | grep searxng | head -1 | awk '{print $1}')
+
+    - name: Wait until SearXNG is ready
+      shell: bash
+      run: while ! curl -s 'http://localhost:8080' | grep 'searxng'; do sleep 1; done

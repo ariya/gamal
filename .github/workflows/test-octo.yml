@@ -11,9 +11,12 @@ jobs:
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
-
+      - name: Run SearXNG
+        uses: ./.github/actions/searxng
+        timeout-minutes: 3
       - run: ./gamal.js tests/en/canary-multi-turn.txt
         env:
+          SEARXNG_URL: http://localhost:8080
           LLM_API_BASE_URL: 'https://text.octoai.run/v1'
           LLM_API_KEY: ${{ secrets.OCTO_API_KEY }}
           LLM_CHAT_MODEL: 'meta-llama-3.1-8b-instruct'

@@ -14,8 +14,12 @@ jobs:
     timeout-minutes: 7
     steps:
       - uses: actions/checkout@v4
+      - name: Run SearXNG
+        uses: ./.github/actions/searxng
+        timeout-minutes: 3
       - run: ./gamal.js tests/it/canary-multi-turn.txt
         env:
+          SEARXNG_URL: http://localhost:8080
           LLM_API_BASE_URL: ${{ secrets.LLM_API_BASE_URL }}
           LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
           LLM_CHAT_MODEL: ${{ secrets.LLM_CHAT_MODEL }}
@@ -26,8 +30,12 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
+      - name: Run SearXNG
+        uses: ./.github/actions/searxng
+        timeout-minutes: 3
       - run: ./gamal.js tests/it/high-school-stem.txt
         env:
+          SEARXNG_URL: http://localhost:8080
           LLM_API_BASE_URL: ${{ secrets.LLM_API_BASE_URL }}
           LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
           LLM_CHAT_MODEL: ${{ secrets.LLM_CHAT_MODEL }}
