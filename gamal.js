@@ -165,8 +165,8 @@ const speak = (text, language = 'en') => {
  */
 const pipe =
     (...fns) =>
-    (arg) =>
-        fns.reduce((d, fn) => d.then(fn), Promise.resolve(arg));
+        (arg) =>
+            fns.reduce((d, fn) => d.then(fn), Promise.resolve(arg));
 
 const MAX_RETRY_ATTEMPT = 3;
 
@@ -1076,7 +1076,7 @@ const interact = async () => {
         if (asr) {
             try {
                 asr.kill();
-            } catch (e) {}
+            } catch (e) { }
         }
 
         if (inquiry === '!reset' || inquiry === '/reset') {
