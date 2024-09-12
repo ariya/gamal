@@ -1372,7 +1372,7 @@ const canary = async () => {
             await serve(port);
         } else if (GAMAL_TELEGRAM_TOKEN && GAMAL_TELEGRAM_TOKEN.length >= 40) {
             console.log('Running as a Telegram bot...');
-                await poll();
+            await poll();
         } else {
             await interact();
         }
