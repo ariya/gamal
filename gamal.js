@@ -874,8 +874,10 @@ const evaluate = async (filename) => {
                             if (references && Array.isArray(references)) {
                                 if (references.length > 0 && references.length >= refs.length) {
                                     refs.forEach((ref, i) => {
-                                        const { url } = references[ref - 1];
-                                        console.log(`  ${GRAY}[${i + 1}] ${url}${NORMAL}`);
+                                        const entry = references[ref - 1];
+                                        if (entry && entry.url) {
+                                            console.log(`  ${GRAY}[${i + 1}] ${entry.url}${NORMAL}`);
+                                        }
                                     });
                                 }
                             }
@@ -1187,9 +1189,11 @@ const serve = async (port) => {
                     response.write('\n\n');
                     console.log();
                     refs.forEach((ref, i) => {
-                        const { url } = references[ref - 1];
-                        response.write(`[${i + 1}] ${url}\n`);
-                        console.log(`[${i + 1}] ${url}`);
+                        const entry = references[ref - 1];
+                        if (entry && entry.url) {
+                            response.write(`[${i + 1}] ${entry.url}\n`);
+                            console.log(`[${i + 1}] ${entry.url}`);
+                        }
                     });
                 }
                 response.end();
@@ -1244,8 +1248,10 @@ const poll = async () => {
         if (references && Array.isArray(references) && references.length >= refs.length) {
             buffer += '\n\nReferences:\n';
             refs.forEach((ref, i) => {
-                const { url } = references[ref - 1];
-                buffer += `[${i + 1}] ${url}\n`;
+                const entry = references[ref - 1];
+                if (entry && entry.url) {
+                    buffer += `[${i + 1}] ${entry.url}\n`;
+                }
             });
         }
         return buffer;
