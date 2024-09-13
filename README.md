@@ -107,6 +107,15 @@ export LLM_CHAT_MODEL="llama-3.1-8b-instant"
 ```
 </details>
 
+<details><summary>Hyperbolic</summary>
+
+```bash
+export LLM_API_BASE_URL=https://api.hyperbolic.xyz/v1
+export LLM_API_KEY="yourownapikey"
+export LLM_CHAT_MODEL="meta-llama/Meta-Llama-3.1-8B-Instruct"
+```
+</details>
+
 <details><summary>Lepton</summary>
 
 ```bash
