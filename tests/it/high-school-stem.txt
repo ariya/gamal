@@ -31,6 +31,6 @@ Pipeline.Reason.Language: /Italian(o)?/
 Pipeline.Reason.Keyphrases: /magnesium|magnesio/
 
 User: Quali sono i più piccoli costituenti conosciuti della materia?
-Assistant: I più piccoli costituenti conosciuti della materia sono /particelle elementari|particelle subatomiche|particelle ancora|quark|quant|leptoni/.
+Assistant: I più piccoli costituenti conosciuti della materia sono /particelle elementari|particelle subatomiche|particelle ancora|quark|quant|leptoni|protoni|neutroni|elettroni/.
 Pipeline.Reason.Language: /Italian(o)?/
 Pipeline.Reason.Keyphrases: /unit|nucleus|atom|elementary|particle|materia|particelle|elementar/
