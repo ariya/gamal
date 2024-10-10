@@ -632,7 +632,7 @@ const respond = async (context) => {
     if (references && Array.isArray(references) && references.length > 0) {
         const refs = references.map((ref) => {
             const { position, title, snippet } = ref;
-            return `[citation:${position}] ${title} - ${snippet}`;
+            return `[citation:${position}] ${snippet}`;
         });
 
         const prompt = RESPOND_PROMPT.replace('{LANGUAGE}', language).replace('{REFERENCES}', refs.join('\n'));
