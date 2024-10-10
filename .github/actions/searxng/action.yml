@@ -1,15 +1,15 @@
-name: Run SearxNG
+name: Run SearXNG
 description: Configure and launch SearXNG
 runs:
   using: "composite"
   steps:
     - name: Launch SearXNG container
       shell: bash
-      run: docker run -d --name searxng -p 8080:8080 -v /home/runner/work/_temp/searxng:/etc/searxng searxng/searxng:2024.9.6-153a28ccd
+      run: docker run -d --name searxng -p 9000:8080 -v /home/runner/work/_temp/searxng:/etc/searxng searxng/searxng:2024.9.6-153a28ccd
 
     - name: Wait until SearXNG is ready
       shell: bash
-      run: while ! curl -s 'http://localhost:8080' | grep 'searxng'; do sleep 1; done
+      run: while ! curl -s 'http://localhost:9000' | grep 'searxng'; do sleep 1; done
 
     - name: Modify SearXNG to allow JSON format
       shell: bash
@@ -28,4 +28,4 @@ runs:
 
     - name: Wait until SearXNG is ready
       shell: bash
-      run: while ! curl -s 'http://localhost:8080' | grep 'searxng'; do sleep 1; done
+      run: while ! curl -s 'http://localhost:9000' | grep 'searxng'; do sleep 1; done
