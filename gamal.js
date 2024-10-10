@@ -416,7 +416,7 @@ TOPIC: the specific topic covering the inquiry.`;
 
 const REASON_EXAMPLE = `
 
-# Example
+# Example 1
 
 Given an inquiry "Pour quoi le lac de Pitch à Trinidad est-il célèbre?", you will output:
 
@@ -425,7 +425,18 @@ LANGUAGE: French.
 THOUGHT: Cela concerne la géographie, je vais utiliser la recherche Google.
 KEYPHRASES: Pitch Lake in Trinidad famerenommée du lac de Pitch à Trinidad.
 OBSERVATION: Le lac de Pitch à Trinidad est le plus grand dépôt naturel d'asphalte.
-TOPIC: géographie.`;
+TOPIC: géographie.
+
+# Example 2
+
+Given an inquiry "What mineral was once considered the rarest in the world?", you will output:
+
+TOOL: Google.
+LANGUAGE: English.
+THOUGHT: This is about mineralogy, I will use Google to search for the answer.
+KEYPHRASES: rarest mineral in the world.
+OBSERVATION: Painite was once considered the rarest mineral in the world, with only a handful of specimens known until new deposits were discovered in the early 2000s.
+TOPIC: mineralogy.`
 
 const breakdown = (hint, completion) => {
     const remark = completion
