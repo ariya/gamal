@@ -607,6 +607,8 @@ Your answer should not exceed 3 sentences in length, unless the instruction is t
 Do not give any information that is not related to the question.
 No need to mention "according to the references..." and other internal references.
 
+Use plain text only, no markdown or HTML.
+
 After every sentence, always cite the reference with the citation numbers, in the format [citation:x].
 If a sentence comes from multiple references, please list all applicable citations, like [citation:3][citation:5].
 
