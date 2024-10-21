@@ -19,7 +19,7 @@ jobs:
         timeout-minutes: 3
       - run: ./gamal.js tests/lang-switch.txt
         env:
-          SEARXNG_URL: http://localhost:8080
+          SEARXNG_URL: http://localhost:9000
           LLM_API_BASE_URL: ${{ secrets.LLM_API_BASE_URL }}
           LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
           LLM_CHAT_MODEL: ${{ secrets.LLM_CHAT_MODEL }}

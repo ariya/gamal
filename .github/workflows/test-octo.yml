@@ -17,7 +17,7 @@ jobs:
       - run: ./gamal.js tests/en/canary-multi-turn.txt
         if: ${{ env.LLM_API_KEY != '' }}
         env:
-          SEARXNG_URL: http://localhost:8080
+          SEARXNG_URL: http://localhost:9000
           LLM_API_BASE_URL: 'https://text.octoai.run/v1'
           LLM_API_KEY: ${{ secrets.OCTO_API_KEY }}
           LLM_CHAT_MODEL: 'meta-llama-3.1-8b-instruct'
