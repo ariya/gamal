@@ -31,6 +31,6 @@ Pipeline.Reason.Language: /Spanish|Español/
 Pipeline.Reason.Keyphrases: /magnesium|magnesio/
 
 User: ¿Cuáles son las partículas más pequeñas conocidas de la materia?
-Assistant: Las partículas más pequeñas conocidas de la materia son /partículas elementales|quarks|quarks|leptones|protones|neutrones|electrones/.
+Assistant: Las partículas más pequeñas conocidas de la materia son /partículas elementales|quark[s]?|leptones|protones|neutrones|electrones/.
 Pipeline.Reason.Language: /Spanish|Español/
 Pipeline.Reason.Keyphrases: /unit|elementary|particle|unidad|elemental|partícula(s)?/
