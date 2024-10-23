@@ -6,7 +6,7 @@ Pipeline.Reason.Keyphrases: /force|gravity|Earth/
 
 User: What is the atomic number of carbon?
 Assistant: The atomatic number of carbon is /6|six/.
-Pipeline.Reason.Keyphrases: /carbon/
+Pipeline.Reason.Keyphrases: /carbon|atomic|number/
 
 User: What is the process by which plants make their own food?
 Assistant: Plants make their own food using /photosynthesis/.
@@ -14,7 +14,7 @@ Pipeline.Reason.Keyphrases: /plant|photosynthesis/
 
 User: What is the sum (in degrees) of the interior angles of a triangle?
 Assistant: /180/ degrees.
-Pipeline.Reason.Keyphrases: /angles/ /triangle/
+Pipeline.Reason.Keyphrases: /angles/ /triangle|interior/
 
 User: What is the unit for measuring force?
 Assistant: The standard unit for measuring force is called a /Newton/ (N).
