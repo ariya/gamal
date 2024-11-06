@@ -1,0 +1,18 @@
+name: Prepare Small LLM
+description: Download small LLM and launch it
+runs:
+  using: composite
+  steps:
+    - name: Download and unpack llama.cpp
+      shell: bash
+      run: |
+        curl -OL https://github.com/ggerganov/llama.cpp/releases/download/b4034/llama-b4034-bin-ubuntu-x64.zip
+        unzip llama-b4034-bin-ubuntu-x64.zip
+
+    - name: Launch llama.cpp
+      shell: bash
+      run: ./build/bin/llama-server -c 4096 --hf-repo lmstudio-community/Llama-3.2-3B-Instruct-GGUF --hf-file Llama-3.2-3B-Instruct-Q4_K_M.gguf &
+
+    - name: Wait until it is ready
+      shell: bash
+      run: while ! curl -s 'http://localhost:8080/health' | grep 'ok'; do sleep 1; done
