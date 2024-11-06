@@ -66,7 +66,7 @@ The synthesized audio will be played back through the speaker or other audio out
 
 Gamal is designed to be used with OpenRouter by default, but it can also be configured to work with other LLM services by adjusting some environment variables. The correct API key and a suitable model are required.
 
-Compatible LLM services include [Deep Infra](https://deepinfra.com), [Fireworks](https://fireworks.ai), [Groq](https://groq.com), [Hyperbolic](https://www.hyperbolic.xyz), [Lepton](https://lepton.ai), [Novita](https://novita.ai), [Octo](https://octo.ai), [OpenAI](https://platform.openai.com), and [Together](https://www.together.ai).
+Compatible LLM services include [Deep Infra](https://deepinfra.com), [Fireworks](https://fireworks.ai), [Groq](https://groq.com), [Hyperbolic](https://www.hyperbolic.xyz), [Lepton](https://lepton.ai), [Novita](https://novita.ai), [OpenAI](https://platform.openai.com), and [Together](https://www.together.ai).
 
 [![Test on DeepInfra](https://github.com/ariya/gamal/actions/workflows/test-deepinfra.yml/badge.svg)](https://github.com/ariya/gamal/actions/workflows/test-deepinfra.yml)
 [![Test on Fireworks](https://github.com/ariya/gamal/actions/workflows/test-fireworks.yml/badge.svg)](https://github.com/ariya/gamal/actions/workflows/test-fireworks.yml)
@@ -74,7 +74,6 @@ Compatible LLM services include [Deep Infra](https://deepinfra.com), [Fireworks]
 [![Test on Hyperbolic](https://github.com/ariya/gamal/actions/workflows/test-hyperbolic.yml/badge.svg)](https://github.com/ariya/gamal/actions/workflows/test-hyperbolic.yml)
 [![Test on Lepton](https://github.com/ariya/gamal/actions/workflows/test-lepton.yml/badge.svg)](https://github.com/ariya/gamal/actions/workflows/test-lepton.yml)
 [![Test on Novita](https://github.com/ariya/gamal/actions/workflows/test-novita.yml/badge.svg)](https://github.com/ariya/gamal/actions/workflows/test-novita.yml)
-[![Test on Octo](https://github.com/ariya/gamal/actions/workflows/test-octo.yml/badge.svg)](https://github.com/ariya/gamal/actions/workflows/test-octo.yml)
 [![Test on OpenAI](https://github.com/ariya/gamal/actions/workflows/test-openai.yml/badge.svg)](https://github.com/ariya/gamal/actions/workflows/test-openai.yml)
 [![Test on Together](https://github.com/ariya/gamal/actions/workflows/test-together.yml/badge.svg)](https://github.com/ariya/gamal/actions/workflows/test-together.yml)
 
@@ -131,15 +130,6 @@ export LLM_CHAT_MODEL="llama3-1-8b"
 export LLM_API_BASE_URL=https://api.novita.ai/v3/openai
 export LLM_API_KEY="yourownapikey"
 export LLM_CHAT_MODEL="meta-llama/llama-3.1-8b-instruct"
-```
-</details>
-
-<details><summary>Octo</summary>
-
-```bash
-export LLM_API_BASE_URL=https://text.octoai.run/v1/
-export LLM_API_KEY="yourownapikey"
-export LLM_CHAT_MODEL="meta-llama-3.1-8b-instruct"
 ```
 </details>
 
