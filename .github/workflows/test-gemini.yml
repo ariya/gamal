@@ -20,4 +20,5 @@ jobs:
           SEARXNG_URL: http://localhost:9000
           LLM_API_BASE_URL: 'https://generativelanguage.googleapis.com/v1beta'
           LLM_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          LLM_CHAT_MODEL: 'gemini-1.5-flash'
+          LLM_CHAT_MODEL: 'gemini-1.5-flash-8b'
+          LLM_JSON_SCHEMA: 1
