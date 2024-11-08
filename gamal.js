@@ -618,7 +618,6 @@ const reason = async (context) => {
     const { inquiry } = context;
     messages.push({ role: 'user', content: inquiry });
     const hint = schema ? '' : ['tool: Google', 'language: '].join('\n');
-    messages.push({ role: 'assistant', content: hint });
     (!schema) && messages.push({ role: 'assistant', content: hint });
     const completion = await chat(messages, schema);
     let result = breakdown(hint, completion);
