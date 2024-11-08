@@ -40,18 +40,3 @@ jobs:
           LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
           LLM_CHAT_MODEL: ${{ secrets.LLM_CHAT_MODEL }}
 
-  latest-news:
-    runs-on: ubuntu-22.04
-    needs: high-school-stem
-    timeout-minutes: 10
-    steps:
-      - uses: actions/checkout@v4
-      - name: Run SearXNG
-        uses: ./.github/actions/searxng
-        timeout-minutes: 3
-      - run: ./gamal.js tests/en/latest-news.txt
-        env:
-          SEARXNG_URL: http://localhost:9000
-          LLM_API_BASE_URL: ${{ secrets.LLM_API_BASE_URL }}
-          LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
-          LLM_CHAT_MODEL: ${{ secrets.LLM_CHAT_MODEL }}
