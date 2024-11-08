@@ -670,7 +670,7 @@ const iso6391 = (language) => {
 const searxng = async (query, language, attempt = MAX_RETRY_ATTEMPT) => {
     const timeout = 31; // seconds
 
-    LLM_DEBUG_SEARCH && console.log(`SearXNG search at ${SEARXNG_URL} with language: ${MAGENTA}${language}${NORMAL}, query: ${YELLOW}${query}${NORMAL}`);
+    LLM_DEBUG_SEARCH && console.log(`SearXNG search with language: ${MAGENTA}${language}${NORMAL}, query: ${YELLOW}${query}${NORMAL}`);
 
     const lang = iso6391(language) || 'auto';
     let url = new URL(`${SEARXNG_URL}/search`);
@@ -680,7 +680,6 @@ const searxng = async (query, language, attempt = MAX_RETRY_ATTEMPT) => {
     url.searchParams.append('engines', 'go,ddg,bi,br,yh,qw,sp,mjk');
     url.searchParams.append('safesearch', '0');
     url.searchParams.append('format', 'json');
-    LLM_DEBUG_SEARCH && console.log(`SearXNG request: ${url.toString()}`);
     try {
         const response = await fetch(url, {
             method: 'GET',
@@ -1509,6 +1508,7 @@ const poll = async () => {
  * terminates the process if it is not.
  */
 const canary = async () => {
+    console.log(`Using SearXNG at ${MAGENTA}${SEARXNG_URL}${NORMAL}.`);
     console.log(`Using LLM at ${LLM_API_BASE_URL} (model: ${GREEN}${LLM_CHAT_MODEL || 'default'}${NORMAL}).`);
     process.stdout.write(`${ARROW} Checking LLM...\r`);
     const messages = [];
