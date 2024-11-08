@@ -5,7 +5,7 @@ runs:
   steps:
     - name: Launch SearXNG container
       shell: bash
-      run: docker run -d --name searxng -p 9000:8080 -v /home/runner/work/_temp/searxng:/etc/searxng searxng/searxng:2024.9.6-153a28ccd
+      run: docker run -d --name searxng -p 9000:8080 -v ${RUNNER_TEMP}/searxng:/etc/searxng searxng/searxng:2024.9.6-153a28ccd
 
     - name: Wait until SearXNG is ready
       shell: bash
