@@ -622,11 +622,13 @@ const reason = async (context) => {
     (!schema) && messages.push({ role: 'assistant', content: hint });
     const completion = await chat(messages, schema);
     let result = breakdown(hint, completion);
-    if (!schema && (!result.keyphrases || result.keyphrases.length === 0)) {
+    if (!result.keyphrases || result.keyphrases.length === 0) {
         LLM_DEBUG_CHAT && console.log(`-->${RED}Invalid keyphrases. Trying again...`);
-        const hint = ['TOOL: Google.', 'THOUGHT: ' + result.thought, 'KEYPHRASES: '].join('\n');
-        messages.pop();
-        messages.push({ role: 'assistant', content: hint });
+        if (!schema) {
+            const hint = ['TOOL: Google.', 'THOUGHT: ' + result.thought, 'KEYPHRASES: '].join('\n');
+            messages.pop();
+            messages.push({ role: 'assistant', content: hint });
+        }
         const completion = await chat(messages);
         result = breakdown(hint, completion);
     }
