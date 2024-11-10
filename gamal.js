@@ -29,6 +29,7 @@ const LLM_DEBUG_FAIL_EXIT = process.env.LLM_DEBUG_FAIL_EXIT;
 const NORMAL = '\x1b[0m';
 const BOLD = '\x1b[1m';
 const YELLOW = '\x1b[93m';
+const BLUE = '\x1b[94m';
 const MAGENTA = '\x1b[35m';
 const RED = '\x1b[91m';
 const GREEN = '\x1b[92m';
@@ -823,6 +824,13 @@ const respond = async (context) => {
  * @param {Array<Stage>} stages
  */
 const review = (stages) => {
+    const cite = (references) => {
+        return '\n' + references.map(reference => {
+            const { position, url, title, snippet } = reference;
+            return `${BLUE}[${position}]${NORMAL} ${BOLD}${title} ${GRAY}(${url})${NORMAL}\n${snippet}`;
+        }).join('\n');
+    };
+
     let buffer = 'Pipeline review:\n';
     console.log();
     console.log(`${MAGENTA}Pipeline review ${NORMAL}`);
@@ -833,7 +841,8 @@ const review = (stages) => {
         buffer += `\nStage #${index + 1} ${name} [${duration} ms]\n`;
         Object.keys(fields).map((key) => {
             const value = fields[key];
-            const str = Array.isArray(value) ? JSON.stringify(value, null, 2) : value?.toString();
+            const str = (key === 'references') ? cite(value)
+                : Array.isArray(value) ? JSON.stringify(value, null, 2) : value?.toString();
             console.log(`${GRAY}${key}: ${NORMAL}${str}`);
             buffer += `${key}: ${str}\n`;
         });
