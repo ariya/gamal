@@ -515,9 +515,13 @@ const REASON_PROMPT = `You are Gamal, a world-class answering assistant.
 You are interacting with a human who gives you an inquiry.
 Your task is as follows.
 
+Focus on the last message from the user.
+If necessary, refer to the relevant part of the previous conversation history.
+This is particulary useful when the inquiry is a follow-up question with pronouns, or when the inquiry contains pronouns referring to the earlier discussion.
+
 Use Google to search for the answer. Think step by step. Fix any misspelings.
 Do not refuse to search for future events beyond your knowledge cutoff, because Google will still find it for you.
-If necessary, refer to the relevant part of the previous conversation history.
+
 Use the same language as the inquiry.
 
 Always output your thought in the following format`;
@@ -598,22 +602,23 @@ const reason = async (context) => {
     enter && enter('Reason');
 
     const schema = LLM_JSON_SCHEMA ? REASON_SCHEMA : null;
-    let prompt = structure(REASON_PROMPT, REASON_GUIDELINE);
     const relevant = history.slice(-3);
-    if (relevant.length === 0) {
-        prompt += structure(REASON_EXAMPLE_FRENCH_INQUIRY, REASON_EXAMPLE_FRENCH_OUTPUT);
-        prompt += structure(REASON_EXAMPLE_ENGLISH_INQUIRY, REASON_EXAMPLE_ENGLISH_OUTPUT);
-    }
 
     const messages = [];
+    let prompt = structure(REASON_PROMPT, REASON_GUIDELINE);
+    prompt += structure(REASON_EXAMPLE_FRENCH_INQUIRY, REASON_EXAMPLE_FRENCH_OUTPUT);
+    prompt += structure(REASON_EXAMPLE_ENGLISH_INQUIRY, REASON_EXAMPLE_ENGLISH_OUTPUT);
+    if (relevant.length > 0) {
+        prompt += '\n\n';
+        prompt += ['# Conversation History', 'You and the user recently discussed:'].join('\n\n');
+        prompt += '\n\n';
+        relevant.forEach((msg) => {
+            const { inquiry, answer } = msg;
+            prompt += `  * ${inquiry}\n`;
+            prompt += `  * ${answer}\n`;
+        });
+    }
     messages.push({ role: 'system', content: prompt });
-    relevant.forEach((msg) => {
-        const { inquiry, topic, language, thought, keyphrases, answer } = msg;
-        const observation = answer;
-        messages.push({ role: 'user', content: inquiry });
-        const assistant = construct({ tool: 'Google', thought, language, keyphrases, observation, topic });
-        messages.push({ role: 'assistant', content: assistant });
-    });
 
     const { inquiry } = context;
     messages.push({ role: 'user', content: inquiry });
@@ -773,12 +778,10 @@ Here are the set of references:
 Remember, don't blindly repeat the references verbatim.
 Only supply the answer and do not add any additional commentaries, notes, remarks, list of citations, literature references, extra translations, postanalysis.
 
-Your answer must be in the same language as the inquiry, i.e. {LANGUAGE}.
-
-And here is the user question:`;
+Your answer must be in the same language as the inquiry, i.e. {LANGUAGE}.`;
 
 const respond = async (context) => {
-    const { delegates = {} } = context;
+    const { history, delegates = {} } = context;
     const { enter, leave, stream } = delegates;
     enter && enter('Respond');
 
@@ -791,7 +794,18 @@ const respond = async (context) => {
             return `[citation:${position}] ${snippet}`;
         });
 
-        const prompt = RESPOND_PROMPT.replace('{LANGUAGE}', language).replace('{REFERENCES}', refs.join('\n'));
+        let prompt = RESPOND_PROMPT.replace('{LANGUAGE}', language).replace('{REFERENCES}', refs.join('\n'));
+        const relevant = history.slice(-2);
+        if (relevant.length > 0) {
+            prompt += '\n\n';
+            prompt += ['# Conversation History', 'You and the user recently discussed:'].join('\n\n');
+            prompt += '\n\n';
+            relevant.forEach((msg) => {
+                const { inquiry, answer } = msg;
+                prompt += `  * ${inquiry}\n`;
+                prompt += `  * ${answer}\n`;
+            });
+        }
         messages.push({ role: 'system', content: prompt });
     } else {
         console.error('No references to cite');
