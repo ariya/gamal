@@ -23,6 +23,7 @@ jobs:
           LLM_API_BASE_URL: ${{ secrets.LLM_API_BASE_URL }}
           LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
           LLM_CHAT_MODEL: ${{ secrets.LLM_CHAT_MODEL }}
+          LLM_JSON_SCHEMA: 1
 
   high-school-stem:
     runs-on: ubuntu-22.04
@@ -39,4 +40,5 @@ jobs:
           LLM_API_BASE_URL: ${{ secrets.LLM_API_BASE_URL }}
           LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
           LLM_CHAT_MODEL: ${{ secrets.LLM_CHAT_MODEL }}
+          LLM_JSON_SCHEMA: 1
 
