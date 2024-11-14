@@ -21,5 +21,5 @@ jobs:
         env:
           SEARXNG_URL: http://localhost:9000
           LLM_API_BASE_URL: http://127.0.0.1:8080/v1
-          LLM_CHAT_MODEL: 'llama3.2-3b'
+          LLM_CHAT_MODEL: 'qwen2.5-1.5b'
           LLM_JSON_SCHEMA: 1

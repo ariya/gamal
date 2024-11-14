@@ -11,7 +11,7 @@ runs:
 
     - name: Launch llama.cpp
       shell: bash
-      run: ./build/bin/llama-server -c 4096 --hf-repo lmstudio-community/Llama-3.2-3B-Instruct-GGUF --hf-file Llama-3.2-3B-Instruct-Q4_K_M.gguf &
+      run: ./build/bin/llama-server -c 4096 --hf-repo bartowski/Qwen2.5-1.5B-Instruct-GGUF --hf-file Qwen2.5-1.5B-Instruct-IQ4_XS.gguf &
 
     - name: Wait until it is ready
       shell: bash
