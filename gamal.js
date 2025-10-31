@@ -366,7 +366,7 @@ const chat = async (messages, schema, handler = null, attempt = MAX_RETRY_ATTEMP
                     if (choices) {
                         const [choice] = choices;
                         const { delta } = choice;
-                        partial = delta?.content;
+                        partial = delta?.content || '';
                     } else if (candidates) {
                         partial = extract(data);
                     }
