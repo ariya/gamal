@@ -4,6 +4,7 @@ const fs = require('fs');
 const http = require('http');
 const readline = require('readline');
 const { spawn } = require('child_process');
+const { Readable } = require('stream');
 
 const GAMAL_HTTP_PORT = process.env.GAMAL_HTTP_PORT;
 const GAMAL_TELEGRAM_TOKEN = process.env.GAMAL_TELEGRAM_TOKEN;
@@ -16,6 +17,11 @@ const LLM_API_BASE_URL = process.env.LLM_API_BASE_URL || 'https://openrouter.ai/
 const LLM_CHAT_MODEL = process.env.LLM_CHAT_MODEL || 'meta-llama/llama-3.1-8b-instruct';
 const LLM_STREAMING = process.env.LLM_STREAMING !== 'no';
 const LLM_JSON_SCHEMA = process.env.LLM_JSON_SCHEMA;
+
+const TTS_API_BASE_URL = process.env.TTS_API_BASE_URL;
+const TTS_API_KEY = process.env.TTS_API_KEY;
+
+
 
 const SEARXNG_URL = process.env.SEARXNG_URL || 'https://searx.foss.family'; // alternatively: 'https://search.mdosch.de'
 const TOP_K = 3;
@@ -98,63 +104,108 @@ const listen = (handler) => {
  * @param {string} language - the language of the text
  * @return {object} an object containing the speaker and piper processes
  */
-const speak = (text, language = 'en') => {
-    const lang = language.toUpperCase();
-    const ref = `PIPER_MODEL_${lang}`;
-    let model = process.env[ref];
-    if (!model || model.length <= 0) {
-        model = process.env.PIPER_MODEL;
-        if (model && model.length > 0) {
-            VOICE_DEBUG && console.log('Using fallback TTS model for', lang, model);
-        } else {
-            VOICE_DEBUG && console.log('TTS model is not available for', lang);
-        }
-    }
-
-    if (!model) {
+const speak = async (text, language = 'en') => {
+    if (!TTS_API_BASE_URL) {
         return;
     }
 
-    let buffer = text;
-    while (true) {
-        const index = buffer.indexOf('[citation:');
-        if (index < 0) {
-            break;
-        }
-        const number = buffer[index + 10];
-        if (number >= '0' && number <= '9') {
-            buffer = buffer.slice(0, index) + buffer.slice(index + 12);
+    const lang = language.toUpperCase();
+    const ref = `TTS_VOICE_${lang}`;
+    let voice = process.env[ref];
+    if (!voice || voice.length <= 0) {
+        voice = process.env.TTS_VOICE;
+        if (voice && voice.length > 0) {
+            VOICE_DEBUG && console.log('Using fallback TTS voice for', lang, voice);
+        } else {
+            VOICE_DEBUG && console.log('TTS voice is not available for', lang);
         }
     }
 
+    if (!voice) {
+        return;
+    }
+
+    const playable = await new Promise((resolve) => {
+        const process = spawn('play', ['--version'], { stdio: 'ignore' });
+        process.on('error', (err) => {
+            if (err.code === 'ENOENT') {
+                resolve(false);
+            } else {
+                resolve(true);
+            }
+        });
+        process.on('exit', () => {
+            resolve(true);
+        });
+    });
+
+    if (!playable) {
+        VOICE_DEBUG && console.error('Skipping audio playback. SoX is not available.');
+        return;
+    }
+
+
+    let input = text;
+    while (true) {
+        const index = input.indexOf('[citation:');
+        if (index < 0) {
+            break;
+        }
+        const number = input[index + 10];
+        if (number >= '0' && number <= '9') {
+            input = input.slice(0, index) + input.slice(index + 12);
+        }
+    }
+
+    const model = process.env.TTS_MODEL;
+    const format = 'pcm';
+    const response_format = format;
+    const speed = 1.0;
+    const body = { input, model, voice, format, response_format, speed };
+    const auth = (TTS_API_KEY) ? { 'Authorization': `Bearer ${TTS_API_KEY}` } : {};
+    const url = `${TTS_API_BASE_URL}/audio/speech`;
+
+
     try {
-        VOICE_DEBUG && console.log('Setting up play (from sox) for audio output...');
+        const timestamp = Date.now();
+        let elapsed = 0;
 
-        // quiet, lowest verbosity, pipe to stdin
+        VOICE_DEBUG && console.log(`Generating audio from text: ${input.length} characters...`)
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', ...auth },
+            body: JSON.stringify(body),
+        });
+        if (!response.ok) {
+            throw new Error(`HTTP error with the status: ${response.status} ${response.statusText}`);
+        }
+        const audio = Readable.fromWeb(response.body);
+        const args = '-q -V0 -t raw -b 16 -e signed -c 1 -r 24000 -'; // quiet, raw 24KHz PCM, single 16-bit, stdin
         const options = { stdio: ['pipe', 'pipe', 'inherit'] };
-        const speaker = spawn('play', ['-q', '-V0', '-'], options);
-        speaker.on('error', (err) => {
-            VOICE_DEBUG && console.log('play failed to run', err);
-        });
-        speaker.on('exit', (code) => {
-            VOICE_DEBUG && console.log('play finished with', code);
+        const speaker = spawn('play', args.split(' '), options);
+
+        audio.pipe(speaker.stdin);
+        audio.on('data', () => {
+            if (elapsed <= 0) {
+                elapsed = Date.now() - timestamp;
+                VOICE_DEBUG && console.log(`First audio chunk received in ${elapsed} ms.`);
+            }
         });
 
-        // quiet, pipe to stdout
-        const piper = spawn('piper', ['--quiet', '--model', model, '-f', '-'], options);
-        piper.on('error', (err) => {
-            VOICE_DEBUG && console.log('piper failed to run', err);
+        await new Promise((resolve) => {
+            speaker.on('error', (err) => {
+                console.error('play failed to run:', err);
+                resolve();
+            });
+            speaker.on('exit', (code) => {
+                VOICE_DEBUG && console.log('play finished with exit code', code);
+                resolve();
+            });
         });
-        piper.on('exit', (code) => {
-            VOICE_DEBUG && console.log('piper finished with', code);
-        });
-        piper.stdout.pipe(speaker.stdin);
-        piper.stdin.write(buffer);
-        piper.stdin.end();
-
-        return { speaker, piper };
+        return { speaker, audio };
     } catch (e) {
-        VOICE_DEBUG && console.error('TTS failed:', e);
+        console.error('Error synthesizing speech', e);
+        throw e;
     }
 };
 
@@ -1262,12 +1313,8 @@ const interact = async () => {
             const { topic, thought, keyphrases } = result;
             const duration = Date.now() - start;
             const { answer, language, references } = result;
-            const tts = speak(answer, iso6391(language) || 'en');
-            if (tts) {
-                tts.speaker.on('exit', prepare);
-            } else {
-                prepare();
-            }
+            await speak(answer, iso6391(language) || 'en');
+            await prepare();
             if (references && Array.isArray(references)) {
                 if (references.length > 0 && references.length >= refs.length) {
                     console.log();

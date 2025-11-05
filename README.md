@@ -58,9 +58,14 @@ With the integration of third-party tools, Gamal can engage in conversations usi
 
 For automatic speech recognition (ASR), also known as speech-to-text (STT), Gamal leverages the streaming tool from [whisper.cpp](https://github.com/ggerganov/whisper.cpp). Ensure that `whisper-cpp-stream`, or the custom executable specified in the `WHISPER_STREAM` environment variable, is available in your system's path. Whisper requires a GGML model, which can be downloaded from [Hugging Face](https://huggingface.co/ggerganov/whisper.cpp). The [base model](https://huggingface.co/ggerganov/whisper.cpp/blob/main/ggml-base.en-q5_1.bin) (60 MB) is generally a good balance between accuracy and speed for most modern computers. Set the `WHISPER_MODEL` environment variable to the full path of the downloaded model.
 
-To enable Gamal to respond with voice instead of just text, install [Piper](https://github.com/rhasspy/piper) for text-to-speech (TTS) conversion. Piper can be installed via Nixpkg (the `piper-tts` package). Piper also requires a [voice model](https://huggingface.co/rhasspy/piper-voices), which can be downloaded from sources like [ryan-medium](https://huggingface.co/rhasspy/piper-voices/tree/main/en/en_US/ryan/medium). Make sure to download both the ONNX model file (63 MB) and the corresponding config JSON. Before running Gamal, set the `PIPER_MODEL` environment variable to the full path of the voice model.
+To enable Gamal to respond with voice instead of just text, set the environment variables to configure any TTS API compatible with the OpenAI Speech API. For example, a good local TTS with Kokoro-82M can be set up with either [Kokoro-FastAPI](https://github.com/remsky/Kokoro-FastAPI) (with pre-downloaded voice weights) or [Speaches](https://speaches.ai) (ensure that the chosen voice weights are downloaded), and then:
 
-The synthesized audio will be played back through the speaker or other audio output using the `play` utility from the [SOX (Sound eXchange project)](https://sourceforge.net/projects/sox/). Ensure that SOX is installed and available in your system's path.
+```
+export TTS_API_BASE_URL=http://127.0.0.1:8880/v1
+export TTS_VOICE="af_bella"
+```
+
+Gamal will detect this TTS API service and use it to generate the corresponding audio. Note that the synthesized audio will be played back through the speaker or other audio output using the `play` utility from the [SOX (Sound eXchange) project](https://sourceforge.net/projects/sox/). Ensure that SOX is installed and available in your system's PATH.
 
 ## Using Other LLM Services
 
